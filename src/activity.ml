@@ -89,22 +89,34 @@ let pp ppf { projects; activity = { username; activity } } =
     Fmt.(list (fun ppf s -> Fmt.pf ppf "- %s" s))
     projects (pp_last_week username) projects pp_activity activity
 
-let run ~cal ~projects { token } =
-  let from, to_ = Calendar.github_week cal in
-  let variables = [ ("from", `String from); ("to", `String to_) ] in
-  let fetch_params =
-    Gql.
-      {
-        query = Get_activity.Contributions.query;
-        variables = Some variables;
-        endpoint = Get_activity.Graphql.graphql_endpoint;
-        token;
-      }
-  in
-  Gql.raw_fetch fetch_params >|= Result.map Yojson.Safe.from_string
-  >>= fun json ->
-  match json with
-  | Ok json ->
-      let activity = Get_activity.Contributions.of_json ~from json in
-      Lwt.return (Ok { projects; activity })
-  | Error _ as e -> Lwt.return e
+let run ?(no_activity = false) ~cal ~projects { token } =
+  if no_activity then
+    Lwt.return
+      (Ok
+         {
+           projects;
+           activity =
+             {
+               username = "<USERNAME>";
+               activity = Get_activity.Contributions.Repo_map.empty;
+             };
+         })
+  else
+    let from, to_ = Calendar.github_week cal in
+    let variables = [ ("from", `String from); ("to", `String to_) ] in
+    let fetch_params =
+      Gql.
+        {
+          query = Get_activity.Contributions.query;
+          variables = Some variables;
+          endpoint = Get_activity.Graphql.graphql_endpoint;
+          token;
+        }
+    in
+    Gql.raw_fetch fetch_params >|= Result.map Yojson.Safe.from_string
+    >>= fun json ->
+    match json with
+    | Ok json ->
+        let activity = Get_activity.Contributions.of_json ~from json in
+        Lwt.return (Ok { projects; activity })
+    | Error _ as e -> Lwt.return e

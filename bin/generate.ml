@@ -61,31 +61,46 @@ let token =
           ~/.github/github-activity-token"
        ~docv:"TOKEN" [ "t"; "token" ]
 
+let no_activity =
+  Arg.value
+  @@ Arg.flag
+  @@ Arg.info
+       ~doc:
+         "The --no-activity flag will disable any attempt to generate activity \
+          reports from Github"
+       ~docv:"NO-ACTIVITY" [ "no-activity" ]
+
 let get_or_error = function
   | Ok v -> v
   | Error (`Msg m) ->
       Fmt.epr "%s" m;
       exit 1
 
-let run cal projects conf =
+let run cal projects conf no_activity =
   let open Lwt_result.Infix in
   let res =
-    Lwt_main.run (Activity.run ~cal ~projects conf >|= Fmt.pr "%a" Activity.pp)
+    Lwt_main.run
+      (Activity.run ~no_activity ~cal ~projects conf >|= Fmt.pr "%a" Activity.pp)
   in
   get_or_error res
 
 let term =
-  let make_with_file cal okra_file token_file =
-    let token = get_or_error @@ Get_activity.Token.load token_file in
+  let make_with_file cal okra_file token_file no_activity =
+    let token =
+      (* If no_activity is passed token won't be used *)
+      if no_activity then ""
+      else get_or_error @@ Get_activity.Token.load token_file
+    in
     let okra_conf =
       match get_or_error @@ Bos.OS.File.exists (Fpath.v okra_file) with
       | false -> Conf.default
       | true -> get_or_error @@ Conf.load okra_file
     in
     let conf = Activity.make_conf token in
-    run cal (Conf.projects okra_conf) conf
+    run cal (Conf.projects okra_conf) conf no_activity
   in
-  Term.(const make_with_file $ calendar_term $ Conf.cmdliner $ token)
+  Term.(
+    const make_with_file $ calendar_term $ Conf.cmdliner $ token $ no_activity)
 
 let cmd =
   let info =

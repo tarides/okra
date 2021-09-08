@@ -31,10 +31,13 @@ val pp : t Fmt.t
     editing to get it into the correct format. *)
 
 val run :
+  ?no_activity:bool ->
   cal:Calendar.t ->
   projects:string list ->
   conf ->
   (t, [ `Msg of string ]) Lwt_result.t
-(** [run ~cal ~projects conf] produces an activity report for the week and year
-    specified by [cal] using the configuration [conf]. The [projects] should be
-    a list of KRs formatted as [<kr-title> (<kr-id>)] *)
+(** [run ?no_activity ~cal ~projects conf] produces an activity report for the
+    week and year specified by [cal] using the configuration [conf]. The
+    [projects] should be a list of KRs formatted as [<kr-title> (<kr-id>)].
+    [no_activity] can disable any attempt to retrieve activities (leaving them
+    empty), by default it is set to [false]. *)

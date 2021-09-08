@@ -21,3 +21,4 @@
   calendar
   (yaml (>= 3.0))
   (omd (>= 2.0))))
+(using mdx 0.1)
