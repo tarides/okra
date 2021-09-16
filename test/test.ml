@@ -20,4 +20,5 @@ let () =
       ("Calendar", Test_calendar.tests);
       ("Lint", Test_lint.tests);
       ("Aggregate", Test_aggregate.tests);
+      ("Spec", Test_spec.tests);
     ]

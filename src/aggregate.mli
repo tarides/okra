@@ -34,6 +34,7 @@ type t = {
 }
 (** TODO: make it abstract *)
 
+val inline : 'a Omd.inline -> string list
 val compare : t -> t -> int
 
 module Weekly : sig

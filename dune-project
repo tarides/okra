@@ -30,5 +30,6 @@
   fmt
   get-activity
   calendar
+  ppx_deriving_yojson
   (omd (>= 2.0))))
 (using mdx 0.1)
