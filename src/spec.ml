@@ -1,5 +1,8 @@
 module Kr = struct
-  type schedule = Quarterly of [ `Q1 | `Q2 | `Q3 | `Q4 ] * int | Rolling
+  type schedule =
+    | Quarterly of [ `Q1 | `Q2 | `Q3 | `Q4 ] * int
+    | Rolling
+    | Unknown
   [@@deriving yojson]
 
   type status =
@@ -28,6 +31,7 @@ module Kr = struct
     | Quarterly (q, i) ->
         "(" ^ quarter_to_string q ^ " " ^ string_of_int i ^ ")"
     | Rolling -> "(rolling)"
+    | Unknown -> "()"
 
   let status_of_string s =
     match String.lowercase_ascii s with
@@ -37,6 +41,7 @@ module Kr = struct
     | "blocked" -> Blocked
     | "unfunded" -> Unfunded
     | "scheduled (rolling)" -> Scheduled Rolling
+    | "scheduled ()" -> Scheduled Unknown
     | s -> (
         match String.split_on_char ' ' s with
         | [ "scheduled"; quarter; year ] ->

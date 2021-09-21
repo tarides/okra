@@ -1,5 +1,8 @@
 module Kr : sig
-  type schedule = Quarterly of [ `Q1 | `Q2 | `Q3 | `Q4 ] * int | Rolling
+  type schedule =
+    | Quarterly of [ `Q1 | `Q2 | `Q3 | `Q4 ] * int
+    | Rolling
+    | Unknown
   [@@deriving yojson]
 
   type status =
