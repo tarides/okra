@@ -18,7 +18,8 @@
   cmdliner
   bos
   (yaml (>= 3.0))
-  (cohttp-lwt-unix (>= 4.0.0))))
+  (cohttp-lwt-unix (>= 4.0.0))
+  tls))
 
 (package
  (name okra)
