@@ -144,5 +144,8 @@ let tests =
     ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time1.rej");
     ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time2.rej");
     ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time3.rej");
+    ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time4.rej");
+    ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time5.rej");
+    ("Invalid_time", `Quick, test_invalid_time "./lint/invalid-time6.rej");
     ("Valid_time", `Quick, test_valid_time "./lint/valid-time1.acc");
   ]

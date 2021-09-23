@@ -60,7 +60,8 @@ let string_of_result res =
         s
   | Invalid_time s ->
       Fmt.pf ppf
-        "Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days)'\n\
+        "Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days) \
+         where x is multiple of 0.5'\n\
          Error: %s\n"
         s
   | Multiple_time_entries s ->
