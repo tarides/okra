@@ -87,6 +87,19 @@ let calendar_term : Calendar.t Term.t =
   | None, Some range, _, year -> Calendar.of_week_range ?year range
   | None, None, Some month, year -> Calendar.of_month ?year month
 
+let user_term : Get_activity.Contributions.user Term.t =
+  let open Let_syntax_cmdliner in
+  let+ opt =
+    Arg.value
+    @@ Arg.opt Arg.(some string) None
+    @@ Arg.info
+         ~doc:"Generate a report for this github user (defaults to viewer)"
+         ~docv:"USER" [ "user" ]
+  in
+  match opt with
+  | None -> Get_activity.Contributions.Viewer
+  | Some s -> Explicit s
+
 (* The kind of report we are generating
      - engineer: a report for an individual engineer
      - reposiories: 1 or more repository contributions *)
@@ -172,7 +185,7 @@ let fetch ~token ~period =
   Gitlab.make_activity ~token ~before ~after
 
 let run_engineer conf cal projects token no_activity no_links with_repositories
-    =
+    user =
   let open Lwt.Syntax in
   let period = Calendar.to_iso8601 cal in
   let week = Calendar.week cal in
@@ -183,7 +196,7 @@ let run_engineer conf cal projects token no_activity no_links with_repositories
         [] )
     else
       let contributions () =
-        let+ fetch = Fetch.exec ~period ~token
+        let+ fetch = Fetch.exec ~user ~period ~token
         and+ report =
           (* When a user specifies `with_repositories` we also fetch reports
              from these repositories and filter the PRs made over the same
@@ -250,10 +263,10 @@ let run_monthly cal repos token with_names with_times with_descriptions =
       projects)
 
 let run cal okra_conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos = function
+    with_descriptions with_repositories repos user = function
   | Engineer ->
       run_engineer okra_conf cal (Conf.projects okra_conf) token no_activity
-        no_links with_repositories
+        no_links with_repositories user
   | Repository ->
       run_monthly cal repos token with_names with_times with_descriptions
 
@@ -270,6 +283,7 @@ let term =
   and+ with_descriptions = with_descriptions_term
   and+ repos = repositories
   and+ okra_conf = Common.conf
+  and+ user = user_term
   and+ () = Common.setup () in
   let token =
     (* If [no_activity] is specfied then the token will not be used, don't try
@@ -278,7 +292,7 @@ let term =
     else get_or_error @@ Get_activity.Token.load token_file
   in
   run cal okra_conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos kind
+    with_descriptions with_repositories repos user kind
 
 let cmd =
   let info =

@@ -1,3 +1,3 @@
 pin-depends: [
-  ["get-activity.dev" "git+https://github.com/patricoferris/get-activity#e63fe7b6e56aabbcd2693e7d1bf64a793fd18593"]
+  ["get-activity.dev" "git+https://github.com/emillon/get-activity#a2dc8f80fa353811e3be237ff8968c6f38b4c637"]
 ]
