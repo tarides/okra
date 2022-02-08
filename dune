@@ -1,0 +1,3 @@
+(dirs :standard \ var)
+
+(vendored_dirs ocaml-gitlab)
