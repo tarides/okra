@@ -85,6 +85,7 @@ let make ~projects activity = { projects; activity }
 
 let pp ?(gitlab = false) ?(no_links = false) () ppf
     { projects; activity = { username; activity } } =
+  let newline fs () = Fmt.pf fs "@\n" in
   Fmt.pf ppf
     {|# Projects
 
@@ -97,7 +98,7 @@ let pp ?(gitlab = false) ?(no_links = false) () ppf
 
 %a
 |}
-    Fmt.(list (fun ppf s -> Fmt.pf ppf "- %s" s))
+    Fmt.(list ~sep:newline (fun ppf s -> Fmt.pf ppf "- %s" s))
     (List.map title projects) (pp_last_week username) projects
     (pp_activity ~gitlab ~no_links ())
     activity
