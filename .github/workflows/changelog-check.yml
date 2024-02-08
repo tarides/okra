@@ -11,5 +11,3 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: tarides/changelog-check-action@v2
-        with:
-          changelog: CHANGELOG
