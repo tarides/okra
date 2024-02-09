@@ -16,8 +16,14 @@
 
 open Cmdliner
 
+let get_or_error = function
+  | Ok v -> v
+  | Error (`Msg m) ->
+      Fmt.epr "%s" m;
+      exit 1
+
 let lint t =
-  let repo = Common.repo t in
+  let repo = get_or_error @@ Common.repo t in
   let weeks = Common.weeks t in
   let year = Common.year t in
   let teams = Common.teams t in
@@ -25,7 +31,7 @@ let lint t =
   Format.printf "%a" Okra.Team.pp_lint_report lint_report
 
 let aggregate t =
-  let repo = Common.repo t in
+  let repo = get_or_error @@ Common.repo t in
   let okr_db = Common.okr_db t in
   let teams = Common.teams t in
   let year = Common.year t in

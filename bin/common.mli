@@ -28,7 +28,7 @@ val in_place : bool Term.t
 
 val okr_db : t -> Okra.Masterdb.t option
 val filter : t -> Okra.Filter.t
-val repo : t -> string
+val repo : t -> (string, [ `Msg of string ]) result
 val output : ?input_files:string list -> ?in_place:bool -> t -> out_channel
 val conf : t -> Conf.t
 

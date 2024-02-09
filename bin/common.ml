@@ -392,7 +392,14 @@ let filter t =
       Okra.Filter.union t.filter extra_filter
 
 let repo t =
-  match t.repo with Some x -> x | None -> Option.get (Conf.admin_dir t.conf)
+  match t.repo with
+  | Some x -> Ok x
+  | None ->
+      Option.to_result (Conf.admin_dir t.conf)
+        ~none:
+          (`Msg
+            "Missing [-C] or [--repo-dir] argument, or [admin_dir] \
+             configuration.")
 
 let date t = t.calendar
 let year t = Okra.Calendar.year t.calendar

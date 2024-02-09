@@ -1,5 +1,6 @@
 ## Changes (unreleased)
 
+- Fail with an explicit error message when --repo-dir is missing (#<PR_NUMBER>, @gpetiot)
 - Remove not-so-useful Unicode characters from output for a11y accessibility (#151, @shindere)
 - Add missing linebreaks in the project list of activity report (#148, @gpetiot)
 - Use ocamlformat 0.21.0

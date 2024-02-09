@@ -14,3 +14,9 @@ Team Lint example
                         Line 5: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                         2 formatting errors found. Parsing aborted.
       + Report week 42: Not found: admin//weekly/2022/42/eng2.md
+
+Missing [--repo-dir] argument:
+
+  $ okra team lint -W 40-42 -y 2022 --conf ./conf.yml
+  Missing [-C] or [--repo-dir] argument, or [admin_dir] configuration, using "./" instead.
+  [1]
