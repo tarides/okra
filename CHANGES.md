@@ -1,6 +1,6 @@
 ## Changes (unreleased)
 
-- Remove not-so-useful Unicode characters from output
+- Remove not-so-useful Unicode characters from output for a11y accessibility (#151, @shindere)
 - Add missing linebreaks in the project list of activity report (#148, @gpetiot)
 - Use ocamlformat 0.21.0
 - CSV parsing updates. Include new fields for reports and links. (@magnuss)
