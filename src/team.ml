@@ -65,10 +65,10 @@ let lint admin_dir ~year ~weeks teams =
   List.map (fun team -> (team, lint_team (members team))) teams
 
 let pp_report ppf = function
-  | Not_found fpath -> Fmt.pf ppf "Not found: %s ❌" fpath
-  | Complete _ -> Fmt.pf ppf "Complete ✅"
+  | Not_found fpath -> Fmt.pf ppf "Not found: %s" fpath
+  | Complete _ -> Fmt.pf ppf "Complete"
   | Erroneous (fpath, e) ->
-      Fmt.pf ppf "Lint error at %s ⚠️@ @[<v 0>%a@]" fpath Lint.pp_error e
+      Fmt.pf ppf "Lint error at %s @[<v 0>%a@]" fpath Lint.pp_error e
 
 let pp_lint_report ppf lint_report =
   let pp_report_lint ppf (week, report) =
