@@ -18,5 +18,5 @@ Team Lint example
 Missing [--repo-dir] argument:
 
   $ okra team lint -W 40-42 -y 2022 --conf ./conf.yml
-  Missing [-C] or [--repo-dir] argument, or [admin_dir] configuration, using "./" instead.
+  Missing [-C] or [--repo-dir] argument, or [admin_dir] configuration.
   [1]
