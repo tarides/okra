@@ -1,3 +1,6 @@
+version
+: 0.1
+
 # Projects
 
 - Make Okra, the OKR management tool (OKR1)

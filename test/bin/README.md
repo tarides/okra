@@ -210,6 +210,9 @@ And here's an example of a well-formatted report:
 <!-- $MDX dir=files -->
 ```sh
 $ cat bactrian.good.md
+version
+: 0.1
+
 # Projects
 
 - Make Okra, the OKR management tool (OKR1)
