@@ -16,6 +16,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+exception No_version_found
+exception Invalid_version of string
+exception Unsupported_version of string
 exception No_time_found of string
 exception Multiple_time_entries of string
 exception Invalid_time of string
@@ -24,14 +27,17 @@ exception No_KR_ID_found of string
 exception No_project_found of string
 exception Not_all_includes_accounted_for of string list
 
-type markdown = (string * string) list Omd.block list
+type markdown = Omd.doc
 (** The type for markdown files. *)
+
+type metadata = { version : Version.Lang.t }
+type weekly = { meta : metadata; doc : KR.t list }
 
 val of_markdown :
   ?ignore_sections:string list ->
   ?include_sections:string list ->
   markdown ->
-  KR.t list
+  weekly
 (** Process markdown data from omd. Optionally [ignore_sections] can be used to
     ignore specific sections, or [include_sections] can be used to only process
     specific sections. *)

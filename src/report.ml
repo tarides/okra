@@ -238,7 +238,8 @@ let of_objectives ~project objectives =
   of_projects [ p ]
 
 let of_markdown ?existing_report ?ignore_sections ?include_sections ?okr_db m =
-  let new_krs = Parser.of_markdown ?ignore_sections ?include_sections m in
+  let weekly = Parser.of_markdown ?ignore_sections ?include_sections m in
+  let new_krs = weekly.doc in
   let old_krs = match existing_report with None -> [] | Some t -> all_krs t in
   let krs = old_krs @ new_krs in
   of_krs ?okr_db krs

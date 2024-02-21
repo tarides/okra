@@ -17,6 +17,9 @@
 
 type lint_error =
   | Format_error of (int * string) list
+  | No_version_found
+  | Invalid_version of int option * string
+  | Unsupported_version of int option * string
   | No_time_found of int option * string
   | Invalid_time of int option * string
   | Multiple_time_entries of int option * string
@@ -52,6 +55,11 @@ let pp_error ppf = function
       Fmt.pf ppf "@[<v 0>%a@,%d formatting errors found. Parsing aborted.@]"
         (Fmt.list ~sep:Fmt.sp pp_msg)
         x (List.length x)
+  | No_version_found ->
+      Fmt.pf ppf "Missing version at the beginning of the file"
+  | Invalid_version (_, s) -> Fmt.pf ppf "@[<hv 2>Invalid version: %S@]@," s
+  | Unsupported_version (_, s) ->
+      Fmt.pf ppf "@[<hv 2>Unsupported version: %S@]@," s
   | No_time_found (_, s) ->
       Fmt.pf ppf
         "@[<hv 2>In KR %S:@ No time entry found. Each KR must be followed by \
@@ -109,10 +117,14 @@ let check_document ?okr_db ~include_sections ~ignore_sections s =
   in
   try
     let md = Omd.of_string s in
-    let okrs = Parser.of_markdown ~include_sections ~ignore_sections md in
-    let _report = Report.of_krs ?okr_db okrs in
+    let weekly = Parser.of_markdown ~include_sections ~ignore_sections md in
+    let _report = Report.of_krs ?okr_db weekly.doc in
     Ok ()
   with
+  | Parser.No_version_found -> Error No_version_found
+  | Parser.Invalid_version s -> Error (Invalid_version (grep_n s lines, s))
+  | Parser.Unsupported_version s ->
+      Error (Unsupported_version (grep_n s lines, s))
   | Parser.No_time_found s -> Error (No_time_found (grep_n s lines, s))
   | Parser.Invalid_time s -> Error (Invalid_time (grep_n s lines, s))
   | Parser.Multiple_time_entries s ->
@@ -172,6 +184,12 @@ let short_messages_of_error file_name =
       List.concat_map
         (fun (line_number, message) -> short_message line_number message)
         errs
+  | No_version_found ->
+      short_message 0 "No version found at the beginninf of the file"
+  | Invalid_version (line_number, s) ->
+      short_messagef line_number "Invalid version: %S" s
+  | Unsupported_version (line_number, s) ->
+      short_messagef line_number "Unsupported version: %S" s
   | No_time_found (line_number, kr) ->
       short_messagef line_number "No time found in %S" kr
   | Invalid_time (line_number, kr) ->

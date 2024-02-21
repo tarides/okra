@@ -21,6 +21,9 @@ let src = Logs.Src.create "okra.parser"
 module Log = (val Logs.src_log src : Logs.LOG)
 open Omd
 
+exception No_version_found
+exception Invalid_version of string
+exception Unsupported_version of string
 exception No_time_found of string (* Record found without a time record *)
 exception Invalid_time of string (* Time record found, but has errors *)
 exception No_work_found of string (* No work items found under KR *)
@@ -40,7 +43,9 @@ type t =
   | Work of Item.t list (* Work items *)
   | Time of string
 
-type markdown = (string * string) list Omd.block list
+type markdown = Omd.doc
+type metadata = { version : Version.Lang.t }
+type weekly = { meta : metadata; doc : KR.t list }
 
 let okr_re = Str.regexp "\\(.+\\) (\\([a-zA-Z#]+[0-9]+\\))$"
 (* Header: This is a legacy KR (KR12) *)
@@ -270,10 +275,13 @@ type state = {
   mutable current_proj : string;
   ignore_sections : string list;
   include_sections : string list;
+  meta : metadata;
 }
+[@@warning "-69"]
+(* Suppressing the warning about [meta] not being used. *)
 
-let init ?(ignore_sections = []) ?(include_sections = []) () =
-  { current_o = ""; current_proj = ""; ignore_sections; include_sections }
+let init ?(ignore_sections = []) ?(include_sections = []) ~meta () =
+  { current_o = ""; current_proj = ""; ignore_sections; include_sections; meta }
 
 let ignore_section t =
   match t.ignore_sections with
@@ -330,6 +338,23 @@ let process_block state acc = function
       (* FIXME: also keep floating text *)
       acc
 
+let process_metadata = function
+  | Definition_list
+      ([], [ { term = Text ([], "version"); defs = [ Text ([], s) ] } ])
+    :: ast -> (
+      match Version.Lang.of_string s with
+      | Ok v ->
+          if Version.Lib.can_read ~lang:v Version.current then ()
+          else raise (Unsupported_version s);
+          ({ version = v }, ast)
+      | Error _ -> raise (Invalid_version s))
+  | ast ->
+      (* Ok for the first release, but we should [raise No_version_found]
+         starting from the second release., and [version] should not be an
+         [option] anymore. *)
+      let first_version = Version.Lang.{ major = 0; minor = 1 } in
+      ({ version = first_version }, ast)
+
 let process t ast = List.fold_left (process_block t) ([], []) ast
 
 let check_includes u_includes (includes : string list) =
@@ -345,7 +370,10 @@ let of_markdown ?(ignore_sections = [ "OKR Updates" ]) ?(include_sections = [])
     ast =
   let u_ignore = List.map String.uppercase_ascii ignore_sections in
   let u_include = List.map String.uppercase_ascii include_sections in
-  let state = init ~ignore_sections:u_ignore ~include_sections:u_include () in
+  let meta, ast = process_metadata ast in
+  let state =
+    init ~ignore_sections:u_ignore ~include_sections:u_include ~meta ()
+  in
   let includes, krs = process state ast in
   check_includes u_include (List.sort_uniq String.compare includes);
-  List.rev krs
+  { meta; doc = List.rev krs }

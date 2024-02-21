@@ -1,6 +1,23 @@
 Types of errors
 ---------------
 
+Invalid version:
+
+  $ okra lint << EOF
+  > version
+  > : ~-100.0
+  > 
+  > # Title
+  > 
+  > - This is a KR
+  >   - @eng1 (1 day)
+  >   - My work
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  Invalid version: "~-100.0"
+  [1]
+
 No KR ID found:
 
   $ okra lint << EOF

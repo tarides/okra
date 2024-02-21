@@ -1,4 +1,14 @@
 (library
  (name okra)
  (public_name okra)
- (libraries lwt logs omd fmt str calendar csv get-activity gitlab))
+ (libraries
+  dune-build-info
+  lwt
+  logs
+  omd
+  fmt
+  str
+  calendar
+  csv
+  get-activity
+  gitlab))

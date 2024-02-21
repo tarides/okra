@@ -17,6 +17,9 @@
 
 type lint_error =
   | Format_error of (int * string) list
+  | No_version_found
+  | Invalid_version of int option * string
+  | Unsupported_version of int option * string
   | No_time_found of int option * string
   | Invalid_time of int option * string
   | Multiple_time_entries of int option * string
