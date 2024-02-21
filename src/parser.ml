@@ -350,8 +350,7 @@ let process_metadata = function
       | Error _ -> raise (Invalid_version s))
   | ast ->
       (* Ok for the first release, but we should [raise No_version_found]
-         starting from the second release., and [version] should not be an
-         [option] anymore. *)
+         starting from the second release. *)
       let first_version = Version.Lang.{ major = 0; minor = 1 } in
       ({ version = first_version }, ast)
 
