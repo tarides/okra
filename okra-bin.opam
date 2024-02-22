@@ -2,11 +2,11 @@
 opam-version: "2.0"
 synopsis: "Report parsing executable"
 description: "An executable to be used for report parsing"
-maintainer: ["magnus@skjegstad.com"]
+maintainer: ["Guillaume Petiot <guillaume@tarides.com>"]
 authors: ["Magnus Skjegstad"]
 license: "ISC"
-homepage: "https://github.com/MagnusS/okra"
-bug-reports: "https://github.com/MagnusS/okra/issues"
+homepage: "https://github.com/tarides/okra"
+bug-reports: "https://github.com/tarides/okra/issues"
 depends: [
   "dune" {>= "3.7"}
   "alcotest" {>= "1.7.0" & with-test}
@@ -38,4 +38,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/MagnusS/okra.git"
+dev-repo: "git+https://github.com/tarides/okra.git"

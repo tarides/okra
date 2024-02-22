@@ -8,8 +8,8 @@
 
 (license ISC)
 (authors "Magnus Skjegstad")
-(maintainers "magnus@skjegstad.com")
-(source (github MagnusS/okra))
+(maintainers "Guillaume Petiot <guillaume@tarides.com>")
+(source (github tarides/okra))
 
 (package
  (name okra-bin)

@@ -2,11 +2,11 @@
 opam-version: "2.0"
 synopsis: "Report parsing prototypes"
 description: "A library of tools for report parsing"
-maintainer: ["magnus@skjegstad.com"]
+maintainer: ["Guillaume Petiot <guillaume@tarides.com>"]
 authors: ["Magnus Skjegstad"]
 license: "ISC"
-homepage: "https://github.com/MagnusS/okra"
-bug-reports: "https://github.com/MagnusS/okra/issues"
+homepage: "https://github.com/tarides/okra"
+bug-reports: "https://github.com/tarides/okra/issues"
 depends: [
   "dune" {>= "3.7"}
   "ocaml" {>= "4.10"}
@@ -37,7 +37,7 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/MagnusS/okra.git"
+dev-repo: "git+https://github.com/tarides/okra.git"
 pin-depends: [
   ["get-activity.dev" "git+https://github.com/patricoferris/get-activity#a384724b4630031e07c2f2962f44bf76378685d8"]
 ]
