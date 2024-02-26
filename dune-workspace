@@ -1,5 +1,6 @@
 (lang dune 3.7)
-
+(lock_dir
+  (repositories mock))
 (repository
   (name tarides)
   (source "git@github.com:tarides/opam-repository.git"))
