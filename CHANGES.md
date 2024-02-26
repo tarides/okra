@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Depend on get-activity >= 0.2.0 (#<PR_NUMBER>, @gpetiot)
+- Depend on get-activity >= 0.2.0 (#162, @gpetiot)
 
 ## 0.1
 
