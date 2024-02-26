@@ -23,6 +23,7 @@ depends: [
   "omd" {>= "2.0.0~alpha3"}
   "odoc" {with-doc}
 ]
+dev-repo: "git+https://github.com/tarides/okra.git"
 build: [
   ["dune" "subst"] {dev}
   [
@@ -36,5 +37,5 @@ build: [
     "@runtest" {with-test}
     "@doc" {with-doc}
   ]
+  ["opam" "repository" "add" "tarides" "git+https://github.com/tarides/opam-repository"]
 ]
-dev-repo: "git+https://github.com/tarides/okra.git"

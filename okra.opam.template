@@ -1,0 +1,15 @@
+build: [
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+  ["opam" "repository" "add" "tarides" "git+https://github.com/tarides/opam-repository"]
+]
