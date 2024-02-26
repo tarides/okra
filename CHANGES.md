@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Rename the opam packages (#<PR_NUMBER>, @gpetiot)
+- Rename the opam packages (#164, @gpetiot)
   + `okra` is renamed `okra-lib`
   + `okra-bin` is renamed `okra`
 - Depend on get-activity >= 0.2.0 (#162, @gpetiot)
