@@ -1,4 +1,5 @@
 build: [
+  ["opam" "repository" "add" "tarides" "git@github.com:tarides/opam-repository.git"]
   ["dune" "subst"] {dev}
   [
     "dune"
@@ -11,5 +12,4 @@ build: [
     "@runtest" {with-test}
     "@doc" {with-doc}
   ]
-  ["opam" "repository" "add" "tarides" "git+https://github.com/tarides/opam-repository"]
 ]
