@@ -42,7 +42,7 @@
   (lwt (>= 5.6.1))
   (tls-lwt (>= 0.17.0))
   xdg
-  get-activity
+  (get-activity-lib (>= 0.2.0))
   (gitlab (>= 0.1.7))
   (calendar (>= 3.0.0))
   (csv (>= 2.4))

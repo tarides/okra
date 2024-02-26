@@ -315,7 +315,7 @@ let parse_data (from, to_) org repo json =
 let add_list s v t = Project_map.add s v t
 
 module Make (C : Cohttp_lwt.S.Client) = struct
-  module Fetch = Get_activity.Graphql.Make (C)
+  module Fetch = Get_activity.Graphql
 
   let exec ?before_pr ?before_issue ~period:_ ~token query =
     let variables =
@@ -324,7 +324,7 @@ module Make (C : Cohttp_lwt.S.Client) = struct
         ("before_issue", Option.value ~default:`Null before_issue);
       ]
     in
-    Fetch.exec token ~variables query
+    Fetch.exec ~token ~variables ~query ()
 
   let merge_data datas =
     let first, rest =

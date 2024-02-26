@@ -82,7 +82,7 @@ let token =
           ~/.github/github-activity-token"
        ~docv:"TOKEN" [ "token" ]
 
-module Fetch = Get_activity.Contributions.Fetch (Cohttp_lwt_unix.Client)
+module Fetch = Get_activity.Contributions
 module Repo_fetch = Okra.Repo_report.Make (Cohttp_lwt_unix.Client)
 
 module Time = struct
@@ -116,7 +116,7 @@ let run_engineer ppf conf cal projects token no_activity no_links
         [] )
     else
       let contributions () =
-        let+ fetch = Fetch.exec ~period ~token
+        let+ fetch = Lwt.return @@ Fetch.fetch ~period ~token
         and+ report =
           (* When a user specifies `with_repositories` we also fetch reports
              from these repositories and filter the PRs made over the same time

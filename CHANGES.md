@@ -1,3 +1,9 @@
+## unreleased
+
+### Changed
+
+- Depend on get-activity >= 0.2.0 (#<PR_NUMBER>, @gpetiot)
+
 ## 0.1
 
 ### Added
