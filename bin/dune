@@ -1,9 +1,9 @@
 (executable
  (name main)
- (package okra-bin)
+ (package okra)
  (public_name okra)
  (libraries
-  okra
+  okra-lib
   cmdliner
   bos
   yaml

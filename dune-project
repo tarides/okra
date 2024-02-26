@@ -12,7 +12,7 @@
 (source (github tarides/okra))
 
 (package
- (name okra-bin)
+ (name okra)
  (synopsis "Report parsing executable")
  (description "An executable to be used for report parsing")
  (depends
@@ -22,7 +22,7 @@
    tls-lwt
    xdg
   (fmt (>= 0.9.0))
-  (okra (= :version))
+  (okra-lib (= :version))
   (cmdliner (>= 1.1.1))
   (ppx_deriving_yaml (>= 0.2.0))
   bos
@@ -31,7 +31,7 @@
   (cohttp-lwt-unix (>= 5.0.0))))
 
 (package
- (name okra)
+ (name okra-lib)
  (synopsis "Report parsing prototypes")
  (description "A library of tools for report parsing")
  (depends

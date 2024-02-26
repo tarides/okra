@@ -1,7 +1,7 @@
 (executable
  (name test)
  (modules test)
- (libraries okra logs.fmt))
+ (libraries okra-lib logs.fmt))
 
 (rule
  (deps
@@ -14,7 +14,7 @@
 
 (rule
  (alias runtest)
- (package okra)
+ (package okra-lib)
  (action
   (diff use_db_replaced.md use_db.md.pp)))
 
@@ -28,7 +28,7 @@
 
 (rule
  (alias runtest)
- (package okra)
+ (package okra-lib)
  (action
   (diff eng1.md eng1.md.pp)))
 
@@ -43,6 +43,6 @@
 
 (rule
  (alias runtest)
- (package okra)
+ (package okra-lib)
  (action
   (diff aggr.md aggr.md.pp)))
