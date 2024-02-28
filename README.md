@@ -20,8 +20,34 @@ Each command is described in more detail below.
 
 ## Installation
 
-Install opam if you don't already have it, and set up [`tarides/opam-repository`](https://github.com/tarides/opam-repository).
-Then you can install okra with:
+Install opam if you don't already have it, and add [`tarides/opam-repository`](https://github.com/tarides/opam-repository) to your list of opam repositories:
+
+Either only to the current opam switch with the command
+
+```
+opam repository add tarides git@github.com:tarides/opam-repository.git
+```
+
+Or to the list of opam repositories for all opam switches with the command:
+```
+opam repository add --all tarides git@github.com:tarides/opam-repository.git
+```
+
+Update your list of packages:
+```
+opam update
+```
+
+Then you can install okra. If you had it installed previously  through pinning simply run:
+
+```
+opam pin remove okra
+```
+
+(This will both remove the pinned version and install the new one.)
+
+If okra is not installed yet, run:
+
 ```
 opam install okra
 ```
