@@ -8,7 +8,7 @@ license: "ISC"
 homepage: "https://github.com/tarides/okra"
 bug-reports: "https://github.com/tarides/okra/issues"
 depends: [
-  "dune" {>= "3.7"}
+  "dune" {>= "3.2"}
   "alcotest" {>= "1.7.0" & with-test}
   "mdx" {>= "2.2.1" & with-test}
   "logs" {>= "0.7.0"}

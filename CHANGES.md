@@ -1,5 +1,9 @@
 ## unreleased
 
+### Changed
+
+- Lower dune version to 3.2 (#<PR_NUMBER>, @gpetiot)
+
 ### Removed
 
 - Removed unused `tls` dependency (#168, @gpetiot)
