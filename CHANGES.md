@@ -2,7 +2,7 @@
 
 ### Removed
 
-- Removed unused `tls` dependency (#<PR_NUMBER>, @gpetiot)
+- Removed unused `tls` dependency (#168, @gpetiot)
 
 ## 0.2.0
 
