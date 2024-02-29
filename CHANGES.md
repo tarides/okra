@@ -1,3 +1,9 @@
+## unreleased
+
+### Removed
+
+- Removed unused `tls` dependency (#<PR_NUMBER>, @gpetiot)
+
 ## 0.2.0
 
 ### Changed
