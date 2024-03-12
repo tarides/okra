@@ -126,3 +126,15 @@ Valid time
   >   - My work
   > EOF
   [OK]: <stdin>
+  $ okra lint << EOF
+  > # Last Week
+  > 
+  > - Foo the foo (Id123)
+  >   - @eng1 (3 days)
+  >   - Bared the bar
+  > 
+  > - Time off (No KR)
+  >   - @eng1 (2 days)
+  >   - off
+  > EOF
+  [OK]: <stdin>
