@@ -182,6 +182,9 @@ $ cat bactrian.bad.md
 $ okra lint --engineer bactrian.bad.md
 [ERROR(S)]: bactrian.bad.md
 
+Invalid total time found for bactrian (3 days).
+[ERROR(S)]: bactrian.bad.md
+
 In KR "Make Okra, the OKR management tool":
   No time entry found. Each KR must be followed by '- @... (x days)'
 [1]

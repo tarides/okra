@@ -4,7 +4,7 @@ Short mode exits with 0 when there is no error:
   > # Last week
   > 
   > - Everything is great (E1)
-  >   - @a (1 day)
+  >   - @a (5 days)
   >   - Did everything
   > EOF
 
@@ -25,7 +25,7 @@ This also works with files:
   > # Last week
   > 
   > - Everything is great (E1)
-  >   * @a (1 day)
+  >   * @a (5 days)
   >   * Did everything
   > EOF
 

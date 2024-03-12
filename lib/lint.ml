@@ -15,10 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+let ( let* ) = Result.bind
+
 type lint_error =
   | Format_error of (int * string) list
   | No_time_found of int option * string
   | Invalid_time of { lnum : int option; title : string; entry : string }
+  | Invalid_total_time of string * Time.t
   | Multiple_time_entries of int option * string
   | No_work_found of int option * string
   | No_KR_ID_found of int option * string
@@ -63,6 +66,8 @@ let pp_error ppf = function
         "@[<hv 2>In KR %S:@ Invalid time entry %S found. Format is '- @@eng1 \
          (x days), @@eng2 (y days)'@ where x and y must be divisible by 0.5@]@,"
         title entry
+  | Invalid_total_time (s, t) ->
+      Fmt.pf ppf "@[<hv 2>Invalid total time found for %s (%a).@]@," s Time.pp t
   | Multiple_time_entries (_, s) ->
       Fmt.pf ppf
         "@[<hv 2>In KR %S:@ Multiple time entries found. Only one time entry \
@@ -116,9 +121,34 @@ let add_context lines = function
   | Parser.Invalid_markdown_in_work_items s ->
       Invalid_markdown_in_work_items (grep_n s lines, s)
 
+let check_total_time ?check_time (krs : KR.t list) =
+  match check_time with
+  | None -> Ok ()
+  | Some expected ->
+      let tbl = Hashtbl.create 7 in
+      List.iter
+        (fun (kr : KR.t) ->
+          Hashtbl.iter
+            (fun name time ->
+              let time =
+                let open Time in
+                match Hashtbl.find_opt tbl name with
+                | Some x -> x +. time
+                | None -> time
+              in
+              Hashtbl.replace tbl name time)
+            kr.time_per_engineer)
+        krs;
+      Hashtbl.fold
+        (fun name time acc ->
+          let* () = acc in
+          if Time.equal time expected then Ok ()
+          else Error (Invalid_total_time (name, time)))
+        tbl (Ok ())
+
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
-let check_document ?okr_db ~include_sections ~ignore_sections s =
+let check_document ?okr_db ~include_sections ~ignore_sections ?check_time s =
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
@@ -126,23 +156,30 @@ let check_document ?okr_db ~include_sections ~ignore_sections s =
   let okrs, warnings =
     Parser.of_markdown ~include_sections ~ignore_sections md
   in
-  match warnings |> List.map (add_context lines) with
+  let warnings =
+    let warnings = List.map (add_context lines) warnings in
+    match check_total_time ?check_time okrs with
+    | Ok () -> warnings
+    | Error w -> w :: warnings
+  in
+  match warnings with
   | [] ->
       let _report = Report.of_krs ?okr_db okrs in
       Ok ()
   | warnings -> Error warnings
 
-let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s =
+let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_time s =
   if !format_errors <> [] then
     Error
       [
         Format_error
           (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors);
       ]
-  else check_document ?okr_db ~include_sections ~ignore_sections s
+  else check_document ?okr_db ~include_sections ~ignore_sections ?check_time s
 
 let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
-    lines =
+    ?check_time lines =
   let format_errors = ref [] in
   let rec check_and_read buf pos = function
     | [] -> Buffer.contents buf
@@ -153,9 +190,11 @@ let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
         check_and_read buf (pos + 1) rest
   in
   let s = check_and_read (Buffer.create 1024) 1 lines in
-  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s
+  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_time s
 
-let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ic =
+let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time ic
+    =
   let format_errors = ref [] in
   let rec check_and_read buf ic pos =
     try
@@ -169,7 +208,8 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ic =
     | e -> raise e
   in
   let s = check_and_read (Buffer.create 1024) ic 1 in
-  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s
+  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_time s
 
 let short_messages_of_error file_name =
   let short_message line_number msg =
@@ -177,7 +217,7 @@ let short_messages_of_error file_name =
   in
   let short_messagef line_number_opt fmt =
     let line_number = Option.value ~default:1 line_number_opt in
-    Printf.ksprintf (short_message line_number) fmt
+    Format.kasprintf (short_message line_number) fmt
   in
   function
   | Format_error errs ->
@@ -188,6 +228,8 @@ let short_messages_of_error file_name =
       short_messagef line_number "No time found in %S" kr
   | Invalid_time { lnum; title; entry } ->
       short_messagef lnum "Invalid time entry %S in %S" entry title
+  | Invalid_total_time (s, t) ->
+      short_messagef None "Invalid total time for %S (%a)" s Time.pp t
   | Multiple_time_entries (line_number, kr) ->
       short_messagef line_number "Multiple time entries for %S" kr
   | No_work_found (line_number, kr) ->

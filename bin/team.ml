@@ -27,6 +27,7 @@ let lint t =
   let weeks = Common.weeks t in
   let year = Common.year t in
   let teams = Common.teams t in
+  (* Here the linting is done week-by-week. *)
   let lint_report = Okra.Team.lint repo ~year ~weeks teams in
   Format.printf "%a" Okra.Team.pp_lint_report lint_report;
   if not (Okra.Team.is_valid lint_report) then exit 1

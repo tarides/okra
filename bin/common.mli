@@ -53,3 +53,7 @@ val weeks : t -> int list
 (* teams *)
 
 val teams : t -> Okra.Team.t list
+
+(* checks *)
+
+val check_time : t -> Okra.Time.t option

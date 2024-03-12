@@ -18,7 +18,7 @@ Workitems can be checked when a DB of this form is provided:
   > # Last week
   > 
   > - Multicore OCaml Merlin project (#1053)
-  >   - @eng1 (1 day)
+  >   - @eng1 (2 days)
   >   - Some merlin
   > 
   > - Property-Based Testing for Multicore (#1090)
