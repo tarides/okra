@@ -28,7 +28,7 @@ If everything is fine, nothing is printed and it exits with 0:
   > # Last week
   > 
   > - Everything is great (E1)
-  >   - @a (1 day)
+  >   - @a (5 days)
   >   - Do it
   > EOF
 

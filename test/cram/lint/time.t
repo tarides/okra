@@ -1,7 +1,7 @@
 Time formats
 ------------
 
-Invalid time
+Invalid time (format)
 
   $ okra lint << EOF
   > # Title
@@ -43,7 +43,7 @@ Invalid time
     where x and y must be divisible by 0.5
   [1]
 
-Valid time
+Invalid time (total)
 
   $ okra lint << EOF
   > # Title
@@ -62,6 +62,63 @@ Valid time
   > 
   > - This is a KR (KR124)
   >   - @eng1 (0.5 day)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (1.5 days), @eng1 (.5 day)
+  >   - My work
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  Invalid total time found for eng1 (4.0 days).
+  [1]
+  $ okra lint << EOF
+  > # Title
+  > 
+  > - This is a KR (KR123)
+  >   - @eng1 (6.5 day)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (.5 days)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (0.5 days)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (0.5 day)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (1.5 days), @eng1 (.5 day)
+  >   - My work
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  Invalid total time found for eng1 (10.0 days).
+  [1]
+
+Valid time
+
+  $ okra lint << EOF
+  > # Title
+  > 
+  > - This is a KR (KR123)
+  >   - @eng1 (.5 day)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (.5 days)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (0.5 days)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (1.5 day)
   >   - My work
   > 
   > - This is a KR (KR124)

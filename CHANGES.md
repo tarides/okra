@@ -2,7 +2,8 @@
 
 ### Changed
 
--  Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
+- Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
+- Lint: check that the total of days for each engineer is 5 days (#<PR_NUMBER>, @gpetiot)
 
 ## 0.2.1
 
