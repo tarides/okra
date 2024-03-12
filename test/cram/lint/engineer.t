@@ -19,15 +19,19 @@ This is a valid one:
   >   - My work
   > 
   > - This is a KR (KR123)
-  >   - @eng1 (1 day)
+  >   - @eng1 (1.5 day)
+  >   - My work
+  > 
+  > - This is a KR (KR124)
+  >   - @eng1 (.5 day)
   >   - My work
   > 
   > - A KR yet to have an id (New KR)
-  >   - @eng1 (1 day)
+  >   - @eng1 (1. day)
   >   - Some work
   > 
   > - A work without a KR (No KR)
-  >   - @eng1 (1 day)
+  >   - @eng1 (1.0 day)
   >   - Some work
   > 
   > # Activity
@@ -86,4 +90,56 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   
   In KR "This is a KR (Off KR)":
     No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  [1]
+
+  $ okra lint --engineer << EOF
+  > # Projects
+  > 
+  > - Project1 (KR1)
+  > - Project2 (KR2)
+  > 
+  > This is not formatted.
+  > 
+  > # Last week
+  > 
+  > - This is a KR (KR1)
+  >   - @eng1 (1.1 day)
+  >   - My work
+  > 
+  > # Activity
+  > 
+  > More unformatted text.
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  In KR "@eng1 (1.1 day)":
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
+  [1]
+
+  $ okra lint --engineer << EOF
+  > # Projects
+  > 
+  > - Project1 (KR1)
+  > - Project2 (KR2)
+  > 
+  > This is not formatted.
+  > 
+  > # Last week
+  > 
+  > - This is a KR (KR1)
+  >   - @eng1 ( day)
+  >   - My work
+  > 
+  > # Activity
+  > 
+  > More unformatted text.
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  In KR "@eng1 ( day)":
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
   [1]

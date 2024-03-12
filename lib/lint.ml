@@ -59,8 +59,9 @@ let pp_error ppf = function
         s
   | Invalid_time (_, s) ->
       Fmt.pf ppf
-        "@[<hv 2>In KR %S:@ Invalid time entry found. Format is '- @@eng1 (x \
-         days), @@eng2 (x days)'@]@,"
+        "@[<hv 2>In KR %S:@ Invalid time entry found.@,\
+        \ Format is '- @@eng1 (x days), @@eng2 (y days)@,\
+        \ where x and y must be divisible by 0.5'@]@,"
         s
   | Multiple_time_entries (_, s) ->
       Fmt.pf ppf

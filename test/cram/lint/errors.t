@@ -151,7 +151,9 @@ Format errors
   [ERROR(S)]: err-invalid-time.md
   
   In KR "@a (day)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days)'
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
   [1]
   $ okra lint --short err-invalid-time.md
   err-invalid-time.md:4:Invalid time in "@a (day)"

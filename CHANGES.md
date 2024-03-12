@@ -1,3 +1,9 @@
+## unreleased
+
+### Changed
+
+-  Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
+
 ## 0.2.1
 
 ### Changed

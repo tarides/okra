@@ -13,7 +13,9 @@ Invalid time
   [ERROR(S)]: <stdin>
   
   In KR "@eng1 (1 day), eng2 (2 days)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days)'
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
   [1]
   $ okra lint << EOF
   > # Title
@@ -25,7 +27,9 @@ Invalid time
   [ERROR(S)]: <stdin>
   
   In KR "@eng1 (1 day); @eng2 (2 days)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days)'
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
   [1]
   $ okra lint << EOF
   > # Title
@@ -37,7 +41,9 @@ Invalid time
   [ERROR(S)]: <stdin>
   
   In KR "@eng1 (1 day) @eng2 (2 days)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (x days)'
+    Invalid time entry found.
+     Format is '- @eng1 (x days), @eng2 (y days)
+     where x and y must be divisible by 0.5'
   [1]
 
 Valid time
@@ -62,7 +68,7 @@ Valid time
   >   - My work
   > 
   > - This is a KR (KR124)
-  >   - @eng1 (0.1 days), @eng1 (.5 day)
+  >   - @eng1 (1.5 days), @eng1 (.5 day)
   >   - My work
   > EOF
   [OK]: <stdin>
