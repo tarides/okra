@@ -113,9 +113,8 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   [ERROR(S)]: <stdin>
   
   In KR "@eng1 (1.1 day)":
-    Invalid time entry found.
-     Format is '- @eng1 (x days), @eng2 (y days)
-     where x and y must be divisible by 0.5'
+    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (y days)'
+    where x and y must be divisible by 0.5
   [1]
 
   $ okra lint --engineer << EOF
@@ -139,7 +138,6 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   [ERROR(S)]: <stdin>
   
   In KR "@eng1 ( day)":
-    Invalid time entry found.
-     Format is '- @eng1 (x days), @eng2 (y days)
-     where x and y must be divisible by 0.5'
+    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (y days)'
+    where x and y must be divisible by 0.5
   [1]
