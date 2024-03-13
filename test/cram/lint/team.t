@@ -12,7 +12,7 @@ Examples of valid ones:
   > # This is a title
   > 
   > - This is a KR (KR123)
-  >   - @eng1 (5 days)
+  >   - @eng1 (1 day)
   >   - My work
   > EOF
   [OK]: <stdin>
@@ -20,7 +20,7 @@ Examples of valid ones:
   > # This is a title
   > 
   > - This is a KR (KR123)
-  >   - @eng1 (5 days)
+  >   - @eng1 (1 day)
   >   - My work
   > EOF
   [OK]: <stdin>
@@ -30,7 +30,7 @@ Examples of valid ones:
   > ## Another title
   > 
   > - This is a KR (KR123)
-  >   - @eng1 (5 days), @eng2 (5 days), @eng3 (5 days)
+  >   - @eng1 (1 day), @eng2 (2.5 days), @eng3 (4 days)
   >   - My work
   >   - More work
   > EOF
@@ -39,7 +39,7 @@ Examples of valid ones:
   > # This is a title
   > 
   > - This is a WI (#123)
-  >   - @eng1 (5 days)
+  >   - @eng1 (1 day)
   >   - My work
   > EOF
   [OK]: <stdin>

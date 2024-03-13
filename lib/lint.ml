@@ -106,37 +106,40 @@ let grep_n s lines =
     (fun (i, line) -> if Str.string_match re line 0 then Some i else None)
     lines
 
-let check_total_time (krs : KR.t list) =
-  let tbl = Hashtbl.create 7 in
-  List.iter
-    (fun (kr : KR.t) ->
-      Hashtbl.iter
-        (fun name time ->
-          let time =
-            match Hashtbl.find_opt tbl name with
-            | Some x -> x +. time
-            | None -> time
-          in
-          Hashtbl.replace tbl name time)
-        kr.time_per_engineer)
-    krs;
-  Hashtbl.fold
-    (fun name time acc ->
-      let* () = acc in
-      if Float.equal time 5. then Ok ()
-      else Error (Invalid_total_time (name, time)))
-    tbl (Ok ())
+let check_total_time ?check_days (krs : KR.t list) =
+  match check_days with
+  | None -> Ok ()
+  | Some expected ->
+      let tbl = Hashtbl.create 7 in
+      List.iter
+        (fun (kr : KR.t) ->
+          Hashtbl.iter
+            (fun name time ->
+              let time =
+                match Hashtbl.find_opt tbl name with
+                | Some x -> x +. time
+                | None -> time
+              in
+              Hashtbl.replace tbl name time)
+            kr.time_per_engineer)
+        krs;
+      Hashtbl.fold
+        (fun name time acc ->
+          let* () = acc in
+          if Float.equal time expected then Ok ()
+          else Error (Invalid_total_time (name, time)))
+        tbl (Ok ())
 
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
-let check_document ?okr_db ~include_sections ~ignore_sections s =
+let check_document ?okr_db ~include_sections ~ignore_sections ?check_days s =
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
   try
     let md = Omd.of_string s in
     let okrs = Parser.of_markdown ~include_sections ~ignore_sections md in
-    let* () = check_total_time okrs in
+    let* () = check_total_time ?check_days okrs in
     let _report = Report.of_krs ?okr_db okrs in
     Ok ()
   with
@@ -149,15 +152,16 @@ let check_document ?okr_db ~include_sections ~ignore_sections s =
   | Parser.No_project_found s -> Error (No_project_found (grep_n s lines, s))
   | Parser.Not_all_includes_accounted_for s -> Error (Not_all_includes s)
 
-let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s =
+let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_days s =
   if !format_errors <> [] then
     Error
       (Format_error
          (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors))
-  else check_document ?okr_db ~include_sections ~ignore_sections s
+  else check_document ?okr_db ~include_sections ~ignore_sections ?check_days s
 
 let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
-    lines =
+    ?check_days lines =
   let format_errors = ref [] in
   let rec check_and_read buf pos = function
     | [] -> Buffer.contents buf
@@ -168,9 +172,11 @@ let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
         check_and_read buf (pos + 1) rest
   in
   let s = check_and_read (Buffer.create 1024) 1 lines in
-  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s
+  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_days s
 
-let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ic =
+let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_days ic
+    =
   let format_errors = ref [] in
   let rec check_and_read buf ic pos =
     try
@@ -184,7 +190,8 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ic =
     | e -> raise e
   in
   let s = check_and_read (Buffer.create 1024) ic 1 in
-  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s
+  document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
+    ?check_days s
 
 let short_messages_of_error file_name =
   let short_message line_number msg =

@@ -32,6 +32,7 @@ val lint :
   ?okr_db:Masterdb.t ->
   ?include_sections:string list ->
   ?ignore_sections:string list ->
+  ?check_days:float ->
   in_channel ->
   lint_result
 
@@ -39,6 +40,7 @@ val lint_string_list :
   ?okr_db:Masterdb.t ->
   ?include_sections:string list ->
   ?ignore_sections:string list ->
+  ?check_days:float ->
   string list ->
   lint_result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)
