@@ -46,8 +46,11 @@ let lint_member_week admin_dir member ~week ~year =
   | false -> Not_found fname
   | true -> (
       let ic = open_in fname in
+      (* We lint week-by-week so we use the default options of the [engineer]
+         mode. *)
       match
         Lint.lint ~include_sections:[ "Last week" ] ~ignore_sections:[] ic
+          ~check_days:5.
       with
       | Ok () -> Complete fname
       | Error e -> Erroneous (fname, e))

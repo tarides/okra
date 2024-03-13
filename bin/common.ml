@@ -301,6 +301,7 @@ type t = {
   output : string option;
   repo : string option;
   conf : Conf.t;
+  check_days : float option;
 }
 
 let setup () =
@@ -346,7 +347,9 @@ let term =
   and+ conf = conf
   and+ calendar = calendar
   and+ output = output
-  and+ repo = repo in
+  and+ repo = repo
+  and+ engineer_report = engineer_report in
+  let check_days = if engineer_report then Some 5. else None in
   {
     okr_db;
     filter;
@@ -357,6 +360,7 @@ let term =
     output;
     repo;
     okr_db_state = None;
+    check_days;
   }
 
 let okr_db t =
@@ -412,6 +416,7 @@ let with_names t = t.printconf.names
 let with_links t = t.printconf.links
 let with_description t = t.printconf.descriptions
 let conf t = t.conf
+let check_days t = t.check_days
 
 let output ?(input_files = []) ?(in_place = false) t =
   match t.output with

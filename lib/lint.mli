@@ -19,6 +19,7 @@ type lint_error =
   | Format_error of (int * string) list
   | No_time_found of int option * string
   | Invalid_time of int option * string
+  | Invalid_total_time of string * float
   | Multiple_time_entries of int option * string
   | No_work_found of int option * string
   | No_KR_ID_found of int option * string
@@ -31,6 +32,7 @@ val lint :
   ?okr_db:Masterdb.t ->
   ?include_sections:string list ->
   ?ignore_sections:string list ->
+  ?check_days:float ->
   in_channel ->
   lint_result
 
@@ -38,6 +40,7 @@ val lint_string_list :
   ?okr_db:Masterdb.t ->
   ?include_sections:string list ->
   ?ignore_sections:string list ->
+  ?check_days:float ->
   string list ->
   lint_result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)
