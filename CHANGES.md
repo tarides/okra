@@ -4,7 +4,7 @@
 
 - Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
 - Printed reports now use undercore instead of star characters for emphasis/strong styling(#180, @gpetiot)
-- The weeks are now set with the option `-w`/`--weeks` (#<PR_NUMBER>, @gpetiot)
+- The weeks are now set with the option `-w`/`--weeks` (#184, @gpetiot)
 
 ### Added
 
