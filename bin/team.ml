@@ -41,6 +41,8 @@ let aggregate t =
     | _ -> failwith "provide only one week"
   in
   let report = Okra.Team.aggregate ?okr_db repo ~year ~week teams in
+  let filters = Common.filter t in
+  let report = Okra.Filter.apply filters report in
   let pp =
     Okra.Report.pp ~show_time:true ~show_time_calc:false ~show_engineers:true
   in

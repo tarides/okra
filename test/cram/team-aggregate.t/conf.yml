@@ -1,0 +1,7 @@
+teams:
+  - name: My Team
+    members:
+      - name: Engineer 1
+        github: eng1
+      - name: Engineer 2
+        github: eng2
