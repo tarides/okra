@@ -7,7 +7,7 @@
 
 ### Added
 
-- Multiple weeks can now be passed to `okra team aggregate` (#<PR_NUMBER>, @gpetiot)
+- Multiple weeks can now be passed to `okra team aggregate` (#182, @gpetiot)
 
 ### Fixed
 
