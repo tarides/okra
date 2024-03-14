@@ -83,13 +83,13 @@ let rec pp_inline ppf = function
   | Concat c -> list ~sep:nop pp_inline ppf c
   | Text s -> string ppf s
   | Emph e ->
-      string ppf "*";
+      string ppf "_";
       pp_inline ppf e;
-      string ppf "*"
+      string ppf "_"
   | Strong e ->
-      string ppf "**";
+      string ppf "__";
       pp_inline ppf e;
-      string ppf "**"
+      string ppf "__"
   | Code s ->
       string ppf "`";
       string ppf s;

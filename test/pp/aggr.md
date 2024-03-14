@@ -28,14 +28,14 @@
 
       asd ada
 
-      ads `foo` *hello*
+      ads `foo` _hello_
       ```ocaml
       test
 
       with a space
       ```
       - 1 2 3 4 <b>test</b>
-      - `hello` **hello** *hello*
+      - `hello` __hello__ _hello_
       - ![img](http://here.com)
       - [link](here.io) is really great
   - finally asda

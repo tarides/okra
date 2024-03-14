@@ -70,3 +70,31 @@ Engineer reports are aggregated correctly
     - Little bit of work
     - Some item of work
     - Small bit of work
+
+The output of cat passes the lint
+
+  $ cat > eng3.md << EOF
+  > # Last week
+  > 
+  > - My task (No KR)
+  >   - @foobar (5 days)
+  >   - aaa bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
+  >     _oooo_ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
+  >     __aaaa__ bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
+  >     ___oooo___ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
+  > EOF
+  $ okra lint -e eng3.md
+  [OK]: eng3.md
+
+  $ okra cat eng3.md > aggregate.md
+  $ cat aggregate.md
+  # Last week
+  
+  - My task (No KR)
+    - @foobar (5 days)
+    - aaa bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
+      _oooo_ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
+      __aaaa__ bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
+      ___oooo___ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
+  $ okra lint aggregate.md
+  [OK]: aggregate.md

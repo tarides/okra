@@ -2,7 +2,8 @@
 
 ### Changed
 
--  Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
+- Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
+- Printed reports now use undercore instead of star characters for emphasis/strong styling(#<PR_NUMBER>, @gpetiot)
 
 ## 0.2.1
 
