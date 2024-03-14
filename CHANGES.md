@@ -7,7 +7,7 @@
 
 ### Fixed
 
-- Filtering options now properly apply to `okra team aggregate` (#<PR_NUMBER>, @gpetiot)
+- Filtering options now properly apply to `okra team aggregate` (#181, @gpetiot)
 
 ## 0.2.1
 
