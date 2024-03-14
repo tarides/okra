@@ -42,7 +42,7 @@ Exclude a few okrs
 
 Multiple weeks
 
-  $ okra team aggregate -C admin/ -W 40-41 -y 2022 --conf ./conf.yml
+  $ okra team aggregate -C admin/ -w 40-41 -y 2022 --conf ./conf.yml
   # Last Week
   
   - A KR (KR100)

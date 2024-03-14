@@ -208,17 +208,29 @@ let includes =
 
 (* Calendar term *)
 
-let week =
-  Arg.value
-  @@ Arg.opt Arg.(some int) None
-  @@ Arg.info ~doc:"The week of the year defaulting to the current week"
-       ~docv:"WEEK" [ "w"; "week" ]
+let weeks_conv =
+  let parse w =
+    match Arg.conv_parser Arg.(pair ~sep:'-' int int) w with
+    | Ok (x, y) -> Ok (`Range (x, y))
+    | Error _ -> (
+        match Arg.conv_parser Arg.int w with
+        | Ok x -> Ok (`One x)
+        | Error _ -> Fmt.error_msg "invalid week(s): %s" w)
+  in
+  let pp fs = function
+    | `One x -> Format.fprintf fs "%i" x
+    | `Range (x, y) -> Format.fprintf fs "%i-%i" x y
+  in
+  Arg.conv (parse, pp)
 
 let weeks =
   Arg.value
-  @@ Arg.opt Arg.(some (pair ~sep:'-' int int)) None
-  @@ Arg.info ~doc:"A range specified by a start and end week (inclusive)"
-       ~docv:"WEEKS" [ "W"; "weeks" ]
+  @@ Arg.opt Arg.(some weeks_conv) None
+  @@ Arg.info
+       ~doc:
+         "The week of the year defaulting to the current week, or a range \
+          specified by a start and end week (inclusive)"
+       ~docv:"WEEKS" [ "w"; "weeks" ]
 
 let month =
   Arg.value
@@ -237,12 +249,12 @@ let year =
 let calendar : Okra.Calendar.t Term.t =
   let open Let_syntax_cmdliner in
   let module C = CalendarLib.Calendar in
-  let+ week = week and+ weeks = weeks and+ month = month and+ year = year in
-  match (week, weeks, month, year) with
-  | None, None, None, year -> Okra.Calendar.of_week ?year (C.now () |> C.week)
-  | Some week, _, _, year -> Okra.Calendar.of_week ?year week
-  | None, Some range, _, year -> Okra.Calendar.of_week_range ?year range
-  | None, None, Some month, year -> Okra.Calendar.of_month ?year month
+  let+ weeks = weeks and+ month = month and+ year = year in
+  match (weeks, month) with
+  | None, None -> Okra.Calendar.of_week ?year (C.now () |> C.week)
+  | Some (`One week), _ -> Okra.Calendar.of_week ?year week
+  | Some (`Range weeks), _ -> Okra.Calendar.of_week_range ?year weeks
+  | None, Some month -> Okra.Calendar.of_month ?year month
 
 (* Report printing configuration *)
 

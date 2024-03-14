@@ -1,7 +1,7 @@
 
 Team Lint example
 
-  $ okra team lint -C admin/ -W 40-42 -y 2022 --conf ./conf.yml
+  $ okra team lint -C admin/ -w 40-42 -y 2022 --conf ./conf.yml
   === My Team ===
     + Engineer 1
       + Report week 40: Complete
@@ -17,6 +17,6 @@ Team Lint example
 
 Missing [--repo-dir] argument:
 
-  $ okra team lint -W 40-42 -y 2022 --conf ./conf.yml
+  $ okra team lint -w 40-42 -y 2022 --conf ./conf.yml
   Missing [-C] or [--repo-dir] argument, or [admin_dir] configuration.
   [1]
