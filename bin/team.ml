@@ -35,12 +35,8 @@ let aggregate t =
   let okr_db = Common.okr_db t in
   let teams = Common.teams t in
   let year = Common.year t in
-  let week =
-    match Common.weeks t with
-    | [ w ] -> w
-    | _ -> failwith "provide only one week"
-  in
-  let report = Okra.Team.aggregate ?okr_db repo ~year ~week teams in
+  let weeks = Common.weeks t in
+  let report = Okra.Team.aggregate ?okr_db repo ~year ~weeks teams in
   let filters = Common.filter t in
   let report = Okra.Filter.apply filters report in
   let pp =

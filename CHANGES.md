@@ -5,6 +5,10 @@
 - Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
 - Printed reports now use undercore instead of star characters for emphasis/strong styling(#180, @gpetiot)
 
+### Added
+
+- Multiple weeks can now be passed to `okra team aggregate` (#<PR_NUMBER>, @gpetiot)
+
 ### Fixed
 
 - Filtering options now properly apply to `okra team aggregate` (#181, @gpetiot)

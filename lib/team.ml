@@ -94,15 +94,19 @@ let read_file f =
   close_in ic;
   s
 
-let aggregate ?okr_db admin_dir ~year ~week teams =
+let aggregate ?okr_db admin_dir ~year ~weeks teams =
   let files =
     List.concat
+    @@ List.concat
     @@ List.map
          (fun team ->
            List.map
              (fun member ->
-               file_path ~admin_dir ~year ~week
-                 ~engineer_name:(Member.github member))
+               List.map
+                 (fun week ->
+                   file_path ~admin_dir ~year ~week
+                     ~engineer_name:(Member.github member))
+                 weeks)
              (members team))
          teams
   in

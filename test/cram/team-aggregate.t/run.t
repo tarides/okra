@@ -39,3 +39,25 @@ Exclude a few okrs
   - A KR (KR100)
     - @eng1 (1 day)
     - Work 1
+
+Multiple weeks
+
+  $ okra team aggregate -C admin/ -W 40-41 -y 2022 --conf ./conf.yml
+  # Last Week
+  
+  - A KR (KR100)
+    - @eng1 (2 days)
+    - Work 1
+    - Work 1
+  
+  - A KR (KR123)
+    - @eng1 (2 days), @eng2 (2 days)
+    - Work 1
+    - Work 1
+    - Work 1
+    - Work 1
+  
+  - A KR (KR124)
+    - @eng2 (2 days)
+    - Work 1
+    - Work 1
