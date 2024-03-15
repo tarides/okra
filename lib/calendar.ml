@@ -28,7 +28,7 @@ let now () = Cal.now () |> Cal.to_date
 
 let weeks { from; to_ } =
   let result = ref [] in
-  (* This check is wrong is we are requesting the last week of the year.
+  (* This check is wrong if we are requesting the last week of the year.
 
      if Cal.Date.year from <> Cal.Date.year to_ then failwith "invalid calendar
      range"; *)
