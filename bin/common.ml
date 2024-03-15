@@ -17,6 +17,12 @@
 
 open Cmdliner
 
+let get_or_error = function
+  | Ok v -> v
+  | Error (`Msg m) ->
+      Fmt.epr "%s" m;
+      exit 1
+
 (* DB *)
 let okr_db =
   let info =
@@ -250,6 +256,8 @@ let calendar : Okra.Calendar.t Term.t =
   let open Let_syntax_cmdliner in
   let module C = CalendarLib.Calendar in
   let+ weeks = weeks and+ month = month and+ year = year in
+  get_or_error
+  @@
   match (weeks, month) with
   | None, None -> Okra.Calendar.of_week ?year (C.now () |> C.week)
   | Some (`One week), _ -> Okra.Calendar.of_week ?year week
@@ -322,12 +330,6 @@ let setup () =
   Logs.set_level level;
   Logs.set_reporter (Logs_fmt.reporter ());
   Fmt_tty.setup_std_outputs ?style_renderer ()
-
-let get_or_error = function
-  | Ok v -> v
-  | Error (`Msg m) ->
-      Fmt.epr "%s" m;
-      exit 1
 
 let conf =
   let conf_arg =

@@ -19,6 +19,7 @@ module Cal = CalendarLib.Calendar
 type date = Cal.Date.t
 type t = { from : date; to_ : date }
 
+let ( let* ) = Result.bind
 let week t = Cal.Date.week t.from (* ISO compliant? *)
 let month t = Cal.Date.month t.from |> Cal.Date.int_of_month
 let year t = Cal.Date.year t.from
@@ -27,8 +28,10 @@ let now () = Cal.now () |> Cal.to_date
 
 let weeks { from; to_ } =
   let result = ref [] in
-  if Cal.Date.year from <> Cal.Date.year to_ then
-    failwith "invalid calendar range";
+  (* This check is wrong is we are requesting the last week of the year.
+
+     if Cal.Date.year from <> Cal.Date.year to_ then failwith "invalid calendar
+     range"; *)
   for week = Cal.Date.week from to Cal.Date.week to_ do
     result := week :: !result
   done;
@@ -56,20 +59,26 @@ let of_week =
   let six_days = Cal.Date.Period.make 0 0 6 in
   fun ?year week ->
     let year = Option.value ~default:(now () |> Cal.Date.year) year in
-    let monday = monday_of_week week year in
-    { from = monday; to_ = Cal.Date.add monday six_days }
+    if 1 <= week && week <= Cal.Date.weeks_in_year year then
+      let monday = monday_of_week week year in
+      Ok { from = monday; to_ = Cal.Date.add monday six_days }
+    else Fmt.error_msg "invalid week: %i" week
 
 let of_week_range ?year (first, last) =
-  let { from; to_ = _ } = of_week ?year first in
-  let { from = _; to_ } = of_week ?year last in
-  { from; to_ }
+  if first <= last then
+    let* { from; to_ = _ } = of_week ?year first in
+    let* { from = _; to_ } = of_week ?year last in
+    Ok { from; to_ }
+  else Fmt.error_msg "invalid week range: %i-%i" first last
 
 let of_month ?year month =
-  let year = Option.value ~default:(now () |> Cal.Date.year) year in
-  let from = Cal.Date.lmake ~year ~month ~day:1 () in
-  let days = Cal.Date.days_in_month from in
-  let to_ = Cal.Date.add from @@ Cal.Date.Period.day (days - 1) in
-  { from; to_ }
+  if 1 <= month && month <= 12 then
+    let year = Option.value ~default:(now () |> Cal.Date.year) year in
+    let from = Cal.Date.lmake ~year ~month ~day:1 () in
+    let days = Cal.Date.days_in_month from in
+    let to_ = Cal.Date.add from @@ Cal.Date.Period.day (days - 1) in
+    Ok { from; to_ }
+  else Fmt.error_msg "invalid month: %i" month
 
 let range { from; to_ } = (from, to_)
 

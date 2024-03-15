@@ -32,16 +32,16 @@ val weeks : t -> int list
 val year : t -> int
 (** [year t] gets the year from [t] *)
 
-val of_week : ?year:int -> int -> t
+val of_week : ?year:int -> int -> (t, [ `Msg of string ]) result
 (** [of_week ?year week] generates a [t] for ISO8601 week starting on the Monday
     and ending on the Sunday *)
 
-val of_week_range : ?year:int -> int * int -> t
+val of_week_range : ?year:int -> int * int -> (t, [ `Msg of string ]) result
 (** [of_week_range ?year (first, last)] returns the range between the two weeks
     [first] and [last] inclusive of the final week (for a given optional
     [year]). *)
 
-val of_month : ?year:int -> int -> t
+val of_month : ?year:int -> int -> (t, [ `Msg of string ]) result
 (** [of_month ?year month] generates a [t] for the [month] starting on the first
     day of the month and ending on the last *)
 
