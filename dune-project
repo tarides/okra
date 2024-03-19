@@ -26,7 +26,8 @@
   (ppx_deriving_yaml (>= 0.2.0))
   bos
   dune-build-info
-  (yaml (>= 3.0))))
+  (yaml (>= 3.0))
+  (cohttp-lwt-unix (>= 5.0.0))))
 
 (package
  (name okra-lib)
