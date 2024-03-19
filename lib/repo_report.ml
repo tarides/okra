@@ -14,6 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+let ( let* ) = Result.bind
+
 let owner_name s =
   match Astring.String.cut ~sep:"/" s with
   | Some t -> t
@@ -314,64 +316,61 @@ let parse_data (from, to_) org repo json =
 
 let add_list s v t = Project_map.add s v t
 
-module Make (C : Cohttp_lwt.S.Client) = struct
-  module Fetch = Get_activity.Graphql
+module Fetch = Get_activity.Graphql
 
-  let exec ?before_pr ?before_issue ~period:_ ~token query =
-    let variables =
-      [
-        ("before_pr", Option.value ~default:`Null before_pr);
-        ("before_issue", Option.value ~default:`Null before_issue);
-      ]
-    in
-    Fetch.exec ~token ~variables ~query ()
+let request ?before_pr ?before_issue ~period:_ ~token query =
+  let variables =
+    [
+      ("before_pr", Option.value ~default:`Null before_pr);
+      ("before_issue", Option.value ~default:`Null before_issue);
+    ]
+  in
+  Fetch.request ~token ~variables ~query ()
 
-  let merge_data datas =
-    let first, rest =
-      match datas with x :: rest -> (x, rest) | _ -> failwith "No data found!"
-    in
-    let data =
-      List.fold_left
-        (fun d { prs; issues; _ } ->
-          { d with prs = d.prs @ prs; issues = d.issues @ issues })
-        first rest
-    in
-    {
-      data with
-      prs =
-        List.sort_uniq
-          (fun v1 v2 -> String.compare v1.PR.title v2.title)
-          data.prs;
-      issues =
-        List.sort_uniq
-          (fun v1 v2 -> String.compare v1.Issue.title v2.title)
-          data.issues;
-    }
+let exec req = Fetch.exec req
 
-  let get ~period ~token repos =
-    let open Lwt.Syntax in
-    let open Lwt.Infix in
-    let repos = List.map owner_name repos in
-    let* json = exec ~period ~token (query repos) in
-    let rec parse acc period org name json =
-      match parse_data period org name json with
-      | None, None, data ->
-          if acc = [] then Lwt.return data
-          else Lwt.return (merge_data (data :: acc))
-      | before_pr, before_issue, data ->
-          let* json =
-            (* TODO: we always ask for all the data even if we don't need more
-               issues when searching for more PRs (and for every repository).
-               For queries not too far in the past, and with not too many repos
-               per query this is okay but in the long-term it might be good to
-               drop parts of the query when they are done. *)
-            exec ?before_pr ?before_issue ~period ~token (query repos)
-          in
-          parse (data :: acc) period org name json
-    in
-    let map = Project_map.empty in
-    Lwt_list.fold_left_s
-      (fun m (org, name) ->
-        parse [] period org name json >|= fun v -> add_list name v m)
-      map repos
-end
+let merge_data datas =
+  let first, rest =
+    match datas with x :: rest -> (x, rest) | _ -> failwith "No data found!"
+  in
+  let data =
+    List.fold_left
+      (fun d { prs; issues; _ } ->
+        { d with prs = d.prs @ prs; issues = d.issues @ issues })
+      first rest
+  in
+  {
+    data with
+    prs =
+      List.sort_uniq (fun v1 v2 -> String.compare v1.PR.title v2.title) data.prs;
+    issues =
+      List.sort_uniq
+        (fun v1 v2 -> String.compare v1.Issue.title v2.title)
+        data.issues;
+  }
+
+let get ~period ~token repos =
+  let repos = List.map owner_name repos in
+  let* json = exec @@ request ~period ~token (query repos) in
+  let rec parse acc period org name json =
+    match parse_data period org name json with
+    | None, None, data ->
+        if acc = [] then Ok data else Ok (merge_data (data :: acc))
+    | before_pr, before_issue, data ->
+        let* json =
+          (* TODO: we always ask for all the data even if we don't need more
+             issues when searching for more PRs (and for every repository). For
+             queries not too far in the past, and with not too many repos per
+             query this is okay but in the long-term it might be good to drop
+             parts of the query when they are done. *)
+          exec @@ request ?before_pr ?before_issue ~period ~token (query repos)
+        in
+        parse (data :: acc) period org name json
+  in
+  let map = Project_map.empty in
+  List.fold_left
+    (fun m (org, name) ->
+      let* m = m in
+      let* v = parse [] period org name json in
+      Ok (add_list name v m))
+    (Ok map) repos

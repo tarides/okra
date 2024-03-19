@@ -1,4 +1,4 @@
 (library
  (name okra)
  (public_name okra-lib)
- (libraries lwt logs omd fmt str calendar csv get-activity-lib gitlab))
+ (libraries logs omd fmt str calendar csv get-activity-lib gitlab))

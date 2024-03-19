@@ -26,8 +26,7 @@
   (ppx_deriving_yaml (>= 0.2.0))
   bos
   dune-build-info
-  (yaml (>= 3.0))
-  (cohttp-lwt-unix (>= 5.0.0))))
+  (yaml (>= 3.0))))
 
 (package
  (name okra-lib)
@@ -38,9 +37,8 @@
   (alcotest (and (>= 1.7.0) :with-test))
   (logs (>= 0.7.0))
   (fmt (>= 0.9.0))
-  (lwt (>= 5.6.1))
   xdg
-  (get-activity-lib (and (>= 0.2.0) (< 1.0.0)))
+  (get-activity-lib (and (>= 1.0.0) (< 2.0.0)))
   (gitlab (>= 0.1.7))
   (calendar (>= 3.0.0))
   (csv (>= 2.4))

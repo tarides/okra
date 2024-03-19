@@ -78,15 +78,13 @@ module Project_map : Map.S with type key := string
 type t = data Project_map.t
 (** A map from repositories to their PR/issue data *)
 
-module Make (_ : Cohttp_lwt.S.Client) : sig
-  val get :
-    period:string * string ->
-    token:string ->
-    string list ->
-    data Project_map.t Lwt.t
-  (** [get ~period ~token repos] gets the information for [repos] over the
+val get :
+  period:string * string ->
+  token:string ->
+  string list ->
+  (data Project_map.t, [ `Msg of string ]) result
+(** [get ~period ~token repos] gets the information for [repos] over the
       specified [period] using the Github [token] *)
-end
 
 val pp :
   ?with_names:bool -> ?with_times:bool -> ?with_descriptions:bool -> t Fmt.t

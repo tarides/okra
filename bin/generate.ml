@@ -21,6 +21,8 @@ open Okra
 open Cmdliner
 module Cal = CalendarLib.Calendar
 
+let ( let* ) = Result.bind
+
 (* The kind of report we are generating - engineer: a report for an individual
    engineer - reposiories: 1 or more repository contributions *)
 
@@ -63,6 +65,21 @@ let with_repositories_term =
           activity won't appear normally (or creating the PR)"
        [ "include-repositories" ]
 
+let user : Get_activity.User.t Term.t =
+  let str_parser, str_printer = Arg.string in
+  let parser x =
+    match str_parser x with
+    | `Ok x -> `Ok (Get_activity.User.User x)
+    | `Error e -> `Error e
+  in
+  let printer fs = function
+    | Get_activity.User.Viewer -> str_printer fs "viewer"
+    | User x -> str_printer fs x
+  in
+  let user_conv = (parser, printer) in
+  let doc = Arg.info ~doc:"User name" [ "user" ] in
+  Arg.(value & opt user_conv Viewer & doc)
+
 (* Get activity configuration *)
 let home =
   match Sys.getenv_opt "HOME" with
@@ -82,8 +99,8 @@ let token =
           ~/.github/github-activity-token"
        ~docv:"TOKEN" [ "token" ]
 
-module Fetch = Get_activity.Contributions
-module Repo_fetch = Okra.Repo_report.Make (Cohttp_lwt_unix.Client)
+module User_fetch = Get_activity.Contributions
+module Repo_fetch = Okra.Repo_report
 
 module Time = struct
   let now = Unix.gettimeofday
@@ -105,29 +122,30 @@ let fetch ~token ~period =
   Gitlab.make_activity ~token ~before ~after
 
 let run_engineer ppf conf cal projects token no_activity no_links
-    with_repositories =
-  let open Lwt.Syntax in
+    with_repositories user =
   let period = Calendar.to_iso8601 cal in
   let week = Calendar.week cal in
-  let activity, _ =
+  let* activity, _ =
     if no_activity then
-      ( Get_activity.Contributions.
-          { username = "<USERNAME>"; activity = Repo_map.empty },
-        [] )
+      Ok
+        ( Get_activity.Contributions.
+            { username = "<USERNAME>"; activity = Repo_map.empty },
+          [] )
     else
       let contributions () =
-        let+ fetch = Lwt.return @@ Fetch.fetch ~period ~token
-        and+ report =
+        let* fetch =
+          Get_activity.Graphql.exec @@ User_fetch.request ~period ~user ~token
+        in
+        let* report =
           (* When a user specifies `with_repositories` we also fetch reports
              from these repositories and filter the PRs made over the same time
              period that were merged by the user returned by fetching the
              original get-activity. *)
-          if with_repositories = [] then
-            Lwt.return Repo_report.Project_map.empty
+          if with_repositories = [] then Ok Repo_report.Project_map.empty
           else Repo_fetch.get ~period ~token with_repositories
         in
-        let contribs =
-          Get_activity.Contributions.of_json ~from:(fst period) fetch
+        let* contribs =
+          Get_activity.Contributions.of_json ~from:(fst period) ~user fetch
         in
         let merges =
           let bindings = Repo_report.Project_map.bindings report in
@@ -138,9 +156,9 @@ let run_engineer ppf conf cal projects token no_activity no_links
                 v.Repo_report.prs)
             bindings
         in
-        (contribs, List.concat merges)
+        Ok (contribs, List.concat merges)
       in
-      Lwt_main.run (contributions ())
+      contributions ()
   in
   let gitlab_activity =
     let open Gitlab.G.Monad in
@@ -165,7 +183,8 @@ let run_engineer ppf conf cal projects token no_activity no_links
     (Activity.pp_activity ~gitlab:true ~no_links:false ())
     gitlab_activity
     Fmt.(option pp_footer)
-    (Conf.footer conf)
+    (Conf.footer conf);
+  Ok ()
 
 let get_or_error = function
   | Ok v -> v
@@ -177,16 +196,17 @@ let run_monthly ppf cal repos token with_names with_times with_descriptions =
   let from, to_ = Calendar.range cal in
   let format_date f = CalendarLib.Printer.Date.fprint "%0Y/%0m/%0d" f in
   let period = Calendar.to_iso8601 cal in
-  let projects = Lwt_main.run (Repo_fetch.get ~period ~token repos) in
+  let* projects = Repo_fetch.get ~period ~token repos in
   Fmt.pf ppf "# Reports (%a - %a)\n\n%a%!" format_date from format_date to_
     (Repo_report.pp ~with_names ~with_times ~with_descriptions)
-    projects
+    projects;
+  Ok ()
 
 let run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos = function
+    with_descriptions with_repositories repos user = function
   | Engineer ->
       run_engineer ppf conf cal (Conf.projects conf) token no_activity no_links
-        with_repositories
+        with_repositories user
   | Repository ->
       run_monthly ppf cal repos token with_names with_times with_descriptions
 
@@ -197,6 +217,7 @@ let term =
   and+ no_activity = no_activity
   and+ with_repositories = with_repositories_term
   and+ kind = kind_term
+  and+ user = user
   and+ repos = repositories in
   let token =
     (* If [no_activity] is specfied then the token will not be used, don't try
@@ -212,7 +233,7 @@ let term =
   let with_descriptions = Common.with_description c in
   let ppf = Format.formatter_of_out_channel (Common.output c) in
   run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos kind
+    with_descriptions with_repositories repos user kind
 
 let cmd =
   let info =
@@ -233,4 +254,4 @@ let cmd =
              the README at https://github.com/talex5/get-activity.";
         ]
   in
-  Cmd.v info term
+  Cmd.v info (Term.term_result term)

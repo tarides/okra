@@ -61,6 +61,11 @@ let pp_ga_item ?(gitlab = false) ~no_links () f
           Fmt.pf f "Issue: %s %a" t.title
             (repo_org ~with_id:true ~no_links)
             t.url
+      (* Actually Issue and PR comments *)
+      | `Issue_comment ->
+          Fmt.pf f "Commented on %S %a" t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
       | `PR ->
           Fmt.pf f "PR: %s %a" t.title (repo_org ~with_id:true ~no_links) t.url
       | `Review s ->
