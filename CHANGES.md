@@ -5,7 +5,7 @@
 - Change granularity of time to 0.5 days (#177, @punchagan @ganeshn-gh)
 - Printed reports now use undercore instead of star characters for emphasis/strong styling(#180, @gpetiot)
 - The weeks are now set with the option `-w`/`--weeks` and inputs are checked (#184, @gpetiot)
-- Requires get-activity-lib.1.0.0 (#<PR_NUMBER>, @gpetiot)
+- Requires get-activity-lib.1.0.0 (#185, @gpetiot)
   + `okra generate`: new option `--user`
   + `okra generate`: issue/PR comments are added to the activity
 
