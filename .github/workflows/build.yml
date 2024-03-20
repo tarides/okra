@@ -37,7 +37,7 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
 
       - name: Opam dependencies
-        run: opam install --deps-only -t .
+        run: opam install --deps-only -t . --with-dev-setup
 
       - name: Format
         run: opam exec -- dune fmt
