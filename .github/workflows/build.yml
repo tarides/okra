@@ -36,7 +36,9 @@ jobs:
             default: https://github.com/ocaml/opam-repository.git
 
       - name: Opam dependencies
-        run: opam install --deps-only -t . --with-dev-setup
+        run: |
+          opam install --deps-only -t .
+          opam install ocamlformat.0.26.1
 
       - name: Format
         run: opam exec -- dune fmt
