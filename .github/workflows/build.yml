@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-others:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - windows-latest
+          - ubuntu-latest
+        ocaml-compiler:
+          - 4.14.x
+          - 5.0.x
+          - 5.1.x
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Clone the project
+      - uses: actions/checkout@v2
+
+      # Setup
+      - name: Setup OCaml ${{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-repositories: |
+            tarides: https://github.com/tarides/opam-repository.git
+            default: https://github.com/ocaml/opam-repository.git
+
+      - name: Opam dependencies
+        run: opam install --deps-only -t .
+
+      - name: Format
+        run: opam exec -- dune fmt
+
+      - name: Runtest
+        run: opam exec -- dune runtest
