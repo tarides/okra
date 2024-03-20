@@ -44,4 +44,5 @@
   (gitlab (>= 0.1.7))
   (calendar (>= 3.0.0))
   (csv (>= 2.4))
+  (ocamlformat (and (= 0.26.1) :with-dev-setup))
   (omd (>= 2.0.0~alpha3))))
