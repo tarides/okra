@@ -29,12 +29,12 @@ Install opam if you don't already have it, and add [`tarides/opam-repository`](h
 Either only to the current opam switch with the command
 
 ```
-opam repository add tarides git@github.com:tarides/opam-repository.git
+opam repository add tarides https://github.com/tarides/opam-repository.git
 ```
 
 Or to the list of opam repositories for all opam switches with the command:
 ```
-opam repository add --all tarides git@github.com:tarides/opam-repository.git
+opam repository add --all tarides https://github.com/tarides/opam-repository.git
 ```
 
 Update your list of packages:
