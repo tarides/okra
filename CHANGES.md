@@ -6,7 +6,7 @@
 
 ### Added
 
-- generate: add the PR merge events to the contributions (#<PR_NUMBER>, @gpetiot)
+- generate: add the PR merge events to the contributions (#189, @gpetiot)
 
 ### Fixed
 
