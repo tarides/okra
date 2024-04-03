@@ -145,7 +145,7 @@ let run_engineer ppf conf cal projects token no_activity no_links
           else Repo_fetch.get ~period ~token with_repositories
         in
         let* contribs =
-          Get_activity.Contributions.of_json ~from:(fst period) ~user fetch
+          Get_activity.Contributions.of_json ~period ~user fetch
         in
         let merges =
           let bindings = Repo_report.Project_map.bindings report in

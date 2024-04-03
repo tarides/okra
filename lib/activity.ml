@@ -61,15 +61,22 @@ let pp_ga_item ?(gitlab = false) ~no_links () f
           Fmt.pf f "Issue: %s %a" t.title
             (repo_org ~with_id:true ~no_links)
             t.url
-      (* Actually Issue and PR comments *)
-      | `Issue_comment ->
-          Fmt.pf f "Commented on %S %a" t.title
-            (repo_org ~with_id:true ~no_links)
-            t.url
       | `PR ->
           Fmt.pf f "PR: %s %a" t.title (repo_org ~with_id:true ~no_links) t.url
+      | `Comment `Issue ->
+          Fmt.pf f "Commented on issue %S %a" t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
+      | `Comment `PR ->
+          Fmt.pf f "Commented on PR %S %a" t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
       | `Review s ->
           Fmt.pf f "%s %s %a" s t.title (repo_org ~with_id:true ~no_links) t.url
+      | `Merge ->
+          Fmt.pf f "Merged %S %a" t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
       | `New_repo ->
           Fmt.pf f "Created repository %a"
             (repo_org ~with_id:false ~no_links)

@@ -1,3 +1,17 @@
+## unreleased
+
+### Changed
+
+- generate: distinguish between issue comments and PR comments (#<PR_NUMBER>, @gpetiot)
+
+### Added
+
+- generate: add the PR merge events to the contributions (#<PR_NUMBER>, @gpetiot)
+
+### Fixed
+
+- generate: take into account the end date of the specified period when filtering the activity (#<PR_NUMBER>, @gpetiot)
+
 ## 0.3.0
 
 ### Changed
