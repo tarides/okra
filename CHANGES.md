@@ -2,7 +2,7 @@
 
 ### Changed
 
-- generate: distinguish between issue comments and PR comments (#<PR_NUMBER>, @gpetiot)
+- generate: distinguish between issue comments and PR comments (#189, @gpetiot)
 
 ### Added
 
