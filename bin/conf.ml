@@ -85,7 +85,15 @@ let gitlab_token t = t.gitlab_token
 let load file =
   let open Rresult in
   Bos.OS.File.read (Fpath.v file) >>= fun contents ->
-  Yaml.of_string contents >>= fun yaml -> of_yaml yaml
+  Yaml.of_string contents >>= function
+  | `Null -> Ok default
+  | yaml ->
+      Result.map_error
+        (fun (`Msg e) ->
+          `Msg
+            (Format.sprintf "@[<hv 2>Invalid configuration file %s:@\n%s@]" file
+               e))
+        (of_yaml yaml)
 
 let default_file_path =
   let ( / ) = Filename.concat in

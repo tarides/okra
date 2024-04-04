@@ -1,3 +1,9 @@
+## unreleased
+
+### Fixed
+
+- Using an empty conf should not fail, better message in case of error (#<PR_NUMBER>, @gpetiot)
+
 ## 0.4.0
 
 ### Changed
