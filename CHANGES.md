@@ -2,7 +2,7 @@
 
 ### Fixed
 
-- Using an empty conf should not fail, better message in case of error (#<PR_NUMBER>, @gpetiot)
+- Using an empty conf should not fail, better message in case of error (#192, @gpetiot)
 
 ## 0.4.0
 
