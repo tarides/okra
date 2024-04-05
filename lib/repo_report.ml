@@ -147,9 +147,12 @@ module PR = struct
 
   let pp ~with_names ~with_times ~with_descriptions ppf
       { author; title; url; created_at; merged_at; reviewers; body; _ } =
-    let pp_user ppf = Fmt.pf ppf "@%s" in
+    let pp_user ppf u = Fmt.pf ppf "[@%s](https://github.com/%s)" u u in
     let pp_created_at ppf = Fmt.pf ppf " (created/merged: %s)" in
     let pp_author ppf = Fmt.pf ppf " by %a" pp_user in
+    let reviewers =
+      List.filter (fun x -> not (String.equal "github-actions" x)) reviewers
+    in
     if reviewers = [] || not with_names then
       Fmt.(
         pf ppf " - [%s](%s)%a%a\n   %a\n" title url (option pp_author)

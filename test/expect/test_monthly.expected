@@ -5,17 +5,17 @@ Irmin is a distributed database that follows the same design principles as Git
 
 #### Opened (and not merged in same time frame)
 
- - [Small fix](https://github.com/mirage/irmin) by @Bactrian
+ - [Small fix](https://github.com/mirage/irmin) by [@Bactrian](https://github.com/Bactrian)
 
-   (created: 2021-02-01T00:00:00Z, reviewed by: @Dromedary)
+   (created: 2021-02-01T00:00:00Z, reviewed by: [@Dromedary](https://github.com/Dromedary))
    Fixes a small thing
 
 
 #### Merged
 
- - [Smaller fix](https://github.com/mirage/irmin) by @Bactrian
+ - [Smaller fix](https://github.com/mirage/irmin) by [@Bactrian](https://github.com/Bactrian)
 
-   (merged: 2021-02-01T00:00:02Z, reviewed by: @Dromedary)
+   (merged: 2021-02-01T00:00:02Z, reviewed by: [@Dromedary](https://github.com/Dromedary))
    Fixes a really small thing
 
 

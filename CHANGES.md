@@ -1,5 +1,9 @@
 ## unreleased
 
+### Changes
+
+- Make github handles clickable in repo reports (#<PR_NUMBER>, @gpetiot)
+
 ### Fixed
 
 - Using an empty conf should not fail, better message in case of error (#192, @gpetiot)
