@@ -2,7 +2,7 @@
 
 ### Changes
 
-- Make github handles clickable in repo reports (#<PR_NUMBER>, @gpetiot)
+- Make github handles clickable in repo reports (#193, @gpetiot)
 
 ### Fixed
 
