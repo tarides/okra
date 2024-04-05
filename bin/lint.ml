@@ -35,8 +35,8 @@ let run conf =
         ~ignore_sections:(Common.ignore_sections conf.c)
         ic
     with
-    | Ok () -> [ (name, None) ]
-    | Error e -> [ (name, Some e) ]
+    | Ok () -> (name, [])
+    | Error errors -> (name, errors)
   in
   let report_error name e =
     match conf.format with
@@ -47,7 +47,7 @@ let run conf =
     | Short ->
         List.iter print_endline (Okra.Lint.short_messages_of_error name e)
   in
-  let report_ok name =
+  let report_ok (name, _) =
     match conf.format with
     | Pretty -> Fmt.pr "%a: %s\n%!" (pp_status green) "OK" name
     | Short -> ()
@@ -55,21 +55,18 @@ let run conf =
   try
     let errors =
       if conf.input_files <> [] then
-        List.concat_map
+        List.map
           (fun path -> with_in_file path (fun ic -> collect_errors path ic))
           conf.input_files
-      else collect_errors "<stdin>" stdin
+      else [ collect_errors "<stdin>" stdin ]
     in
     let correct, errors =
-      List.fold_left
-        (fun (correct, errors) (name, err) ->
-          match err with
-          | Some err -> (correct, (name, err) :: errors)
-          | None -> (name :: correct, errors))
-        ([], []) errors
+      List.partition (fun (_name, err) -> err = []) errors
     in
     List.iter report_ok (List.rev correct);
-    List.iter (fun (name, error) -> report_error name error) (List.rev errors);
+    List.iter
+      (fun (name, error) -> List.iter (report_error name) error)
+      (List.rev errors);
     if errors <> [] then exit 1
   with e ->
     Printf.fprintf stderr "Caught unknown error while linting:\n\n";

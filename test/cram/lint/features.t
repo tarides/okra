@@ -47,13 +47,13 @@ When errors are found in several files, they are all printed:
   >   - Do it
   > EOF
   $ okra lint err.md err2.md
-  [ERROR(S)]: err.md
-  
-  In KR "Everything is great":
-    No time entry found. Each KR must be followed by '- @... (x days)'
   [ERROR(S)]: err2.md
   
   In KR "@a":
     Invalid time entry found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
+  [ERROR(S)]: err.md
+  
+  In KR "Everything is great":
+    No time entry found. Each KR must be followed by '- @... (x days)'
   [1]

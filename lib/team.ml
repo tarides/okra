@@ -31,7 +31,7 @@ let members { members; _ } = members
 type report =
   | Not_found of string
   | Complete of string
-  | Erroneous of (string * Lint.lint_error)
+  | Erroneous of (string * Lint.lint_error list)
 
 type lint_report = (t * (Member.t * (int * report) list) list) list
 
@@ -68,7 +68,8 @@ let pp_report ppf = function
   | Not_found fpath -> Fmt.pf ppf "Not found: %s" fpath
   | Complete _ -> Fmt.pf ppf "Complete"
   | Erroneous (fpath, e) ->
-      Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" fpath Lint.pp_error e
+      Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" fpath (Fmt.list Lint.pp_error)
+        e
 
 let pp_lint_report ppf lint_report =
   let pp_report_lint ppf (week, report) =

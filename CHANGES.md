@@ -3,6 +3,7 @@
 ### Changes
 
 - Make github handles clickable in repo reports (#193, @gpetiot)
+- Parser collects all issues instead of raising an exception (#195, @gpetiot)
 
 ### Fixed
 

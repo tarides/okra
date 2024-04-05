@@ -21,17 +21,15 @@ let src = Logs.Src.create "okra.parser"
 module Log = (val Logs.src_log src : Logs.LOG)
 open Omd
 
-exception No_time_found of string (* Record found without a time record *)
-exception Invalid_time of string (* Time record found, but has errors *)
-exception No_work_found of string (* No work items found under KR *)
-exception Multiple_time_entries of string (* More than one time entry found *)
-exception No_KR_ID_found of string (* Empty or no KR ID *)
-exception No_project_found of string (* No project found *)
-exception Invalid_markdown_in_work_items of string
-(* Subset of markdown not supported in work items *)
-
-exception Not_all_includes_accounted_for of string list
-(* There should be a section for all include sections passed to the parser *)
+type warning =
+  | No_time_found of string
+  | Multiple_time_entries of string
+  | Invalid_time of string
+  | No_work_found of string
+  | No_KR_ID_found of string
+  | No_project_found of string
+  | Not_all_includes_accounted_for of string list
+  | Invalid_markdown_in_work_items of string
 
 (* Types for parsing the AST *)
 type t =
@@ -40,8 +38,10 @@ type t =
   | Work of Item.t list (* Work items *)
   | Time of string
 
-type markdown = (string * string) list Omd.block list
+type markdown = Omd.doc
 
+let warnings : warning list ref = ref []
+let add_warning w = warnings := w :: !warnings
 let okr_re = Str.regexp "\\(.+\\) (\\([a-zA-Z#]+[0-9]+\\))$"
 (* Header: This is a legacy KR (KR12) *)
 (* Header: This is a GitHub WI (12) *)
@@ -115,14 +115,14 @@ let dump_elt ppf = function
   | Time _ -> Fmt.pf ppf "Time: <not shown>"
 
 let dump ppf okr = Fmt.Dump.list dump_elt ppf okr
-let err_no_project s = raise (No_project_found s)
-let err_multiple_time_entries s = raise (Multiple_time_entries s)
-let err_markdown s = raise (Invalid_markdown_in_work_items s)
-let err_no_work s = raise (No_work_found s)
-let err_no_id s = raise (No_KR_ID_found s)
-let err_time s = raise (Invalid_time s)
-let err_no_time s = raise (No_time_found s)
-let err_missing_includes s = raise (Not_all_includes_accounted_for s)
+let err_no_project s = add_warning (No_project_found s)
+let err_multiple_time_entries s = add_warning (Multiple_time_entries s)
+let err_markdown s = add_warning (Invalid_markdown_in_work_items s)
+let err_no_work s = add_warning (No_work_found s)
+let err_no_id s = add_warning (No_KR_ID_found s)
+let err_time s = add_warning (Invalid_time s)
+let err_no_time s = add_warning (No_time_found s)
+let err_missing_includes s = add_warning (Not_all_includes_accounted_for s)
 
 let rec inline = function
   | Concat (_, xs) -> Item.Concat (List.map inline xs)
@@ -143,15 +143,26 @@ let list_type = function
   | Bullet c -> Item.Bullet c
 
 let rec block = function
-  | Paragraph (_, x) -> Item.Paragraph (inline x)
-  | List (_, x, _, bls) -> Item.List (list_type x, List.map (List.map block) bls)
-  | Blockquote (_, x) -> Item.Blockquote (List.map block x)
-  | Code_block (_, x, y) -> Item.Code_block (x, y)
-  | Html_block _ -> err_markdown "Html_bloc"
-  | Definition_list _ -> err_markdown "Definition_list"
-  | Thematic_break _ -> err_markdown "Thematic_break"
-  | Heading _ -> err_markdown "Heading"
-  | Table _ -> err_markdown "Table"
+  | Paragraph (_, x) -> Some (Item.Paragraph (inline x))
+  | List (_, x, _, bls) ->
+      Some (Item.List (list_type x, List.map (List.filter_map block) bls))
+  | Blockquote (_, x) -> Some (Item.Blockquote (List.filter_map block x))
+  | Code_block (_, x, y) -> Some (Item.Code_block (x, y))
+  | Html_block _ ->
+      err_markdown "Html_bloc";
+      None
+  | Definition_list _ ->
+      err_markdown "Definition_list";
+      None
+  | Thematic_break _ ->
+      err_markdown "Thematic_break";
+      None
+  | Heading _ ->
+      err_markdown "Heading";
+      None
+  | Table _ ->
+      err_markdown "Table";
+      None
 
 let inline_to_string = Printer.to_string Item.pp_inline
 let item_to_string = Printer.to_string Item.pp
@@ -195,10 +206,12 @@ let kr ~project ~objective = function
                     | false -> None
                     | true ->
                         let user = Str.matched_group 1 s in
-                        (* todo: let this conversion raise an exception, would
-                           be nice to exit more cleanly, but it should be
-                           fatal *)
-                        let days = Float.of_string (Str.matched_group 2 s) in
+                        (* warning emitted earlier, we use [0.] and move on *)
+                        let days =
+                          match Float.of_string_opt (Str.matched_group 2 s) with
+                          | Some f -> f
+                          | None -> 0.
+                        in
                         Some (user, days))
                   t_split
               in
@@ -216,26 +229,29 @@ let kr ~project ~objective = function
         | _ -> err_no_time title
       in
 
-      let work =
-        match (List.filter_map (function Work e -> Some e | _ -> None)) l with
-        | [] -> err_no_work title
-        | l -> l
-      in
+      let work = List.filter_map (function Work e -> Some e | _ -> None) l in
+      if work = [] then err_no_work title;
 
       let id =
-        try Option.get !id with Invalid_argument _ -> err_no_id title
+        match !id with
+        | Some id -> id
+        | None ->
+            err_no_id title;
+            No_KR
       in
 
       let time_entries =
         match !time_entries with
-        | [] -> err_time title
+        (* [No_time_found] already reported. *)
+        | [] -> []
         | [ e ] -> e
-        | _ -> err_multiple_time_entries title
+        | x :: _ ->
+            err_multiple_time_entries title;
+            x
       in
 
-      let project =
-        match String.trim project with "" -> err_no_project title | s -> s
-      in
+      let project = String.trim project in
+      if project = "" then err_no_project title;
       let objective = String.trim objective in
 
       (* Construct final entry *)
@@ -254,11 +270,17 @@ let block_okr = function
           if is_time_block bl then
             (* todo verify that this is true *)
             let time_s =
-              String.concat "" (List.map (fun b -> item_to_string (block b)) bl)
+              String.concat ""
+                (List.map
+                   (fun b ->
+                     match block b with
+                     | Some b -> item_to_string b
+                     | None -> "")
+                   bl)
             in
             Time time_s
           else
-            let work_items = List.map block bl in
+            let work_items = List.filter_map block bl in
             Work work_items)
         bls
   | _ -> []
@@ -346,9 +368,10 @@ let check_includes u_includes (includes : string list) =
 
 let of_markdown ?(ignore_sections = [ "OKR Updates" ]) ?(include_sections = [])
     ast =
+  warnings := [];
   let u_ignore = List.map String.uppercase_ascii ignore_sections in
   let u_include = List.map String.uppercase_ascii include_sections in
   let state = init ~ignore_sections:u_ignore ~include_sections:u_include () in
   let includes, krs = process state ast in
   check_includes u_include (List.sort_uniq String.compare includes);
-  List.rev krs
+  (List.rev krs, List.rev !warnings)

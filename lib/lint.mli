@@ -24,8 +24,9 @@ type lint_error =
   | No_KR_ID_found of int option * string
   | No_project_found of int option * string
   | Not_all_includes of string list
+  | Invalid_markdown_in_work_items of int option * string
 
-type lint_result = (unit, lint_error) result
+type lint_result = (unit, lint_error list) result
 
 val lint :
   ?okr_db:Masterdb.t ->

@@ -24,8 +24,9 @@ type lint_error =
   | No_KR_ID_found of int option * string
   | No_project_found of int option * string
   | Not_all_includes of string list
+  | Invalid_markdown_in_work_items of int option * string
 
-type lint_result = (unit, lint_error) result
+type lint_result = (unit, lint_error list) result
 
 let fail_fmt_patterns =
   [
@@ -84,6 +85,8 @@ let pp_error ppf = function
       Fmt.pf ppf "@[<hv 2>In KR %S:@ No project found (starting with '#')@]@," s
   | Not_all_includes s ->
       Fmt.pf ppf "Missing includes section: %a\n" Fmt.(list ~sep:comma string) s
+  | Invalid_markdown_in_work_items (_, s) ->
+      Fmt.pf ppf "@[<hv 2>Invalid markdown in work items:@ %s@]@," s
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -101,32 +104,40 @@ let grep_n s lines =
     (fun (i, line) -> if Str.string_match re line 0 then Some i else None)
     lines
 
+let add_context lines = function
+  | Parser.No_time_found s -> No_time_found (grep_n s lines, s)
+  | Parser.Invalid_time s -> Invalid_time (grep_n s lines, s)
+  | Parser.Multiple_time_entries s -> Multiple_time_entries (grep_n s lines, s)
+  | Parser.No_work_found s -> No_work_found (grep_n s lines, s)
+  | Parser.No_KR_ID_found s -> No_KR_ID_found (grep_n s lines, s)
+  | Parser.No_project_found s -> No_project_found (grep_n s lines, s)
+  | Parser.Not_all_includes_accounted_for s -> Not_all_includes s
+  | Parser.Invalid_markdown_in_work_items s ->
+      Invalid_markdown_in_work_items (grep_n s lines, s)
+
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
 let check_document ?okr_db ~include_sections ~ignore_sections s =
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
-  try
-    let md = Omd.of_string s in
-    let okrs = Parser.of_markdown ~include_sections ~ignore_sections md in
-    let _report = Report.of_krs ?okr_db okrs in
-    Ok ()
-  with
-  | Parser.No_time_found s -> Error (No_time_found (grep_n s lines, s))
-  | Parser.Invalid_time s -> Error (Invalid_time (grep_n s lines, s))
-  | Parser.Multiple_time_entries s ->
-      Error (Multiple_time_entries (grep_n s lines, s))
-  | Parser.No_work_found s -> Error (No_work_found (grep_n s lines, s))
-  | Parser.No_KR_ID_found s -> Error (No_KR_ID_found (grep_n s lines, s))
-  | Parser.No_project_found s -> Error (No_project_found (grep_n s lines, s))
-  | Parser.Not_all_includes_accounted_for s -> Error (Not_all_includes s)
+  let md = Omd.of_string s in
+  let okrs, warnings =
+    Parser.of_markdown ~include_sections ~ignore_sections md
+  in
+  match warnings |> List.map (add_context lines) with
+  | [] ->
+      let _report = Report.of_krs ?okr_db okrs in
+      Ok ()
+  | warnings -> Error warnings
 
 let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors s =
   if !format_errors <> [] then
     Error
-      (Format_error
-         (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors))
+      [
+        Format_error
+          (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors);
+      ]
   else check_document ?okr_db ~include_sections ~ignore_sections s
 
 let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
@@ -186,3 +197,5 @@ let short_messages_of_error file_name =
       short_messagef line_number "No project found for %S" kr
   | Not_all_includes l ->
       short_messagef None "Missing includes section: %s" (String.concat ", " l)
+  | Invalid_markdown_in_work_items (line_number, s) ->
+      short_messagef line_number "Invalid markdown in work items: %s" s
