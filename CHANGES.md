@@ -5,7 +5,7 @@
 - Make github handles clickable in repo reports (#193, @gpetiot)
 - Parser collects all issues instead of raising an exception (#195, @gpetiot).
   Other commands that rely on parsing weekly reports (cat, team, stats) can now be run on reports that don't pass linting, but warnings are reported.
-- Improve the "Invalid time" error messages (#<PR_NUMBER>, @gpetiot)
+- Improve the "Invalid time" error messages (#199, @gpetiot)
 
 ### Fixed
 
