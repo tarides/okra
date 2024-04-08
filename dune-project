@@ -43,4 +43,5 @@
   (gitlab (>= 0.1.7))
   (calendar (>= 3.0.0))
   (csv (>= 2.4))
+  re
   (omd (>= 2.0.0~alpha3))))

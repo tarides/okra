@@ -53,17 +53,20 @@ let is_time_block = function
   | [ Paragraph (_, Text (_, s)) ] -> String.get (String.trim s) 0 = '@'
   | _ -> false
 
-let time_block_is_sane s =
-  let regexp =
-    Str.regexp
-      "^@[a-zA-Z0-9-]+[ ]+(\\(\\([0-9]+\\.?[05]?\\)\\|\\(\\.5\\)\\) day[s]?)$"
+let time_entry_regexp =
+  let open Re in
+  let user = seq [ char '@'; group (rep1 (alt [ wordc; char '-' ])) ] in
+  let number =
+    let with_int_part =
+      let int_part = rep1 digit in
+      let fract_part = seq [ char '.'; opt (alt [ char '0'; char '5' ]) ] in
+      seq [ int_part; opt fract_part ]
+    in
+    let without_int_part = seq [ str ".5"; opt (char '0') ] in
+    group (alt [ with_int_part; without_int_part ])
   in
-  let pieces = String.split_on_char ',' (String.trim s) in
-  List.for_all
-    (fun s ->
-      let s = String.trim s in
-      Str.string_match regexp s 0)
-    pieces
+  let time = seq [ number; rep space; str "day"; opt (char 's') ] in
+  compile @@ seq [ start; user; rep space; char '('; time; char ')'; stop ]
 
 let is_suffix suffix s =
   String.length s >= String.length suffix
@@ -190,29 +193,23 @@ let kr ~project ~objective = function
           | KR_title s -> title := s
           | KR_id s -> id := Some s
           | Time t ->
-              (* check that time block makes sense *)
-              if not (time_block_is_sane t) then err_time ~title:!title ~entry:t;
-              (* split on @, then extract first word and any float after *)
-              let t_split = Str.split (Str.regexp "@+") t in
+              let t_split = String.split_on_char ',' (String.trim t) in
               let entry =
                 List.filter_map
                   (fun s ->
+                    let ( let* ) = Option.bind in
+                    let s = String.trim s in
                     match
-                      Str.string_match
-                        (Str.regexp
-                           "^\\([a-zA-Z0-9-]+\\)[ ]+(\\([0-9.]+\\) day[s]?)")
-                        s 0
+                      let* grp = Re.exec_opt time_entry_regexp s in
+                      let* user = Re.Group.get_opt grp 1 in
+                      let* s_time = Re.Group.get_opt grp 2 in
+                      let* f_time = Float.of_string_opt s_time in
+                      Some (user, f_time)
                     with
-                    | false -> None
-                    | true ->
-                        let user = Str.matched_group 1 s in
-                        (* warning emitted earlier, we use [0.] and move on *)
-                        let days =
-                          match Float.of_string_opt (Str.matched_group 2 s) with
-                          | Some f -> f
-                          | None -> 0.
-                        in
-                        Some (user, days))
+                    | Some x -> Some x
+                    | None ->
+                        err_time ~title:!title ~entry:t;
+                        None)
                   t_split
               in
               time_entries := [ entry ] :: !time_entries
