@@ -3,7 +3,8 @@
 ### Changes
 
 - Make github handles clickable in repo reports (#193, @gpetiot)
-- Parser collects all issues instead of raising an exception (#195, @gpetiot)
+- Parser collects all issues instead of raising an exception (#195, @gpetiot).
+  Other commands that rely on parsing weekly reports (cat, team, stats) can now be run on reports that don't pass linting, but warnings are reported.
 
 ### Fixed
 
