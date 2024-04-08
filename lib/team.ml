@@ -75,10 +75,13 @@ let pp_lint_report ppf lint_report =
   let pp_report_lint ppf (week, report) =
     Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" week pp_report report
   in
-  let pp_member_lint ppf (member, member_lint) =
-    Fmt.pf ppf "+ %s@;<1 4>%a" (Member.name member)
-      (Fmt.list ~sep:(Fmt.any "@;<1 4>") pp_report_lint)
-      member_lint
+  let pp_member_lint ppf (_, member_lint) =
+    let not_complete =
+      List.filter (function _, Complete _ -> false | _ -> true) member_lint
+    in
+    Fmt.pf ppf "@[%a@]"
+      (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
+      not_complete
   in
   let pp_team_lint ppf (team, members_list) =
     Fmt.pf ppf "=== %s ===@;<1 2>%a" (name team)
