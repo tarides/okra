@@ -24,7 +24,7 @@ open Omd
 type warning =
   | No_time_found of string
   | Multiple_time_entries of string
-  | Invalid_time of string
+  | Invalid_time of { title : string; entry : string }
   | No_work_found of string
   | No_KR_ID_found of string
   | No_project_found of string
@@ -120,7 +120,7 @@ let err_multiple_time_entries s = add_warning (Multiple_time_entries s)
 let err_markdown s = add_warning (Invalid_markdown_in_work_items s)
 let err_no_work s = add_warning (No_work_found s)
 let err_no_id s = add_warning (No_KR_ID_found s)
-let err_time s = add_warning (Invalid_time s)
+let err_time title entry = add_warning (Invalid_time { title; entry })
 let err_no_time s = add_warning (No_time_found s)
 let err_missing_includes s = add_warning (Not_all_includes_accounted_for s)
 
@@ -191,7 +191,7 @@ let kr ~project ~objective = function
           | KR_id s -> id := Some s
           | Time t ->
               (* check that time block makes sense *)
-              if not (time_block_is_sane t) then err_time t else ();
+              if not (time_block_is_sane t) then err_time !title t else ();
               (* split on @, then extract first word and any float after *)
               let t_split = Str.split (Str.regexp "@+") t in
               let entry =

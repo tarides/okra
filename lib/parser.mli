@@ -19,7 +19,8 @@
 type warning =
   | No_time_found of string  (** Record found without a time record *)
   | Multiple_time_entries of string  (** More than one time entry found *)
-  | Invalid_time of string  (** Time record found, but has errors *)
+  | Invalid_time of { title : string; entry : string }
+      (** Time record found, but has errors *)
   | No_work_found of string  (** No work items found under KR *)
   | No_KR_ID_found of string  (** Empty or no KR ID *)
   | No_project_found of string  (** No project found *)

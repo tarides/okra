@@ -239,7 +239,8 @@ let of_objectives ~project objectives =
 
 let pp_warning ppf = function
   | Parser.No_time_found s -> Fmt.pf ppf "No time found in %S" s
-  | Invalid_time s -> Fmt.pf ppf "Invalid time in %S" s
+  | Invalid_time { title; entry } ->
+      Fmt.pf ppf "Invalid time entry %S in %S" entry title
   | Multiple_time_entries s -> Fmt.pf ppf "Multiple time entries for %S" s
   | No_work_found s -> Fmt.pf ppf "No work found for %S" s
   | No_KR_ID_found s -> Fmt.pf ppf "No KR ID found for %S" s

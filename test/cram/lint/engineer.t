@@ -116,8 +116,8 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "@eng1 (1.1 day)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (y days)'
+  In KR "This is a KR":
+    Invalid time entry "@eng1 (1.1 day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
 
@@ -141,7 +141,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "@eng1 ( day)":
-    Invalid time entry found. Format is '- @eng1 (x days), @eng2 (y days)'
+  In KR "This is a KR":
+    Invalid time entry "@eng1 ( day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]

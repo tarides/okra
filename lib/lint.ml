@@ -18,7 +18,7 @@
 type lint_error =
   | Format_error of (int * string) list
   | No_time_found of int option * string
-  | Invalid_time of int option * string
+  | Invalid_time of { lnum : int option; title : string; entry : string }
   | Multiple_time_entries of int option * string
   | No_work_found of int option * string
   | No_KR_ID_found of int option * string
@@ -58,11 +58,11 @@ let pp_error ppf = function
         "@[<hv 2>In KR %S:@ No time entry found. Each KR must be followed by \
          '- @@... (x days)'@]@,"
         s
-  | Invalid_time (_, s) ->
+  | Invalid_time { lnum = _; title; entry } ->
       Fmt.pf ppf
-        "@[<hv 2>In KR %S:@ Invalid time entry found. Format is '- @@eng1 (x \
-         days), @@eng2 (y days)'@ where x and y must be divisible by 0.5@]@,"
-        s
+        "@[<hv 2>In KR %S:@ Invalid time entry %S found. Format is '- @@eng1 \
+         (x days), @@eng2 (y days)'@ where x and y must be divisible by 0.5@]@,"
+        title entry
   | Multiple_time_entries (_, s) ->
       Fmt.pf ppf
         "@[<hv 2>In KR %S:@ Multiple time entries found. Only one time entry \
@@ -106,7 +106,8 @@ let grep_n s lines =
 
 let add_context lines = function
   | Parser.No_time_found s -> No_time_found (grep_n s lines, s)
-  | Parser.Invalid_time s -> Invalid_time (grep_n s lines, s)
+  | Parser.Invalid_time { title; entry } ->
+      Invalid_time { lnum = grep_n entry lines; title; entry }
   | Parser.Multiple_time_entries s -> Multiple_time_entries (grep_n s lines, s)
   | Parser.No_work_found s -> No_work_found (grep_n s lines, s)
   | Parser.No_KR_ID_found s -> No_KR_ID_found (grep_n s lines, s)
@@ -185,8 +186,8 @@ let short_messages_of_error file_name =
         errs
   | No_time_found (line_number, kr) ->
       short_messagef line_number "No time found in %S" kr
-  | Invalid_time (line_number, kr) ->
-      short_messagef line_number "Invalid time in %S" kr
+  | Invalid_time { lnum; title; entry } ->
+      short_messagef lnum "Invalid time entry %S in %S" entry title
   | Multiple_time_entries (line_number, kr) ->
       short_messagef line_number "Multiple time entries for %S" kr
   | No_work_found (line_number, kr) ->
