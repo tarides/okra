@@ -6,7 +6,7 @@
 - Parser collects all issues instead of raising an exception (#195, @gpetiot).
   Other commands that rely on parsing weekly reports (cat, team, stats) can now be run on reports that don't pass linting, but warnings are reported.
 - Improve the "Invalid time" error messages (#199, @gpetiot)
-- okra team lint: only print invalid/missing files (#<PR_NUMBER>, @gpetiot)
+- okra team lint: only print invalid/missing files (#200, @gpetiot)
 
 ### Fixed
 
