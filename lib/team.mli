@@ -45,3 +45,7 @@ val lint : string -> year:int -> weeks:int list -> t list -> lint_report
     given weeks. *)
 
 val pp_lint_report : Format.formatter -> lint_report -> unit
+
+val is_valid : lint_report -> bool
+(** [is_valid lint_report] indicates whether every report (for all teams, all
+    users, all weeks) are valid. *)

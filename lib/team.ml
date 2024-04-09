@@ -122,6 +122,20 @@ let pp_lint_report ppf lint_report =
       (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
       not_complete
 
+let is_valid lint_report =
+  List.for_all
+    (fun team_report ->
+      List.for_all
+        (fun user_report ->
+          List.for_all
+            (fun week_report ->
+              match week_report.status with
+              | Complete -> true
+              | Not_found | Not_lint _ -> false)
+            user_report.week_reports)
+        team_report.user_reports)
+    lint_report
+
 let read_file f =
   let ic = open_in f in
   let s = really_input_string ic (in_channel_length ic) in

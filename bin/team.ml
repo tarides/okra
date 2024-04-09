@@ -28,7 +28,8 @@ let lint t =
   let year = Common.year t in
   let teams = Common.teams t in
   let lint_report = Okra.Team.lint repo ~year ~weeks teams in
-  Format.printf "%a" Okra.Team.pp_lint_report lint_report
+  Format.printf "%a" Okra.Team.pp_lint_report lint_report;
+  if not (Okra.Team.is_valid lint_report) then exit 1
 
 let aggregate t =
   let repo = get_or_error @@ Common.repo t in

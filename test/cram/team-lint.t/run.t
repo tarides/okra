@@ -10,6 +10,7 @@ Team Lint example with invalid reports:
                       Line 5: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       2 formatting errors found. Parsing aborted.
     + Report week 42: Not found: admin//weekly/2022/42/eng2.md
+  [1]
 
 Team Lint example with only valid reports:
 
@@ -55,3 +56,4 @@ Wrong week
   Team "My Team":
     + Report week 53: Not found: admin//weekly/2020/53/eng1.md
     + Report week 53: Not found: admin//weekly/2020/53/eng2.md
+  [1]
