@@ -79,40 +79,38 @@ let result_partition f =
 
 let sum = List.fold_left ( + ) 0
 
+let pp_report_lint ppf report =
+  Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
+    report
+
+let pp_member_lint ppf { member = _; week_reports } =
+  let complete, not_complete =
+    List.partition
+      (fun r ->
+        match r.status with Complete -> true | Not_found | Not_lint _ -> false)
+      week_reports
+  in
+  if not_complete = [] then Ok (List.length complete)
+  else
+    Error
+      (fun () ->
+        Fmt.pf ppf "@[%a@]"
+          (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
+          not_complete)
+
+let pp_team_lint ppf { team; user_reports } =
+  let complete, not_complete =
+    result_partition (pp_member_lint ppf) user_reports
+  in
+  if not_complete = [] then Ok (sum complete)
+  else
+    Error
+      (fun () ->
+        Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
+          (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
+          not_complete)
+
 let pp_lint_report ppf lint_report =
-  let pp_report_lint ppf report =
-    Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
-      report
-  in
-  let pp_member_lint ppf { member = _; week_reports } =
-    let complete, not_complete =
-      List.partition
-        (fun r ->
-          match r.status with
-          | Complete -> true
-          | Not_found | Not_lint _ -> false)
-        week_reports
-    in
-    if not_complete = [] then Ok (List.length complete)
-    else
-      Error
-        (fun () ->
-          Fmt.pf ppf "@[%a@]"
-            (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
-            not_complete)
-  in
-  let pp_team_lint ppf { team; user_reports } =
-    let complete, not_complete =
-      result_partition (pp_member_lint ppf) user_reports
-    in
-    if not_complete = [] then Ok (sum complete)
-    else
-      Error
-        (fun () ->
-          Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
-            (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
-            not_complete)
-  in
   let complete, not_complete =
     result_partition (pp_team_lint ppf) lint_report
   in
