@@ -7,7 +7,7 @@
   Other commands that rely on parsing weekly reports (cat, team, stats) can now be run on reports that don't pass linting, but warnings are reported.
 - Improve the "Invalid time" error messages (#199, @gpetiot)
 - okra team lint: only print details of invalid/missing files, or total of valid files (#200, @gpetiot)
-- okra gen report: PR/issue entries formatted the same way as in engineer reports (#<PR_NUMBER>, @gpetiot)
+- okra gen report: PR/issue entries formatted the same way as in engineer reports (#201, @gpetiot)
 
 ### Fixed
 
