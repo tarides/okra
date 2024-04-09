@@ -44,7 +44,6 @@ end
 type t = {
   projects : project list; [@default [ default_project ]]
   teams : Team.t list; [@default []]
-  locations : string list; [@default []]
   footer : string option;
   okr_db : string option;
   admin_dir : string option;
@@ -56,7 +55,6 @@ let default =
   {
     projects = [ default_project ];
     teams = [];
-    locations = [];
     footer = None;
     okr_db = None;
     admin_dir = None;
@@ -76,7 +74,6 @@ let teams { teams; _ } =
   List.map to_okra teams
 
 let projects { projects; _ } = projects
-let locations { locations; _ } = locations
 let footer { footer; _ } = footer
 let okr_db t = t.okr_db
 let admin_dir t = t.admin_dir

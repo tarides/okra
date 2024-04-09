@@ -25,9 +25,6 @@ val teams : t -> Okra.Team.t list
 val projects : t -> Okra.Activity.project list
 (** A user's list of activer projects *)
 
-val locations : t -> string list
-(** A list of locations to use when aggregating reports *)
-
 val footer : t -> string option
 (** An optional footer to append to the end of your engineer reports *)
 
