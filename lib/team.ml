@@ -77,6 +77,8 @@ let result_partition f =
   List.partition_map (fun x ->
       match f x with Ok i -> Either.Left i | Error e -> Either.Right e)
 
+let sum = List.fold_left ( + ) 0
+
 let pp_lint_report ppf lint_report =
   let pp_report_lint ppf report =
     Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
@@ -103,7 +105,7 @@ let pp_lint_report ppf lint_report =
     let complete, not_complete =
       result_partition (pp_member_lint ppf) user_reports
     in
-    if not_complete = [] then Ok (List.fold_left ( + ) 0 complete)
+    if not_complete = [] then Ok (sum complete)
     else
       Error
         (fun () ->
@@ -115,7 +117,7 @@ let pp_lint_report ppf lint_report =
     result_partition (pp_team_lint ppf) lint_report
   in
   if not_complete = [] then
-    let total = List.fold_left ( + ) 0 complete in
+    let total = sum complete in
     Fmt.pf ppf "[OK]: %i reports@." total
   else
     Fmt.pf ppf "@[<v 0>%a@]@."
