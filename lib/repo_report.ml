@@ -62,7 +62,9 @@ module Issue = struct
     let pp_created_at ppf = Fmt.pf ppf " (created/merged: %s)" in
     let pp_author ppf = Fmt.pf ppf " by %a" pp_user in
     Fmt.(
-      pf ppf " - [%s](%s)%a%a\n   %a\n" title url (option pp_author)
+      pf ppf " - Issue: %s %a %a%a\n   %a\n" title
+        (Activity.repo_org ~with_id:true ~no_links:false)
+        url (option pp_author)
         (if not with_names then None else author)
         (option pp_created_at)
         (if not with_times then None else Some created_at)
@@ -155,7 +157,9 @@ module PR = struct
     in
     if reviewers = [] || not with_names then
       Fmt.(
-        pf ppf " - [%s](%s)%a%a\n   %a\n" title url (option pp_author)
+        pf ppf " - PR: %s %a %a%a\n   %a\n" title
+          (Activity.repo_org ~with_id:true ~no_links:false)
+          url (option pp_author)
           (if not with_names then None else author)
           (option pp_created_at)
           (if not with_times then None
@@ -165,7 +169,8 @@ module PR = struct
           (if not with_descriptions then None else Some body))
     else
       Fmt.(
-        pf ppf " - [%s](%s) by %a\n\n   (%s, reviewed by: %a)\n   %a\n" title
+        pf ppf " - PR: %s %a by %a\n\n   (%s, reviewed by: %a)\n   %a\n" title
+          (Activity.repo_org ~with_id:true ~no_links:false)
           url pp_user
           (Option.value ~default:"No author" author)
           (Option.value ~default:("created: " ^ created_at)

@@ -23,6 +23,10 @@ type project = { title : string; items : string list }
 val make : projects:project list -> Get_activity.Contributions.t -> t
 (** [make_activity ~projects activites] builds a new weekly activity *)
 
+val repo_org :
+  ?with_id:bool -> ?no_links:bool -> Format.formatter -> string -> unit
+(** [report_org fs url] pretty-prints [url] in the form [repo/id]. *)
+
 val pp_ga_item :
   ?gitlab:bool -> no_links:bool -> unit -> Get_activity.Contributions.item Fmt.t
 (** [pp_ga_item ?gitlab ~no_links () ppf item] prints the get-activity item. See

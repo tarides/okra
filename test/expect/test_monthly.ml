@@ -35,7 +35,7 @@ let repo_report =
                 author = Some "Dromedary";
                 title = "Small bug";
                 cursor = "wkjgkdjlsghwkl";
-                url = "https://github.com/mirage/irmin";
+                url = "https://github.com/mirage/irmin/issues/2200";
                 body = "A small bug";
                 closed = false;
                 closed_at = None;
@@ -48,7 +48,7 @@ let repo_report =
               {
                 author = Some "Bactrian";
                 cursor = "ABCDEFGHIJKLM";
-                url = "https://github.com/mirage/irmin";
+                url = "https://github.com/mirage/irmin/issues/2210";
                 title = "Small fix";
                 body = "Fixes a small thing";
                 closed = false;
@@ -62,7 +62,7 @@ let repo_report =
               {
                 author = Some "Bactrian";
                 cursor = "ZYXW";
-                url = "https://github.com/mirage/irmin";
+                url = "https://github.com/mirage/irmin/issues/2220";
                 title = "Smaller fix";
                 body = "Fixes a really small thing";
                 closed = false;
