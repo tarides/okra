@@ -127,10 +127,10 @@ let run_engineer ppf conf cal projects token no_activity no_links
   let week = Calendar.week cal in
   let* activity, _ =
     if no_activity then
-      Ok
-        ( Get_activity.Contributions.
-            { username = "<USERNAME>"; activity = Repo_map.empty },
-          [] )
+      let username =
+        match user with Get_activity.User.Viewer -> "<USERNAME>" | User u -> u
+      in
+      Ok (Get_activity.Contributions.{ username; activity = Repo_map.empty }, [])
     else
       let contributions () =
         let* fetch =
