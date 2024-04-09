@@ -28,12 +28,11 @@ let make ~name ~members = { name; members }
 let name { name; _ } = name
 let members { members; _ } = members
 
-type report =
-  | Not_found of string
-  | Complete of string
-  | Erroneous of (string * Lint.lint_error list)
-
-type lint_report = (t * (Member.t * (int * report) list) list) list
+type file_status = Complete | Not_found | Not_lint of Lint.lint_error list
+type week_report = { week : int; filename : string; status : file_status }
+type user_report = { member : Member.t; week_reports : week_report list }
+type team_report = { team : t; user_reports : user_report list }
+type lint_report = team_report list
 
 let file_path ~admin_dir ~week ~year ~engineer_name =
   Format.asprintf "%s/weekly/%4d/%02i/%s.md" admin_dir year week engineer_name
@@ -42,51 +41,60 @@ let lint_member_week admin_dir member ~week ~year =
   let fname =
     file_path ~admin_dir ~week ~year ~engineer_name:(Member.github member)
   in
-  match Sys.file_exists fname with
-  | false -> Not_found fname
-  | true -> (
-      let ic = open_in fname in
-      match
-        Lint.lint ~include_sections:[ "Last week" ] ~ignore_sections:[] ic
-      with
-      | Ok () -> Complete fname
-      | Error e -> Erroneous (fname, e))
+  let status =
+    match Sys.file_exists fname with
+    | false -> Not_found
+    | true -> (
+        let ic = open_in fname in
+        match
+          Lint.lint ~include_sections:[ "Last week" ] ~ignore_sections:[] ic
+        with
+        | Ok () -> Complete
+        | Error e -> Not_lint e)
+  in
+  { week; filename = fname; status }
 
 let lint_member admin_dir ~year weeks member =
   let lint_member_week = lint_member_week admin_dir member in
-  List.map (fun week -> (week, lint_member_week ~year ~week)) weeks
+  List.map (fun week -> lint_member_week ~year ~week) weeks
 
 let lint_team admin_dir ~year ~weeks members =
   let lint_member = lint_member ~year admin_dir weeks in
-  List.map (fun member -> (member, lint_member member)) members
+  List.map (fun member -> { member; week_reports = lint_member member }) members
 
 let lint admin_dir ~year ~weeks teams =
   let lint_team = lint_team ~year admin_dir ~weeks in
-  List.map (fun team -> (team, lint_team (members team))) teams
+  List.map (fun team -> { team; user_reports = lint_team (members team) }) teams
 
 let pp_report ppf = function
-  | Not_found fpath -> Fmt.pf ppf "Not found: %s" fpath
-  | Complete _ -> Fmt.pf ppf "Complete"
-  | Erroneous (fpath, e) ->
-      Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" fpath (Fmt.list Lint.pp_error)
-        e
+  | { status = Complete; _ } -> Fmt.pf ppf "Complete"
+  | { filename; status = Not_found; _ } -> Fmt.pf ppf "Not found: %s" filename
+  | { filename; status = Not_lint e; _ } ->
+      Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" filename
+        (Fmt.list Lint.pp_error) e
 
 let pp_lint_report ppf lint_report =
-  let pp_report_lint ppf (week, report) =
-    Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" week pp_report report
+  let pp_report_lint ppf report =
+    Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
+      report
   in
-  let pp_member_lint ppf (_, member_lint) =
+  let pp_member_lint ppf { member = _; week_reports } =
     let not_complete =
-      List.filter (function _, Complete _ -> false | _ -> true) member_lint
+      List.filter
+        (fun r ->
+          match r.status with
+          | Complete -> false
+          | Not_found | Not_lint _ -> true)
+        week_reports
     in
     Fmt.pf ppf "@[%a@]"
       (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
       not_complete
   in
-  let pp_team_lint ppf (team, members_list) =
+  let pp_team_lint ppf { team; user_reports } =
     Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
       (Fmt.list ~sep:(Fmt.any "@;<1 2>") pp_member_lint)
-      members_list
+      user_reports
   in
   Fmt.pf ppf "@[<v 0>%a@]@."
     (Fmt.list ~sep:(Fmt.any "@;<1 2>") pp_team_lint)
