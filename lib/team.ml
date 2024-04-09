@@ -73,32 +73,54 @@ let pp_report ppf = function
       Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" filename
         (Fmt.list Lint.pp_error) e
 
+let result_partition f =
+  List.partition_map (fun x ->
+      match f x with Ok i -> Either.Left i | Error e -> Either.Right e)
+
 let pp_lint_report ppf lint_report =
   let pp_report_lint ppf report =
     Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
       report
   in
   let pp_member_lint ppf { member = _; week_reports } =
-    let not_complete =
-      List.filter
+    let complete, not_complete =
+      List.partition
         (fun r ->
           match r.status with
-          | Complete -> false
-          | Not_found | Not_lint _ -> true)
+          | Complete -> true
+          | Not_found | Not_lint _ -> false)
         week_reports
     in
-    Fmt.pf ppf "@[%a@]"
-      (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
-      not_complete
+    if not_complete = [] then Ok (List.length complete)
+    else
+      Error
+        (fun () ->
+          Fmt.pf ppf "@[%a@]"
+            (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
+            not_complete)
   in
   let pp_team_lint ppf { team; user_reports } =
-    Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
-      (Fmt.list ~sep:(Fmt.any "@;<1 2>") pp_member_lint)
-      user_reports
+    let complete, not_complete =
+      result_partition (pp_member_lint ppf) user_reports
+    in
+    if not_complete = [] then Ok (List.fold_left ( + ) 0 complete)
+    else
+      Error
+        (fun () ->
+          Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
+            (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
+            not_complete)
   in
-  Fmt.pf ppf "@[<v 0>%a@]@."
-    (Fmt.list ~sep:(Fmt.any "@;<1 2>") pp_team_lint)
-    lint_report
+  let complete, not_complete =
+    result_partition (pp_team_lint ppf) lint_report
+  in
+  if not_complete = [] then
+    let total = List.fold_left ( + ) 0 complete in
+    Fmt.pf ppf "[OK]: %i reports@." total
+  else
+    Fmt.pf ppf "@[<v 0>%a@]@."
+      (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
+      not_complete
 
 let read_file f =
   let ic = open_in f in

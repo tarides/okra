@@ -1,7 +1,7 @@
 
-Team Lint example
+Team Lint example with invalid reports:
 
-  $ okra team lint -C admin/ -w 40-42 -y 2022 --conf ./conf.yml
+  $ okra team lint -C admin/ -w 40-43 -y 2022 --conf ./conf.yml
   Team "My Team":
     + Report week 42: Not found: admin//weekly/2022/42/eng1.md
     + Report week 40: Not found: admin//weekly/2022/40/eng2.md
@@ -10,6 +10,11 @@ Team Lint example
                       Line 5: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       2 formatting errors found. Parsing aborted.
     + Report week 42: Not found: admin//weekly/2022/42/eng2.md
+
+Team Lint example with only valid reports:
+
+  $ okra team lint -C admin/ -w 43 -y 2022 --conf ./conf.yml
+  [OK]: 2 reports
 
 Missing [--repo-dir] argument:
 
