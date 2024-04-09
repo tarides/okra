@@ -2,7 +2,7 @@
 Team Lint example
 
   $ okra team lint -C admin/ -w 40-42 -y 2022 --conf ./conf.yml
-  === My Team ===
+  Team "My Team":
     + Report week 42: Not found: admin//weekly/2022/42/eng1.md
     + Report week 40: Not found: admin//weekly/2022/40/eng2.md
     + Report week 41: Lint error at admin//weekly/2022/41/eng2.md
@@ -47,6 +47,6 @@ Wrong week
 2020 has 53 weeks:
 
   $ okra team lint -C admin/ -w 53 -y 2020 --conf ./conf.yml
-  === My Team ===
+  Team "My Team":
     + Report week 53: Not found: admin//weekly/2020/53/eng1.md
     + Report week 53: Not found: admin//weekly/2020/53/eng2.md
