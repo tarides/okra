@@ -8,6 +8,7 @@
 - Improve the "Invalid time" error messages (#199, @gpetiot)
 - okra team lint: only print details of invalid/missing files, or total of valid files (#200, @gpetiot)
 - okra gen report: PR/issue entries formatted the same way as in engineer reports (#201, @gpetiot)
+- Allow to report time in hours, mixing days with hours causes the aggregates to use hours (#205, @gpetiot)
 
 ### Fixed
 

@@ -1,9 +1,14 @@
 module Unit = struct
-  type t = Day
+  type t = Day | Hour
 
-  let of_string = function "day" -> Some Day | _ -> None
-  let equal x y = match (x, y) with Day, Day -> true
-  let pp fs = function Day -> Fmt.pf fs "day"
+  let of_string = function "day" -> Some Day | "hour" -> Some Hour | _ -> None
+
+  let equal x y =
+    match (x, y) with
+    | Day, Day | Hour, Hour -> true
+    | Day, Hour | Hour, Day -> false
+
+  let pp fs = function Day -> Fmt.pf fs "day" | Hour -> Fmt.pf fs "hour"
 end
 
 type t = { data : float; unit : Unit.t }
@@ -14,10 +19,19 @@ let equal x y =
 
 let nil = { unit = Day; data = 0. }
 let days data = { unit = Day; data }
+let hours data = { unit = Hour; data }
+let day_to_hour x = x *. 8.
 
 let add x y =
+  let warning = "converting days metric into hours (considering 8h/day)" in
   match (x.unit, y.unit) with
-  | Day, Day -> { unit = x.unit; data = x.data +. y.data }
+  | Day, Day | Hour, Hour -> { unit = x.unit; data = x.data +. y.data }
+  | Day, Hour ->
+      Logs.warn (fun m -> m "%s" warning);
+      { unit = Hour; data = day_to_hour x.data +. y.data }
+  | Hour, Day ->
+      Logs.warn (fun m -> m "%s" warning);
+      { unit = Hour; data = x.data +. day_to_hour y.data }
 
 let ( +. ) = add
 

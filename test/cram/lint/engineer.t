@@ -132,6 +132,31 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > # Last week
   > 
   > - This is a KR (KR1)
+  >   - @eng1 (1.1 hours)
+  >   - My work
+  > 
+  > # Activity
+  > 
+  > More unformatted text.
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  In KR "This is a KR":
+    Invalid time entry "@eng1 (1.1 hours)" found. Format is '- @eng1 (x days), @eng2 (y days)'
+    where x and y must be divisible by 0.5
+  [1]
+
+  $ okra lint --engineer << EOF
+  > # Projects
+  > 
+  > - Project1 (KR1)
+  > - Project2 (KR2)
+  > 
+  > This is not formatted.
+  > 
+  > # Last week
+  > 
+  > - This is a KR (KR1)
   >   - @eng1 ( day)
   >   - My work
   > 
@@ -143,5 +168,30 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   
   In KR "This is a KR":
     Invalid time entry "@eng1 ( day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
+    where x and y must be divisible by 0.5
+  [1]
+
+  $ okra lint --engineer << EOF
+  > # Projects
+  > 
+  > - Project1 (KR1)
+  > - Project2 (KR2)
+  > 
+  > This is not formatted.
+  > 
+  > # Last week
+  > 
+  > - This is a KR (KR1)
+  >   - @eng1 ( hour)
+  >   - My work
+  > 
+  > # Activity
+  > 
+  > More unformatted text.
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  In KR "This is a KR":
+    Invalid time entry "@eng1 ( hour)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]

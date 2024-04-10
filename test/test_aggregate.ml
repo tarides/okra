@@ -33,13 +33,13 @@ let test_time_parsing f () =
   Alcotest.(check Alcotest_ext.time)
     "eng1 time" (T.days 3.0) (Hashtbl.find res "eng1");
   Alcotest.(check Alcotest_ext.time)
-    "eng3 time" (T.days 5.0) (Hashtbl.find res "eng3");
+    "eng3 time" (T.hours 5.0) (Hashtbl.find res "eng3");
   Alcotest.(check Alcotest_ext.time)
     "eng4 time" (T.days 1.5) (Hashtbl.find res "eng4");
   Alcotest.(check Alcotest_ext.time)
     "eng5 time" (T.days 21.0) (Hashtbl.find res "eng5");
   Alcotest.(check Alcotest_ext.time)
-    "eng6 time" (T.days 1.0) (Hashtbl.find res "eng6")
+    "eng6 time" (T.hours 2.5) (Hashtbl.find res "eng6")
 
 let tests =
   [

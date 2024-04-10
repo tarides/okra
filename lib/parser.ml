@@ -65,7 +65,7 @@ let time_entry_regexp =
     let without_int_part = seq [ str ".5"; opt (char '0') ] in
     group (alt [ with_int_part; without_int_part ])
   in
-  let time_unit = group (alt [ str "day" ]) in
+  let time_unit = group (alt [ str "day"; str "hour" ]) in
   let time = seq [ number; rep space; time_unit; opt (char 's') ] in
   compile @@ seq [ start; user; rep space; char '('; time; char ')'; stop ]
 
