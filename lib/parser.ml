@@ -65,7 +65,8 @@ let time_entry_regexp =
     let without_int_part = seq [ str ".5"; opt (char '0') ] in
     group (alt [ with_int_part; without_int_part ])
   in
-  let time = seq [ number; rep space; str "day"; opt (char 's') ] in
+  let time_unit = group (alt [ str "day" ]) in
+  let time = seq [ number; rep space; time_unit; opt (char 's') ] in
   compile @@ seq [ start; user; rep space; char '('; time; char ')'; stop ]
 
 let is_suffix suffix s =
@@ -204,7 +205,10 @@ let kr ~project ~objective = function
                       let* user = Re.Group.get_opt grp 1 in
                       let* s_time = Re.Group.get_opt grp 2 in
                       let* f_time = Float.of_string_opt s_time in
-                      Some (user, f_time)
+                      let* s_unit = Re.Group.get_opt grp 3 in
+                      let* t_unit = Time.Unit.of_string s_unit in
+                      let time = { Time.unit = t_unit; data = f_time } in
+                      Some (user, time)
                     with
                     | Some x -> Some x
                     | None ->

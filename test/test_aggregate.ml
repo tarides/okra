@@ -14,6 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+module T = Okra.Time
+
 let aggregate f =
   let ic = open_in f in
   let omd = Omd.of_channel ic in
@@ -28,11 +30,16 @@ let aggregate_by_engineer f =
 
 let test_time_parsing f () =
   let res = aggregate_by_engineer f in
-  Alcotest.(check (float 0.0)) "eng1 time" 3.0 (Hashtbl.find res "eng1");
-  Alcotest.(check (float 0.0)) "eng3 time" 5.0 (Hashtbl.find res "eng3");
-  Alcotest.(check (float 0.0)) "eng4 time" 1.5 (Hashtbl.find res "eng4");
-  Alcotest.(check (float 0.0)) "eng5 time" 21.0 (Hashtbl.find res "eng5");
-  Alcotest.(check (float 0.0)) "eng6 time" 1.0 (Hashtbl.find res "eng6")
+  Alcotest.(check Alcotest_ext.time)
+    "eng1 time" (T.days 3.0) (Hashtbl.find res "eng1");
+  Alcotest.(check Alcotest_ext.time)
+    "eng3 time" (T.days 5.0) (Hashtbl.find res "eng3");
+  Alcotest.(check Alcotest_ext.time)
+    "eng4 time" (T.days 1.5) (Hashtbl.find res "eng4");
+  Alcotest.(check Alcotest_ext.time)
+    "eng5 time" (T.days 21.0) (Hashtbl.find res "eng5");
+  Alcotest.(check Alcotest_ext.time)
+    "eng6 time" (T.days 1.0) (Hashtbl.find res "eng6")
 
 let tests =
   [

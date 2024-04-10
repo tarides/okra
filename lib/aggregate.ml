@@ -18,7 +18,7 @@
 let ht_add_or_sum ht k v =
   match Hashtbl.find_opt ht k with
   | None -> Hashtbl.add ht k v
-  | Some x -> Hashtbl.replace ht k (Float.add v x)
+  | Some x -> Hashtbl.replace ht k (Time.add v x)
 
 let by_ f ?(include_krs = []) t =
   let uppercase_include_krs = List.map String.uppercase_ascii include_krs in
@@ -44,20 +44,23 @@ let by_engineer =
 let by_kr =
   by_ (fun result e ->
       let time =
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer 0.
+        let open Time in
+        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
       in
       Hashtbl.add result (e.title, e.id) time)
 
 let by_objective =
   by_ (fun result e ->
       let time =
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer 0.
+        let open Time in
+        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
       in
       ht_add_or_sum result e.objective time)
 
 let by_project =
   by_ (fun result e ->
       let time =
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer 0.
+        let open Time in
+        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
       in
       ht_add_or_sum result e.project time)

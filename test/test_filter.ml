@@ -16,6 +16,7 @@
  *)
 
 open Okra
+module T = Okra.Time
 
 let p1 = "Project 1"
 let p2 = "Project 2"
@@ -27,9 +28,9 @@ let t3 = "title3"
 let e1 = "foo"
 let e2 = "bar"
 let e3 = "john"
-let te1 = [ [ (e1, 1.) ]; [ (e1, 2.); (e2, 2.) ] ]
-let te2 = [ [ (e1, 10.) ] ]
-let te3 = [ [ (e2, 10.) ]; [ (e3, 5.) ] ]
+let te1 = [ [ (e1, T.days 1.) ]; [ (e1, T.days 2.); (e2, T.days 2.) ] ]
+let te2 = [ [ (e1, T.days 10.) ] ]
+let te3 = [ [ (e2, T.days 10.) ]; [ (e3, T.days 5.) ] ]
 let id2 = "Id2"
 let id3 = "ID3"
 
@@ -141,9 +142,9 @@ let test_exclude_engineers () =
 
   let t2 = filter t ~include_krs:[ ID id3 ] ~include_engineers:[ e2 ] in
   let kr = get_kr t2 in
-  Alcotest.(check (list (list (pair string (float 0.)))))
+  Alcotest.(check (list (list (pair string Alcotest_ext.time))))
     "check time entries"
-    [ [ (e2, 10.) ] ]
+    [ [ (e2, T.days 10.) ] ]
     kr.KR.time_entries
 
 let tests =

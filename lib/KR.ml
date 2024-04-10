@@ -33,8 +33,8 @@ type t = {
   objective : string;
   title : string;
   id : id;
-  time_entries : (string * float) list list;
-  time_per_engineer : (string, float) Hashtbl.t;
+  time_entries : (string * Time.t) list list;
+  time_per_engineer : (string, Time.t) Hashtbl.t;
   work : Item.t list list;
 }
 
@@ -52,6 +52,7 @@ let v ~project ~objective ~title ~id ~time_entries work =
     let tbl = Hashtbl.create 7 in
     List.iter
       (List.iter (fun (e, d) ->
+           let open Time in
            let d =
              match Hashtbl.find_opt tbl e with None -> d | Some x -> x +. d
            in
@@ -81,10 +82,10 @@ let dump =
       field "id" (fun t -> t.id) pp_id;
       field "time_entries"
         (fun t -> t.time_entries)
-        (list (list (pair string Fmt.float)));
+        (list (list (pair string Time.pp)));
       field "time_per_engineer"
         (fun t -> List.of_seq (Hashtbl.to_seq t.time_per_engineer))
-        (list (pair string Fmt.float));
+        (list (pair string Time.pp));
       field "work" (fun t -> t.work) (list (list Item.dump));
     ]
 
@@ -147,6 +148,7 @@ let merge x y =
     Hashtbl.iter (fun k v -> Hashtbl.add t k v) x.time_per_engineer;
     Hashtbl.iter
       (fun k v ->
+        let open Time in
         match Hashtbl.find_opt t k with
         | None -> Hashtbl.replace t k v
         | Some v' -> Hashtbl.replace t k (v +. v'))
@@ -170,16 +172,8 @@ let compare a b =
   | ID a, ID b -> compare_no_case a b
   | _ -> compare_no_case a.title b.title
 
-let string_of_days d =
-  let d = floor (d *. 2.0) /. 2. in
-  if d = 1. then "1 day"
-  else if classify_float (fst (modf d)) = FP_zero then
-    Printf.sprintf "%.0f days" d
-  else Printf.sprintf "%.1f days" d
-
 let make_engineer ~time (e, d) =
-  if time then Printf.sprintf "@%s (%s)" e (string_of_days d)
-  else Printf.sprintf "@%s" e
+  if time then Fmt.str "@%s (%a)" e Time.pp d else Printf.sprintf "@%s" e
 
 let make_engineers ~time entries =
   let entries = List.of_seq (Hashtbl.to_seq entries) in
@@ -197,7 +191,7 @@ let make_engineers ~time entries =
       [ Paragraph (Concat lst) ]
 
 let make_time_entries t =
-  let aux (e, d) = Fmt.str "@%s (%s)" e (string_of_days d) in
+  let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
 let update_from_master_db t db =

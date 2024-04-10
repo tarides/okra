@@ -14,6 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+module T = Okra.Time
+
 let aggregate f =
   let ic = open_in f in
   let omd = Omd.of_channel ic in
@@ -41,7 +43,8 @@ let test_newkr_exists1 () =
   let res = aggregate "./reports/newkr_exists1.acc" in
   Alcotest.(check bool) "new KR exists" true (contains_kr res New_KR);
   let res = Okra.Aggregate.by_engineer res in
-  Alcotest.(check (float 0.0)) "eng1 time" 1.0 (Hashtbl.find res "eng1")
+  Alcotest.(check Alcotest_ext.time)
+    "eng1 time" (T.days 1.0) (Hashtbl.find res "eng1")
 
 let test_kr_agg1 () =
   let res = aggregate "./reports/kr_agg1.acc" in
@@ -51,13 +54,15 @@ let test_kr_agg1 () =
     (contains_kr_cnt res (ID "KR123"));
   let res = Okra.Aggregate.by_engineer res in
   (* also check that time adds up *)
-  Alcotest.(check (float 0.0)) "eng1 time" 4.0 (Hashtbl.find res "eng1")
+  Alcotest.(check Alcotest_ext.time)
+    "eng1 time" (T.days 4.0) (Hashtbl.find res "eng1")
 
 let test_work_item () =
   let res = aggregate "./reports/work_item.acc" in
   Alcotest.(check bool) "#123 exists" true (contains_kr res (ID "#123"));
   let res = Okra.Aggregate.by_engineer res in
-  Alcotest.(check (float 0.0)) "eng1 time" 1.0 (Hashtbl.find res "eng1")
+  Alcotest.(check Alcotest_ext.time)
+    "eng1 time" (T.days 1.0) (Hashtbl.find res "eng1")
 
 let tests =
   [

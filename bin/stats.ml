@@ -27,7 +27,7 @@ let sort_by_days l =
 
 let green = Fmt.(styled `Green string)
 let cyan = Fmt.(styled `Cyan string)
-let pp_days ppf d = Fmt.(styled `Bold string) ppf (KR.string_of_days d)
+let pp_days ppf d = Fmt.(styled `Bold Time.pp) ppf d
 
 let print kind t =
   match kind with

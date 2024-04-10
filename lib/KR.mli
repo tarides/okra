@@ -33,8 +33,8 @@ type t = private {
   objective : string;
   title : string;
   id : id;
-  time_entries : (string * float) list list;
-  time_per_engineer : (string, float) Hashtbl.t;
+  time_entries : (string * Time.t) list list;
+  time_per_engineer : (string, Time.t) Hashtbl.t;
   work : Item.t list list;
 }
 
@@ -43,7 +43,7 @@ val v :
   objective:string ->
   title:string ->
   id:id ->
-  time_entries:(string * float) list list ->
+  time_entries:(string * Time.t) list list ->
   Item.t list list ->
   t
 
@@ -53,8 +53,6 @@ val compare : t -> t -> int
 val update_from_master_db : t -> Masterdb.t -> t
 
 (** {2 Pretty-print} *)
-
-val string_of_days : float -> string
 
 val items :
   ?show_time:bool ->

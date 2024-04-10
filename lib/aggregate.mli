@@ -16,13 +16,13 @@
  *)
 
 val by_engineer :
-  ?include_krs:string list -> Report.t -> (string, float) Hashtbl.t
+  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
 
 val by_kr :
-  ?include_krs:string list -> Report.t -> (string * KR.id, float) Hashtbl.t
+  ?include_krs:string list -> Report.t -> (string * KR.id, Time.t) Hashtbl.t
 
 val by_objective :
-  ?include_krs:string list -> Report.t -> (string, float) Hashtbl.t
+  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
 
 val by_project :
-  ?include_krs:string list -> Report.t -> (string, float) Hashtbl.t
+  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
