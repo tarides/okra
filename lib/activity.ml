@@ -48,34 +48,56 @@ let repo_org ?(with_id = false) ?(no_links = false) f s =
   | repo :: org :: _ -> Fmt.pf f "[%s/%s](%s)" org repo s
   | _ -> Fmt.failwith "Malformed URL %S" s
 
-let pp_ga_item ?(gitlab = false) ~no_links () f
+let pp_ga_item ?(gitlab = false) ~no_links sub_items f
     (t : Get_activity.Contributions.item) =
+  let comments =
+    match sub_items with
+    | [] -> ""
+    | [ _ ] -> Format.sprintf " (+ 1 comment)"
+    | _ -> Format.sprintf " (+ %i comments)" (List.length sub_items)
+  in
   match gitlab with
   | true -> (
       match t.kind with
-      | `PR -> Fmt.pf f "PR (Gitlab): %s %s" t.title t.url
-      | `Issue -> Fmt.pf f "Issue (Gitlab): %s %s" t.title t.url
+      | `PR -> Fmt.pf f "Opened PR (Gitlab): %s %s" t.title t.url
+      | `Issue -> Fmt.pf f "Opened issue (Gitlab): %s %s" t.title t.url
       | _ -> ())
   | false -> (
       match t.kind with
       | `Issue ->
-          Fmt.pf f "Issue: %s %a" t.title
+          Fmt.pf f "Opened issue%s: %s %a" comments t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `PR ->
-          Fmt.pf f "PR: %s %a" t.title (repo_org ~with_id:true ~no_links) t.url
+          let merged =
+            List.exists
+              (fun x -> x.Get_activity.Contributions.kind = `Merge)
+              sub_items
+          in
+          let status = if merged then "Opened and merged" else "Opened" in
+          Fmt.pf f "%s PR%s: %s %a" status comments t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
       | `Comment `Issue ->
-          Fmt.pf f "Commented on issue %S %a" t.title
+          Fmt.pf f "Commented (%i) on issue: %s %a"
+            (List.length sub_items + 1)
+            t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Comment `PR ->
-          Fmt.pf f "Commented on PR %S %a" t.title
+          Fmt.pf f "Commented (%i) on PR: %s %a"
+            (List.length sub_items + 1)
+            t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Review s ->
-          Fmt.pf f "%s %s %a" s t.title (repo_org ~with_id:true ~no_links) t.url
+          Fmt.pf f "%s PR%s: %s %a"
+            (String.capitalize_ascii @@ String.lowercase_ascii s)
+            comments t.title
+            (repo_org ~with_id:true ~no_links)
+            t.url
       | `Merge ->
-          Fmt.pf f "Merged %S %a" t.title
+          Fmt.pf f "Merged PR%s: %s %a" comments t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `New_repo ->
@@ -83,10 +105,71 @@ let pp_ga_item ?(gitlab = false) ~no_links () f
             (repo_org ~with_id:false ~no_links)
             t.url)
 
+let order_item_kind = function
+  | `New_repo -> 0
+  | `Issue -> 1
+  | `PR -> 2
+  | `Merge -> 3
+  | `Review _ -> 4
+  | `Comment `PR -> 5
+  | `Comment `Issue -> 56
+
+let sort_items (x : Get_activity.Contributions.item)
+    (y : Get_activity.Contributions.item) =
+  match Int.compare (order_item_kind x.kind) (order_item_kind y.kind) with
+  | 0 -> String.compare x.date y.date
+  | cmp -> cmp
+
+let root_of_url url =
+  match String.split_on_char '#' url with
+  | [ root_url ] -> root_url
+  | [ root_url; _comment_suffix ] -> root_url
+  | _ ->
+      Logs.warn (fun m -> m "invalid url: %s" url);
+      url
+
+let contains match_kind url ((c : Get_activity.Contributions.item), _) =
+  match_kind c.kind && String.equal (root_of_url url) (root_of_url c.url)
+
+let add_to_maybe_another_item ~can_add_to item acc =
+  let found, rest =
+    List.partition (contains can_add_to item.Get_activity.Contributions.url) acc
+  in
+  match found with
+  (* the comment is stored as a root item *)
+  | [] -> (item, []) :: rest
+  (* the comment is stored as a subitem of another item *)
+  | (root, subitems) :: _ -> (root, item :: subitems) :: rest
+
+let build_tree activity =
+  Get_activity.Contributions.Repo_map.map
+    (fun items ->
+      List.sort sort_items items
+      |> List.fold_left
+           (fun acc item ->
+             match item.Get_activity.Contributions.kind with
+             | `Issue | `PR | `New_repo | `Review _ -> (item, []) :: acc
+             | `Merge ->
+                 add_to_maybe_another_item item acc ~can_add_to:(function
+                   | `PR -> true
+                   | _ -> false)
+             | `Comment `PR ->
+                 add_to_maybe_another_item item acc ~can_add_to:(function
+                   | `PR | `Review _ | `Merge | `Comment `PR -> true
+                   | _ -> false)
+             | `Comment `Issue ->
+                 add_to_maybe_another_item item acc ~can_add_to:(function
+                   | `Issue | `Comment `Issue -> true
+                   | _ -> false))
+           []
+      |> List.rev)
+    activity
+
 let pp_activity ?(gitlab = false) ~no_links () ppf activity =
   let open Get_activity.Contributions in
-  let pp_item ppf item =
-    Fmt.pf ppf "  - %a" (pp_ga_item ~gitlab ~no_links ()) item
+  let activity = build_tree activity in
+  let pp_item ppf (item, sub_items) =
+    Fmt.pf ppf "  - %a" (pp_ga_item ~gitlab ~no_links sub_items) item
   in
   let bindings = Repo_map.bindings activity in
   let pp_binding ppf (_repo, items) =

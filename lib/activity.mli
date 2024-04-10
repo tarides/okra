@@ -27,11 +27,6 @@ val repo_org :
   ?with_id:bool -> ?no_links:bool -> Format.formatter -> string -> unit
 (** [report_org fs url] pretty-prints [url] in the form [repo/id]. *)
 
-val pp_ga_item :
-  ?gitlab:bool -> no_links:bool -> unit -> Get_activity.Contributions.item Fmt.t
-(** [pp_ga_item ?gitlab ~no_links () ppf item] prints the get-activity item. See
-    the description of [gitlab] and [no_links] in {!pp}. *)
-
 val pp_activity :
   ?gitlab:bool ->
   no_links:bool ->
