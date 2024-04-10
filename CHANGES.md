@@ -13,6 +13,10 @@
 
 - Using an empty conf should not fail, better message in case of error (#192, @gpetiot)
 
+### Added
+
+- Add `ocaml-re` dependency instead of using `str` (#198, @gpetiot)
+
 ## 0.4.0
 
 ### Changed
