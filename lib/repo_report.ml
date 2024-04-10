@@ -58,7 +58,7 @@ module Issue = struct
 
   let pp ~with_names ~with_times ~with_descriptions ppf
       { author; title; url; created_at; body; _ } =
-    let pp_user ppf = Fmt.pf ppf "@%s" in
+    let pp_user ppf u = Fmt.pf ppf "[@%s](https://github.com/%s)" u u in
     let pp_created_at ppf = Fmt.pf ppf " (created/merged: %s)" in
     let pp_author ppf = Fmt.pf ppf " by %a" pp_user in
     Fmt.(
