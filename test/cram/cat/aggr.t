@@ -53,20 +53,20 @@ Engineer reports are aggregated correctly
   # Last Week
   
   - A Kr (KR123)
-    - @eng1 (1.5 days), @eng2 (1.5 days)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1.5 days)
     - Some work
     - Some work
   
   - A new KR (New KR)
-    - @eng1 (1 day)
+    - [@eng1](https://github.com/eng1) (1 day)
     - Some work
   
   - A new KR, but different title (New KR)
-    - @eng2 (1 day)
+    - [@eng2](https://github.com/eng2) (1 day)
     - Some work
   
   - Work without a KR (No KR)
-    - @eng1 (1.5 days), @eng2 (1 day)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1 day)
     - Little bit of work
     - Some item of work
     - Small bit of work
@@ -91,7 +91,7 @@ The output of cat passes the lint
   # Last week
   
   - My task (No KR)
-    - @foobar (5 days)
+    - [@foobar](https://github.com/foobar) (5 days)
     - aaa bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
       _oooo_ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
       __aaaa__ bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn

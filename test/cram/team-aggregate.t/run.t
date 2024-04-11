@@ -5,16 +5,16 @@ Team aggregate example
   # Last Week
   
   - A KR (KR100)
-    - @eng1 (1 day)
+    - [@eng1](https://github.com/eng1) (1 day)
     - Work 1
   
   - A KR (KR123)
-    - @eng1 (1 day), @eng2 (1 day)
+    - [@eng1](https://github.com/eng1) (1 day), [@eng2](https://github.com/eng2) (1 day)
     - Work 1
     - Work 1
   
   - A KR (KR124)
-    - @eng2 (1 day)
+    - [@eng2](https://github.com/eng2) (1 day)
     - Work 1
 
 Only select a few okrs
@@ -23,12 +23,12 @@ Only select a few okrs
   # Last Week
   
   - A KR (KR123)
-    - @eng1 (1 day), @eng2 (1 day)
+    - [@eng1](https://github.com/eng1) (1 day), [@eng2](https://github.com/eng2) (1 day)
     - Work 1
     - Work 1
   
   - A KR (KR124)
-    - @eng2 (1 day)
+    - [@eng2](https://github.com/eng2) (1 day)
     - Work 1
 
 Exclude a few okrs
@@ -37,7 +37,7 @@ Exclude a few okrs
   # Last Week
   
   - A KR (KR100)
-    - @eng1 (1 day)
+    - [@eng1](https://github.com/eng1) (1 day)
     - Work 1
 
 Multiple weeks
@@ -46,18 +46,18 @@ Multiple weeks
   # Last Week
   
   - A KR (KR100)
-    - @eng1 (2 days)
+    - [@eng1](https://github.com/eng1) (2 days)
     - Work 1
     - Work 1
   
   - A KR (KR123)
-    - @eng1 (2 days), @eng2 (2 days)
+    - [@eng1](https://github.com/eng1) (2 days), [@eng2](https://github.com/eng2) (2 days)
     - Work 1
     - Work 1
     - Work 1
     - Work 1
   
   - A KR (KR124)
-    - @eng2 (2 days)
+    - [@eng2](https://github.com/eng2) (2 days)
     - Work 1
     - Work 1

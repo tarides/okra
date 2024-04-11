@@ -46,7 +46,7 @@ Behaviour without a database
   # Last Week
   
   - A Kr (KR123)
-    - @eng1 (1.5 days), @eng2 (1.5 days)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1.5 days)
     - Some work
     - Some other work
 
@@ -54,13 +54,13 @@ Behaviour without a database
   # Last Week
   
   - A Kr (KR123)
-    - @eng1 (1.5 days), @eng2 (1.5 days), @eng3 (1.5 days)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1.5 days), [@eng3](https://github.com/eng3) (1.5 days)
     - Some work
     - Some other work
     - Some other, other work
   
   - A Different Kr (KR124)
-    - @eng3 (1.5 days)
+    - [@eng3](https://github.com/eng3) (1.5 days)
     - Some work
 
 Behaviour with a database
@@ -77,7 +77,7 @@ Behaviour with a database
   ## Actual objective
   
   - A Kr (KR123)
-    - @eng1 (1.5 days), @eng2 (1.5 days)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1.5 days)
     - Some work
     - Some other work
 
@@ -93,11 +93,11 @@ Behaviour with a database
   ## Actual objective
   
   - A Kr (KR123)
-    - @eng1 (1.5 days), @eng2 (1.5 days), @eng3 (1.5 days)
+    - [@eng1](https://github.com/eng1) (1.5 days), [@eng2](https://github.com/eng2) (1.5 days), [@eng3](https://github.com/eng3) (1.5 days)
     - Some work
     - Some other work
     - Some other, other work
   
   - A Different Kr (KR124)
-    - @eng3 (1.5 days)
+    - [@eng3](https://github.com/eng3) (1.5 days)
     - Some work

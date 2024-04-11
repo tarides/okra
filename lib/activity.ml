@@ -27,7 +27,12 @@ let pp_last_week username ppf projects =
     Fmt.(pf ppf "%a" (list (fun ppf s -> Fmt.pf ppf "  - %s" s))) t
   in
   let pp_project ppf { title; items } =
-    Fmt.pf ppf "- %s\n  - @%s (<X> days)\n%a@." title username pp_items items
+    let pp_user ppf = function
+      | "<USERNAME>" as u -> Fmt.pf ppf "@%s" u
+      | u -> Fmt.pf ppf "[@%s](https://github.com/%s)" u u
+    in
+    Fmt.pf ppf "- %s\n  - %a (<X> days)\n%a@." title pp_user username pp_items
+      items
   in
   Fmt.pf ppf "%a" Fmt.(list ~sep:(cut ++ cut) pp_project) projects
 

@@ -3,17 +3,17 @@
 ## Project A
 
 - The first KR (KR1)
-  - @engA (2 days)
+  - [@engA](https://github.com/engA) (2 days)
   - Work
 
 ## Project B
 
 - Another KR (KR123)
-  - @engineer1 (1 day), @engineer2 (0.5 days)
+  - [@engineer1](https://github.com/engineer1) (1 day), [@engineer2](https://github.com/engineer2) (0.5 days)
   - A work item
 
 - Yo (YO1)
-  - @bar (1 day), @foo (2 days), @zorro (0.5 days)
+  - [@bar](https://github.com/bar) (1 day), [@foo](https://github.com/foo) (2 days), [@zorro](https://github.com/zorro) (0.5 days)
   - Hello, world
     hi hoho:
     - one
@@ -39,5 +39,5 @@
 ## Project C
 
 - This is a new KR (New KR)
-  - @engB (2 days)
+  - [@engB](https://github.com/engB) (2 days)
   - Work
