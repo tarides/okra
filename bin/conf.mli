@@ -32,8 +32,8 @@ val okr_db : t -> string option
 (** [okr_db] is the location of the OKR database. *)
 
 val admin_dir : t -> string option
-(** [admin_dir] is the location of the admin directory for the teams
-    subcommands. *)
+(** [admin_dir] is the location of the admin directory.
+    If [okr_db] is not set, the OKR database is lookup up in [admin_dir]. *)
 
 val gitlab_token : t -> string option
 (** [gitlab_token] is the optional Gitlab token, if present your Gitlab activity

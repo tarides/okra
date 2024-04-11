@@ -378,7 +378,17 @@ let okr_db t =
   | Some s -> Some s
   | None -> (
       let db =
-        match t.okr_db with Some db -> Some db | None -> Conf.okr_db t.conf
+        let ( or ) x y = match x with Some x -> Some x | None -> y in
+        t.okr_db
+        or Conf.okr_db t.conf
+        or
+        match t.repo with
+        | Some repo -> (
+            let path = Fpath.(v repo / "data" / "db.csv") in
+            match Bos.OS.File.exists path with
+            | Ok true -> Some Fpath.(to_string path)
+            | _ -> None)
+        | None -> None
       in
       match db with
       | None -> None
