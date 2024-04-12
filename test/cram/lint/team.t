@@ -4,19 +4,6 @@ Team reports
 Examples of valid ones:
 
   $ okra lint --team << EOF
-  > # OKR updates
-  > 
-  > - This is not properly formatted.
-  > - New KR: Test
-  > 
-  > # This is a title
-  > 
-  > - This is a KR (KR123)
-  >   - @eng1 (1 day)
-  >   - My work
-  > EOF
-  [OK]: <stdin>
-  $ okra lint --team << EOF
   > # This is a title
   > 
   > - This is a KR (KR123)
@@ -47,11 +34,6 @@ Examples of valid ones:
 Errors are not ignored outside the ignored section
 
   $ okra lint --team << EOF
-  > # OKR updates
-  > 
-  > - This is not properly formatted.
-  > - New KR: Test
-  > 
   > # This is a title
   > 
   > - This is a KR (KRID)
@@ -60,6 +42,6 @@ Errors are not ignored outside the ignored section
   > EOF
   [ERROR(S)]: <stdin>
   
-  Line 10: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
+  Line 5: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
   1 formatting errors found. Parsing aborted.
   [1]

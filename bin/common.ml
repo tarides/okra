@@ -114,7 +114,7 @@ let team_report =
     Arg.info [ "team"; "t" ]
       ~doc:
         "Lint a team report. This is an alias for --include-sections=\"\", \
-         --ignore-sections=\"OKR updates\""
+         --ignore-sections=\"\""
   in
   Arg.value (Arg.flag info)
 
@@ -179,7 +179,7 @@ let ignore_sections =
         "If non-empty, ignore everyhing under these sections (titles) from the \
          report"
   in
-  Arg.(value & opt (list string) [ "OKR updates" ] i)
+  Arg.(value & opt (list string) [] i)
 
 type includes = {
   include_categories : string list; (* not totally sure what these are ... *)
@@ -201,9 +201,7 @@ let includes =
   let include_sections =
     if engineer_report then [ "Last week" ] else include_sections
   in
-  let ignore_sections =
-    if team_report then [ "OKR Updates" ] else ignore_sections
-  in
+  let ignore_sections = if team_report then [] else ignore_sections in
   {
     include_sections;
     ignore_sections;

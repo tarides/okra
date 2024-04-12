@@ -2,6 +2,7 @@
 
 ### Changes
 
+- No special treatment for "OKR Updates" sections in reports (#<PR_NUMBER>, @gpetiot)
 - Lookup okr-db in the repo directory (set by `--repo-dir`/`-C`) if `--okr-db` is not set (#210, @gpetiot)
 - Make github handles clickable in repo reports (#193, #207, @gpetiot)
 - Make github handles clickable in generated engineer reports (#209, @gpetiot)

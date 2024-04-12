@@ -374,8 +374,7 @@ let check_includes u_includes (includes : string list) =
   in
   if missing = [] then () else err_missing_includes missing
 
-let of_markdown ?(ignore_sections = [ "OKR Updates" ]) ?(include_sections = [])
-    ast =
+let of_markdown ?(ignore_sections = []) ?(include_sections = []) ast =
   warnings := [];
   let u_ignore = List.map String.uppercase_ascii ignore_sections in
   let u_include = List.map String.uppercase_ascii include_sections in

@@ -145,7 +145,7 @@ $ cat magnus.md patrick.md | okra cat --engineer
 
 It may be the case that you have an existing report (`agg.md`) and a new report comes in that you wish to merge into this report. You can do this with the `--append-to` flag for example `okra cat --engineer patrick.md --append-to=agg.md`.
 
-If `--team` is specified, everything except what is listed under `OKR Updates` is included. This is useful for aggregating reports from multiple teams (or over multiple weeks).
+If `--team` is specified, everything is included. This is useful for aggregating reports from multiple teams (or over multiple weeks).
 
 ```
 $ cat team1.md team2.md | okra cat --team
@@ -280,14 +280,10 @@ By default the repository report does not contain author names, time of creation
 
 ### Team activity report
 
-The expected team report format is similar, but here every section is parsed and multiple engineers may have worked on each KR. Any section called `OKR Updates` is ignored by default and may be used to propose KR changes.
+The expected team report format is similar, but here every section is parsed and multiple engineers may have worked on each KR.
 
 ```
 # Project
-
-## OKR updates
-
-[ignored]
 
 ## Objective
 
@@ -300,7 +296,7 @@ The expected team report format is similar, but here every section is parsed and
 
 KR ID should consist of characters followed by a number (e.g. "KR123").
 
-If the KR doesn't have a KR ID yet (e.g. it was requested in the OKR updates section), "new KR" is recognised by the parser as a placeholder and can be used instead. If a KR with the same name is found with a proper KR ID later they will be combined.
+If the KR doesn't have a KR ID yet, "new KR" is recognised by the parser as a placeholder and can be used instead. If a KR with the same name is found with a proper KR ID later they will be combined.
 
 The `okra cat` command can be used to aggregate multiple engineer reports into one team report grouped by KR.
 
