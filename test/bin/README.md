@@ -28,11 +28,6 @@ a real world scenario you are unlikely to want to pass this flag.
 $ okra generate --week=37 --year=2021 --no-activity --conf=conf.simple.yaml
 <USERNAME> week 37: 2021/09/13 -- 2021/09/19
 
-# Projects
-
-- Make Okra, the OKR management tool (OKR1)
-- Make a web interface for Okra (OKR2)
-
 # Last Week
 
 - Make Okra, the OKR management tool (OKR1)
@@ -71,11 +66,6 @@ projects:
 $ okra generate --week=37 --year=2021  --no-activity --conf=conf.simple.yaml
 <USERNAME> week 37: 2021/09/13 -- 2021/09/19
 
-# Projects
-
-- Make Okra, the OKR management tool (OKR1)
-- Make a web interface for Okra (OKR2)
-
 # Last Week
 
 - Make Okra, the OKR management tool (OKR1)
@@ -109,11 +99,6 @@ projects:
 $ okra generate --week=37 --year=2021 --no-activity --conf=conf.projects.yaml
 <USERNAME> week 37: 2021/09/13 -- 2021/09/19
 
-# Projects
-
-- Make Okra, the OKR management tool (OKR1)
-- Make a web interface for Okra (OKR2)
-
 # Last Week
 
 - Make Okra, the OKR management tool (OKR1)
@@ -146,11 +131,6 @@ footer: |
   - Another thing as well
 $ okra generate --week=37 --year=2021 --no-activity --conf=conf.footer.yaml
 <USERNAME> week 37: 2021/09/13 -- 2021/09/19
-
-# Projects
-
-- Make Okra, the OKR management tool (OKR1)
-- Make a web interface for Okra (OKR2)
 
 # Last Week
 

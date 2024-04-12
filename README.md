@@ -66,10 +66,6 @@ The output looks like this:
 
 ```
 $ okra generate --week=30
-# Projects
-
-- Improve OKRA (OKRA1)
-
 # Last Week
 
 - Improve OKRA (OKRA1)
@@ -85,10 +81,6 @@ $ okra generate --week=30
 To prepare the final report, the work items under `Activity` should be moved to `Last week` under the right KR and time should be added. Additional information can also be added here.
 
 ```
-# Projects
-
-- Improve OKRA (OKRA1)
-
 # Last Week
 
 - Improve OKRA (OKRA1)
@@ -239,10 +231,6 @@ General formatting requirements:
 Engineer reports should be in the following format. Only a section called `Last week` is included by default - the rest is free form as long as it's valid markdown:
 
 ```
-# Projects
-
-- My KR (KR123)
-
 # Last week
 
 - My KR (KR123)
