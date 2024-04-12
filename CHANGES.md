@@ -11,7 +11,7 @@
 - Improve the "Invalid time" error messages (#199, @gpetiot)
 - okra team lint: only print details of invalid/missing files, or total of valid files (#200, @gpetiot)
 - okra gen report: PR/issue entries formatted the same way as in engineer reports (#201, @gpetiot)
-- List of projects not printed anymore in generated reports (#<PR_NUMBER>, @gpetiot)
+- List of projects not printed anymore in generated reports (#212, @gpetiot)
 
 ### Fixed
 
