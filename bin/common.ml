@@ -386,7 +386,7 @@ let okr_db t =
         | Some repo -> (
             let path = Fpath.(v repo / "data" / "db.csv") in
             match Bos.OS.File.exists path with
-            | Ok true -> Some Fpath.(to_string path)
+            | Ok true -> Some (Fpath.to_string path)
             | _ -> None)
         | None -> None
       in
