@@ -54,6 +54,13 @@ let no_activity =
           reports from Github"
        ~docv:"NO-ACTIVITY" [ "no-activity" ]
 
+let print_projects =
+  let info =
+    Arg.info [ "print-projects" ]
+      ~doc:"Print the list of projects in the generated report"
+  in
+  Arg.value (Arg.flag info)
+
 let with_repositories_term =
   Arg.value
   @@ Arg.opt Arg.(list string) []
@@ -122,7 +129,7 @@ let fetch ~token ~period =
   Gitlab.make_activity ~token ~before ~after
 
 let run_engineer ppf conf cal projects token no_activity no_links
-    with_repositories user =
+    with_repositories user print_projects =
   let period = Calendar.to_iso8601 cal in
   let week = Calendar.week cal in
   let* activity, _ =
@@ -179,7 +186,9 @@ let run_engineer ppf conf cal projects token no_activity no_links
   in
   let pp_footer ppf conf = Fmt.(pf ppf "\n\n%a" string conf) in
   let activity = Activity.make ~projects activity in
-  Fmt.pf ppf "%s\n\n%a%a%a%!" header (Activity.pp ~no_links ()) activity
+  Fmt.pf ppf "%s\n\n%a%a%a%!" header
+    (Activity.pp ~no_links ~print_projects ())
+    activity
     (Activity.pp_activity ~gitlab:true ~no_links:false ())
     gitlab_activity
     Fmt.(option pp_footer)
@@ -203,10 +212,10 @@ let run_monthly ppf cal repos token with_names with_times with_descriptions =
   Ok ()
 
 let run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos user = function
+    with_descriptions with_repositories repos user print_projects = function
   | Engineer ->
       run_engineer ppf conf cal (Conf.projects conf) token no_activity no_links
-        with_repositories user
+        with_repositories user print_projects
   | Repository ->
       run_monthly ppf cal repos token with_names with_times with_descriptions
 
@@ -215,6 +224,7 @@ let term =
   let+ c = Common.term
   and+ token_file = token
   and+ no_activity = no_activity
+  and+ print_projects = print_projects
   and+ with_repositories = with_repositories_term
   and+ kind = kind_term
   and+ user = user
@@ -233,7 +243,7 @@ let term =
   let with_descriptions = Common.with_description c in
   let ppf = Format.formatter_of_out_channel (Common.output c) in
   run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos user kind
+    with_descriptions with_repositories repos user print_projects kind
 
 let cmd =
   let info =

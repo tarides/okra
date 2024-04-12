@@ -16,6 +16,9 @@
  *)
 
 type project = { title : string; items : string list }
+
+let title { title; _ } = title
+
 type t = { projects : project list; activity : Get_activity.Contributions.t }
 
 let pp_last_week ?(no_links = false) username ppf projects =
@@ -97,8 +100,20 @@ let pp_activity ?(gitlab = false) ~no_links () ppf activity =
 
 let make ~projects activity = { projects; activity }
 
-let pp ?(gitlab = false) ?(no_links = false) () ppf
+let pp_projects ~print_projects ppf projects =
+  if print_projects then
+    let newline fs () = Fmt.pf fs "@\n" in
+    Fmt.pf ppf {|# Projects
+
+%a
+
+|}
+      Fmt.(list ~sep:newline (fun ppf s -> Fmt.pf ppf "- %s" s))
+      (List.map title projects)
+
+let pp ?(gitlab = false) ?(no_links = false) ~print_projects () ppf
     { projects; activity = { username; activity } } =
+  pp_projects ~print_projects ppf projects;
   Fmt.pf ppf {|# Last Week
 
 %a

@@ -42,7 +42,8 @@ val pp_activity :
 (** [pp_activity ?gitlab ~no_links ()] can be used to print the underlying
     get-activity items. See the description of [gitlab] and [no_links] in {!pp}. *)
 
-val pp : ?gitlab:bool -> ?no_links:bool -> unit -> t Fmt.t
+val pp :
+  ?gitlab:bool -> ?no_links:bool -> print_projects:bool -> unit -> t Fmt.t
 (** [pp ppf activity] formats a weekly activity into a template that needs some
     editing to get it into the correct format.
 
@@ -52,7 +53,10 @@ val pp : ?gitlab:bool -> ?no_links:bool -> unit -> t Fmt.t
 
     [no_links] controls rendering of markdown links to issues, reviews and prs.
     Defaults to [false] and longer url links. [true] for GitHub style shorter
-    links eg project/repo#number *)
+    links eg project/repo#number
+
+    [print_projects] controls wheter we display the list of projects at the
+    beginning of the report. *)
 
 module Gitlab : sig
   open Get_activity.Contributions

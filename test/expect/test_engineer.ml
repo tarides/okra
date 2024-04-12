@@ -74,4 +74,4 @@ let activity =
   let activities = { username = "bactrian"; activity } in
   Activity.make ~projects activities
 
-let () = Activity.pp () Fmt.stdout activity
+let () = Activity.pp ~print_projects:false () Fmt.stdout activity
