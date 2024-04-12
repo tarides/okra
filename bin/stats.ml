@@ -92,7 +92,7 @@ let print conf t =
         krs
 
 let run conf =
-  let okrs =
+  let okrs, _warnings =
     Okra.Report.of_markdown
       ~ignore_sections:(Common.ignore_sections conf.c)
       ~include_sections:(Common.include_sections conf.c)

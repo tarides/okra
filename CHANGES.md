@@ -2,6 +2,8 @@
 
 ### Changed
 
+- Lint: activity is now checked against objectives instead of workitems (#218, @gpetiot)
+- Cat/Aggregate: generated reports use objectives instead of workitems (#218, @gpetiot)
 - Use standardized categories for reporting non-engineering work time: Community, Hack, Learning, Leave, Management, Meet and Onboard (#230, @gpetiot)
 - Lint: check the quarter of workitems instead of their status (#228, @gpetiot)
 

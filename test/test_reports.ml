@@ -19,7 +19,7 @@ module T = Okra.Time
 let aggregate f =
   let ic = open_in f in
   let omd = Omd.of_channel ic in
-  let p = Okra.Report.of_markdown omd in
+  let p, _warnings = Okra.Report.of_markdown omd in
   close_in ic;
   p
 

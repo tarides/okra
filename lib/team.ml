@@ -173,7 +173,7 @@ let aggregate ?okr_db admin_dir ~year ~weeks teams =
          files
   in
   let md = Omd.of_string content in
-  let report =
+  let report, _warnings =
     try Report.of_markdown ~report_kind:Engineer ?okr_db md
     with e ->
       Printf.eprintf

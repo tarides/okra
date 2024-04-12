@@ -106,7 +106,7 @@ let apply f (t : Report.t) =
           if
             StringSet.is_empty f.include_engineers
             && StringSet.is_empty f.exclude_engineers
-          then Report.add new_t kr
+          then ignore @@ Report.add new_t kr
           else
             let time_entries =
               List.fold_left
@@ -127,7 +127,8 @@ let apply f (t : Report.t) =
               |> List.rev
             in
             if time_entries = [] then ()
-            else if time_entries = kr.time_entries then Report.add new_t kr
+            else if time_entries = kr.time_entries then
+              ignore @@ Report.add new_t kr
             else
               let work =
                 Item.
@@ -146,7 +147,7 @@ let apply f (t : Report.t) =
                 KR.v ~project:kr.project ~objective:kr.objective ~time_entries
                   ~kind:kr.kind work
               in
-              Report.add new_t kr
+              ignore @@ Report.add new_t kr
         in
         let check x (incl, excl) =
           match StringSet.(is_empty incl, is_empty excl) with

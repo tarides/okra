@@ -115,7 +115,7 @@ The result of aggregate should pass the lint
   > "#1115","General okra maintenance","Draft","","","","Maintenance - internal tooling","","pillar/ecosystem,team/internal-tooling",""
   > EOF
 
-  $ okra team aggregate --okr-db db.csv -C xxx -y 2024 -w 10 --conf conf.yml > aggr.md
+  $ okra team aggregate --work-item-db db.csv -C xxx -y 2024 -w 10 --conf conf.yml > aggr.md
 
   $ cat aggr.md
   # Last week

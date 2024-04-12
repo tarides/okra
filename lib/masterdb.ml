@@ -14,113 +14,182 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type status_t =
-  | Draft
-  | Scheduled
-  | Active
-  | Paused
-  | Blocked
-  | Complete
-  | Dropped
+module Objective = struct
+  type status_t = Todo | In_progress | Paused | Complete | Closed
 
-type elt_t = {
-  id : string;
-  printable_id : string;
-  title : string;
-  objective : string;
-  team : string;
-  status : status_t option;
-  quarter : Quarter.t option;
-}
+  type elt_t = {
+    id : string;
+    printable_id : string;
+    title : string;
+    project : string;
+    team : string;
+    status : status_t option;
+    quarter : Quarter.t option;
+  }
 
-type t = (string, elt_t) Hashtbl.t
+  type t = (string, elt_t) Hashtbl.t
 
-let status_of_string s =
-  match Astring.String.cuts ~sep:" " (String.uppercase_ascii s) with
-  | "DRAFT" :: _ -> Some Draft
-  | "SCHEDULED" :: _ -> Some Scheduled
-  | "ACTIVE" :: _ -> Some Active
-  | "PAUSED" :: _ -> Some Paused
-  | "BLOCKED" :: _ -> Some Blocked
-  | "DROPPED" :: _ -> Some Dropped
-  | "COMPLETE" :: _ -> Some Complete
-  | _ -> None
+  let status_of_string s =
+    match Astring.String.cuts ~sep:" " (String.uppercase_ascii s) with
+    | "TODO" :: _ -> Some Todo
+    | "IN" :: "PROGRESS" :: _ -> Some In_progress
+    | "PAUSED" :: _ -> Some Paused
+    | "COMPLETE" :: _ -> Some Complete
+    | "CLOSED" :: _ -> Some Closed
+    | _ -> None
 
-let string_of_status s =
-  match s with
-  | Draft -> "Draft"
-  | Scheduled -> "Scheduled"
-  | Active -> "Active"
-  | Paused -> "Paused"
-  | Blocked -> "Blocked"
-  | Dropped -> "Dropped"
-  | Complete -> "Complete"
+  let string_of_status s =
+    match s with
+    | Todo -> "Todo"
+    | In_progress -> "In Progress"
+    | Paused -> "Paused"
+    | Complete -> "Complete"
+    | Closed -> "Closed"
 
-let normalise_title s =
-  match Astring.String.cut ~sep:":" s with
-  | Some (_, s) -> String.trim s
-  | None -> s
+  let normalise_title s =
+    match Astring.String.cut ~sep:":" s with
+    | Some (_, s) -> String.trim s
+    | None -> s
 
-let empty_db = Hashtbl.create 13
+  let empty_db = Hashtbl.create 13
 
-let load_csv ?(separator = ',') f =
-  let ( let* ) = Result.bind in
-  let res = empty_db in
-  let line = ref 1 in
-  let ic = open_in f in
-  try
-    let rows = Csv.of_channel ~separator ~has_header:true ic in
-    let* () =
-      Csv.Rows.fold_left ~init:(Ok ())
-        ~f:(fun acc row ->
-          let* () = acc in
-          line := !line + 1;
-          let find_and_trim col = Csv.Row.find row col |> String.trim in
-          let printable_id = find_and_trim "id" in
-          let* quarter = find_and_trim "quarter" |> Quarter.of_string in
-          let e =
-            {
-              id = String.uppercase_ascii printable_id;
-              printable_id;
-              title = find_and_trim "title" |> normalise_title;
-              objective = find_and_trim "objective";
-              team = find_and_trim "team";
-              status = find_and_trim "status" |> status_of_string;
-              quarter;
-            }
-          in
-          if e.id = "" then
-            Fmt.error_msg "line %i: A unique KR ID is required per line" !line
-          else if e.id <> "#" && Hashtbl.mem res e.id then
-            Fmt.error_msg "line %i: KR ID \"%s\" is not unique." !line e.id
-          else if e.title = "" then
-            Fmt.error_msg "line %i: KR ID \"%s\" does not have a title" !line
-              e.id
-          else (
-            Hashtbl.add res e.id e;
-            Ok ()))
-        rows
+  let load_csv ?(separator = ',') f =
+    let ( let* ) = Result.bind in
+    let res = empty_db in
+    let line = ref 1 in
+    let ic = open_in f in
+    try
+      let rows = Csv.of_channel ~separator ~has_header:true ic in
+      let* () =
+        Csv.Rows.fold_left ~init:(Ok ())
+          ~f:(fun acc row ->
+            let* () = acc in
+            line := !line + 1;
+            let find_and_trim col = Csv.Row.find row col |> String.trim in
+            let printable_id = find_and_trim "id" in
+            let* quarter = find_and_trim "quarter" |> Quarter.of_string in
+            let e =
+              {
+                id = String.uppercase_ascii printable_id;
+                printable_id;
+                title = find_and_trim "title" |> normalise_title;
+                project = find_and_trim "project";
+                team = find_and_trim "team";
+                status = find_and_trim "status" |> status_of_string;
+                quarter;
+              }
+            in
+            if e.id = "" then
+              Fmt.error_msg "line %i: A unique KR ID is required per line" !line
+            else if e.id <> "#" && Hashtbl.mem res e.id then
+              Fmt.error_msg "line %i: KR ID \"%s\" is not unique." !line e.id
+            else if e.title = "" then
+              Fmt.error_msg "line %i: KR ID \"%s\" does not have a title" !line
+                e.id
+            else (
+              Hashtbl.add res e.id e;
+              Ok ()))
+          rows
+      in
+      Ok res
+    with e ->
+      close_in_noerr ic;
+      Error (`Msg (Printexc.to_string e))
+
+  let find_kr_opt t id = Hashtbl.find_opt t (id |> String.uppercase_ascii)
+
+  let find_title_opt t title =
+    let title_no_case = title |> String.uppercase_ascii |> String.trim in
+    let okrs = Hashtbl.to_seq_values t |> List.of_seq in
+    List.find_opt
+      (fun kr ->
+        kr.title |> String.uppercase_ascii |> String.trim = title_no_case)
+      okrs
+
+  let filter_krs t f =
+    let v = Hashtbl.to_seq_values t in
+    List.of_seq (Seq.filter f v)
+
+  let find_krs_for_teams t teams =
+    let teams = List.map String.uppercase_ascii teams in
+    let p e =
+      List.exists (String.equal (String.uppercase_ascii e.team)) teams
     in
-    Ok res
-  with e ->
-    close_in_noerr ic;
-    Error (`Msg (Printexc.to_string e))
+    filter_krs t p
+end
 
-let find_kr_opt t id = Hashtbl.find_opt t (id |> String.uppercase_ascii)
+module Work_item = struct
+  type elt_t = {
+    id : string;
+    printable_id : string;
+    title : string;
+    objective : string;
+    project : string;
+    team : string;
+    status : string;
+    quarter : Quarter.t option;
+  }
 
-let find_title_opt t title =
-  let title_no_case = title |> String.uppercase_ascii |> String.trim in
-  let okrs = Hashtbl.to_seq_values t |> List.of_seq in
-  List.find_opt
-    (fun kr ->
-      kr.title |> String.uppercase_ascii |> String.trim = title_no_case)
-    okrs
+  type t = (string, elt_t) Hashtbl.t
 
-let filter_krs t f =
-  let v = Hashtbl.to_seq_values t in
-  List.of_seq (Seq.filter f v)
+  let normalise_title s =
+    match Astring.String.cut ~sep:":" s with
+    | Some (_, s) -> String.trim s
+    | None -> s
 
-let find_krs_for_teams t teams =
-  let teams = List.map String.uppercase_ascii teams in
-  let p e = List.exists (String.equal (String.uppercase_ascii e.team)) teams in
-  filter_krs t p
+  let empty_db = Hashtbl.create 13
+
+  let load_csv ?(separator = ',') f =
+    let ( let* ) = Result.bind in
+    let res = empty_db in
+    let line = ref 1 in
+    let ic = open_in f in
+    try
+      let rows = Csv.of_channel ~separator ~has_header:true ic in
+      let* () =
+        Csv.Rows.fold_left ~init:(Ok ())
+          ~f:(fun acc row ->
+            let* () = acc in
+            line := !line + 1;
+            let find_and_trim col = Csv.Row.find row col |> String.trim in
+            let printable_id = find_and_trim "id" in
+            let* quarter = find_and_trim "quarter" |> Quarter.of_string in
+            let e =
+              {
+                id = String.uppercase_ascii printable_id;
+                printable_id;
+                title = find_and_trim "title" |> normalise_title;
+                objective = find_and_trim "objective";
+                project = find_and_trim "project";
+                team = find_and_trim "team";
+                status = find_and_trim "status";
+                quarter;
+              }
+            in
+            if e.id = "" then
+              Fmt.error_msg "line %i: A unique KR ID is required per line" !line
+            else if e.id <> "#" && Hashtbl.mem res e.id then
+              Fmt.error_msg "line %i: KR ID \"%s\" is not unique." !line e.id
+            else if e.title = "" then
+              Fmt.error_msg "line %i: KR ID \"%s\" does not have a title" !line
+                e.id
+            else (
+              Hashtbl.add res e.id e;
+              Ok ()))
+          rows
+      in
+      Ok res
+    with e ->
+      close_in_noerr ic;
+      Error (`Msg (Printexc.to_string e))
+
+  let find_title_opt t title =
+    let title_no_case = title |> String.uppercase_ascii |> String.trim in
+    let okrs = Hashtbl.to_seq_values t |> List.of_seq in
+    List.find_opt
+      (fun kr ->
+        kr.title |> String.uppercase_ascii |> String.trim = title_no_case)
+      okrs
+end
+
+type t = { objective_db : Objective.t; work_item_db : Work_item.t option }

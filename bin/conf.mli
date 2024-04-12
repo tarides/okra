@@ -28,8 +28,11 @@ val projects : t -> Okra.Activity.project list
 val footer : t -> string option
 (** An optional footer to append to the end of your engineer reports *)
 
-val okr_db : t -> string option
-(** [okr_db] is the location of the OKR database. *)
+val work_item_db : t -> string option
+(** [work_item_db] is the location of the work item database. *)
+
+val objective_db : t -> string option
+(** [objective_db] is the location of the objective database. *)
 
 val admin_dir : t -> string option
 (** [admin_dir] is the location of the admin directory. *)

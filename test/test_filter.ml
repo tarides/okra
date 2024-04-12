@@ -46,7 +46,7 @@ let kr3 =
   let kind = KR.Kind.Work (KR.Work.v ~title:t3 ~id:(ID id3) ~quarter:None) in
   KR.v ~kind ~project:p2 ~objective:o2 ~time_entries:te3 []
 
-let report () = Okra.Report.of_krs [ kr1; kr2; kr3 ]
+let report () = fst @@ Okra.Report.of_krs [ kr1; kr2; kr3 ]
 
 let filter ?include_projects ?exclude_projects ?include_objectives
     ?exclude_objectives ?include_krs ?exclude_krs ?include_engineers

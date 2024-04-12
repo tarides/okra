@@ -47,12 +47,12 @@ let run conf =
     | None -> None
     | Some file ->
         let content = read_file file in
-        let exisiting =
+        let exisiting, _warnings =
           Okra.Report.of_markdown ?okr_db (Omd.of_string content)
         in
         Some exisiting
   in
-  let okrs =
+  let okrs, _warnings =
     try
       Okra.Report.of_markdown ?existing_report
         ~ignore_sections:(Common.ignore_sections conf.c)

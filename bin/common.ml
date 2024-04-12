@@ -24,12 +24,21 @@ let get_or_error = function
       exit 1
 
 (* DB *)
-let okr_db =
+let work_item_db =
   let info =
-    Arg.info [ "okr-db" ]
+    Arg.info [ "work-item-db" ]
       ~doc:
-        "Replace KR titles, objectives and projects with information from a \
-         CSV. Requires header with columns id,title,objective,project."
+        "Replace work item titles, objectives and projects with information \
+         from a CSV. Requires header with columns id,title,objective,project."
+  in
+  Arg.value (Arg.opt (Arg.some Arg.file) None info)
+
+let objective_db =
+  let info =
+    Arg.info [ "objective-db" ]
+      ~doc:
+        "Replace objective titles, objectives and projects with information \
+         from a CSV. Requires header with columns id,title,objective,project."
   in
   Arg.value (Arg.opt (Arg.some Arg.file) None info)
 
@@ -276,7 +285,8 @@ let output =
   Arg.(value & opt (some string) None & info [ "o"; "output" ] ~docv:"FILE")
 
 type t = {
-  okr_db : string option;
+  work_item_db : string option;
+  objective_db : string option;
   mutable okr_db_state : Okra.Masterdb.t option;
   filter : Okra.Filter.t;
   includes : includes;
@@ -319,7 +329,8 @@ let repo =
 let term =
   let open Let_syntax_cmdliner in
   let+ () = setup ()
-  and+ okr_db = okr_db
+  and+ work_item_db = work_item_db
+  and+ objective_db = objective_db
   and+ filter = filter
   and+ includes = includes
   and+ printconf = printconf
@@ -339,7 +350,8 @@ let term =
   in
   let check_time = Option.map Okra.Time.days (Conf.work_days_in_a_week conf) in
   {
-    okr_db;
+    work_item_db;
+    objective_db;
     filter;
     includes;
     printconf;
@@ -352,44 +364,56 @@ let term =
     report_kind;
   }
 
+let db_path t ~from_cmdline ~from_conf ~from_file:fname =
+  let ( or ) x y = match x with Some x -> Some x | None -> y in
+  from_cmdline
+  or from_conf t.conf
+  or
+  match t.repo with
+  | Some repo -> (
+      let path = Fpath.(v repo / "data" / fname) in
+      match Bos.OS.File.exists path with
+      | Ok true -> Some (Fpath.to_string path)
+      | _ -> None)
+  | None -> None
+
 let okr_db t =
   match t.okr_db_state with
   | Some s -> Some s
   | None -> (
-      let db =
-        let ( or ) x y = match x with Some x -> Some x | None -> y in
-        t.okr_db
-        or Conf.okr_db t.conf
-        or
-        match t.repo with
-        | Some repo -> (
-            let path = Fpath.(v repo / "data" / "db.csv") in
-            match Bos.OS.File.exists path with
-            | Ok true -> Some (Fpath.to_string path)
-            | _ -> None)
-        | None -> None
-      in
-      match db with
-      | None -> None
-      | Some f -> (
-          match Okra.Masterdb.load_csv f with
-          | Ok state ->
-              t.okr_db_state <- Some state;
-              Some state
-          | Error (`Msg e) ->
-              Logs.err (fun m -> m "%s" e);
-              exit 1))
+      match
+        db_path t ~from_cmdline:t.objective_db ~from_conf:Conf.objective_db
+          ~from_file:"team-objectives.csv"
+      with
+      | Some objective_db ->
+          let objective_db =
+            Okra.Masterdb.Objective.load_csv objective_db |> get_or_error
+          in
+          let work_item_db =
+            match
+              db_path t ~from_cmdline:t.work_item_db
+                ~from_conf:Conf.work_item_db ~from_file:"db.csv"
+            with
+            | None -> None
+            | Some f -> Some (Okra.Masterdb.Work_item.load_csv f |> get_or_error)
+          in
+          let okr_db = { Okra.Masterdb.objective_db; work_item_db } in
+          t.okr_db_state <- Some okr_db;
+          Some okr_db
+      | None -> None)
 
 let filter t =
   match okr_db t with
   | None -> t.filter
   | Some okr_db ->
       let additional_krs =
-        Okra.Masterdb.find_krs_for_teams okr_db t.includes.include_teams
+        Okra.Masterdb.Objective.find_krs_for_teams okr_db.objective_db
+          t.includes.include_teams
       in
       let kr_ids =
         List.map
-          (fun f -> Okra.Filter.kr_of_string (f : Okra.Masterdb.elt_t).id)
+          (fun f ->
+            Okra.Filter.kr_of_string (f : Okra.Masterdb.Objective.elt_t).id)
           additional_krs
       in
       let extra_filter = Okra.Filter.v ?include_krs:(Some kr_ids) () in

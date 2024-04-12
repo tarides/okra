@@ -25,7 +25,7 @@ let config_dir =
   let ( / ) = Filename.concat in
   Xdg.config_dir xdg / "okra"
 
-let default_project = { Activity.title = "TODO ADD KR (ID)"; items = [] }
+let default_project = { Activity.title = "OBJECTIVE (ID)"; items = [] }
 
 type project = Activity.project = {
   title : string;
@@ -45,7 +45,8 @@ type t = {
   projects : project list; [@default [ default_project ]]
   teams : Team.t list; [@default []]
   footer : string option;
-  okr_db : string option;
+  work_item_db : string option;
+  objective_db : string option;
   admin_dir : string option;
   gitlab_token : string option;
   work_days_in_a_week : float option;
@@ -57,7 +58,8 @@ let default =
     projects = [ default_project ];
     teams = [];
     footer = None;
-    okr_db = None;
+    work_item_db = None;
+    objective_db = None;
     admin_dir = None;
     gitlab_token = None;
     work_days_in_a_week = None;
@@ -77,7 +79,8 @@ let teams { teams; _ } =
 
 let projects { projects; _ } = projects
 let footer { footer; _ } = footer
-let okr_db t = t.okr_db
+let work_item_db t = t.work_item_db
+let objective_db t = t.objective_db
 let admin_dir t = t.admin_dir
 let gitlab_token t = t.gitlab_token
 let work_days_in_a_week t = t.work_days_in_a_week

@@ -87,7 +87,20 @@ val v :
 val dump : t Fmt.t
 val merge : t -> t -> t
 val compare : t -> t -> int
-val update_from_master_db : t -> Masterdb.t -> t
+
+(** Functions in this module can raise exceptions.
+    Use at your own risk. *)
+module Unsafe : sig
+  val to_work : t -> Work.t
+  (** @raise Invalid_argument if the argument kind is of type [Meta.t]. *)
+end
+
+type kr_lookup_error =
+  | Not_found of t
+  | Migrate_work_item of t
+  | Migrate_work_item_to_objective of t * t
+
+val update_from_master_db : t -> Masterdb.t -> (t, kr_lookup_error) result
 
 (** {2 Pretty-print} *)
 

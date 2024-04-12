@@ -14,29 +14,44 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type status_t =
-  | Draft
-  | Scheduled
-  | Active
-  | Paused
-  | Blocked
-  | Complete
-  | Dropped
+module Objective : sig
+  type status_t = Todo | In_progress | Paused | Complete | Closed
 
-type elt_t = private {
-  id : string;
-  printable_id : string;
-  title : string;
-  objective : string;
-  team : string;
-  status : status_t option;
-  quarter : Quarter.t option;
-}
+  type elt_t = private {
+    id : string;
+    printable_id : string;
+    title : string;
+    project : string;
+    team : string;
+    status : status_t option;
+    quarter : Quarter.t option;
+  }
 
-type t = (string, elt_t) Hashtbl.t
+  type t = (string, elt_t) Hashtbl.t
 
-val string_of_status : status_t -> string
-val load_csv : ?separator:char -> string -> (t, [ `Msg of string ]) result
-val find_kr_opt : t -> string -> elt_t option
-val find_title_opt : t -> string -> elt_t option
-val find_krs_for_teams : t -> string list -> elt_t list
+  val string_of_status : status_t -> string
+  val load_csv : ?separator:char -> string -> (t, [ `Msg of string ]) result
+  val find_kr_opt : t -> string -> elt_t option
+  val find_title_opt : t -> string -> elt_t option
+  val find_krs_for_teams : t -> string list -> elt_t list
+end
+
+module Work_item : sig
+  type elt_t = private {
+    id : string;
+    printable_id : string;
+    title : string;
+    objective : string;
+    project : string;
+    team : string;
+    status : string;
+    quarter : Quarter.t option;
+  }
+
+  type t = (string, elt_t) Hashtbl.t
+
+  val load_csv : ?separator:char -> string -> (t, [ `Msg of string ]) result
+  val find_title_opt : t -> string -> elt_t option
+end
+
+type t = { objective_db : Objective.t; work_item_db : Work_item.t option }

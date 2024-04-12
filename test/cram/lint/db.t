@@ -53,11 +53,7 @@ Workitems can be checked when a DB of this form is provided:
   > EOF
 
   $ okra lint -e -C admin admin/weekly/2023/50/eng1.md
-  [ERROR(S)]: admin/weekly/2023/50/eng1.md
-  
-  In WI "Property-Based Testing for Multicore":
-    Work logged on WI scheduled for 2024 Q1
-  [1]
+  [OK]: admin/weekly/2023/50/eng1.md
 
   $ okra lint -e -C admin admin/weekly/2023/50/eng2.md
   [OK]: admin/weekly/2023/50/eng2.md
@@ -65,11 +61,7 @@ Workitems can be checked when a DB of this form is provided:
   $ cp admin/weekly/2023/50/eng1.md admin/weekly/2024/01/eng1.md
 
   $ okra lint -e -C admin admin/weekly/2024/01/eng1.md
-  [ERROR(S)]: admin/weekly/2024/01/eng1.md
-  
-  In WI "Application and Operational Metrics":
-    Work logged on WI scheduled for 2023 Q4
-  [1]
+  [OK]: admin/weekly/2024/01/eng1.md
 
   $ cat > weekly.md << EOF
   > # Last week
@@ -101,15 +93,15 @@ No check on WIs without the DB:
 
 The DB can be passed through the [--okr-db] option:
 
-  $ okra lint -e --okr-db admin/data/db.csv weekly.md
+  $ okra lint -e --work-item-db admin/data/db.csv weekly.md
   okra: [WARNING] Conflicting titles:
-  - "Invalid name"
   - "Property-Based Testing for Multicore"
+  - "Invalid name"
   [OK]: weekly.md
 
 The DB can be looked up in the [repo-dir] passed through the [-C]/[--repo-dir] option:
   $ okra lint -e -C admin weekly.md
   okra: [WARNING] Conflicting titles:
-  - "Invalid name"
   - "Property-Based Testing for Multicore"
+  - "Invalid name"
   [OK]: weekly.md

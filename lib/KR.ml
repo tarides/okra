@@ -358,21 +358,48 @@ let make_time_entries t =
   let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
-let update_from_master_db orig_kr db =
+type kr_lookup_error =
+  | Not_found of t
+  | Migrate_work_item of t
+  | Migrate_work_item_to_objective of t * t
+
+let update_from_master_db orig_kr (db : Masterdb.t) =
   match orig_kr.kind with
-  | Meta _ -> orig_kr
+  | Meta _ -> Ok orig_kr
   | Work orig_work -> (
       let db_kr =
         match orig_work.id with
-        | ID id -> Masterdb.find_kr_opt db id
-        | _ -> Masterdb.find_title_opt db orig_work.title
+        | ID id -> Masterdb.Objective.find_kr_opt db.objective_db id
+        | _ -> Masterdb.Objective.find_title_opt db.objective_db orig_work.title
       in
       match db_kr with
-      | None ->
+      | None -> (
           if orig_work.id = New_KR then
             Log.warn (fun l ->
                 l "KR ID not found for new KR %S" orig_work.title);
-          orig_kr
+          match db.work_item_db with
+          | None -> Ok orig_kr
+          | Some work_item_db -> (
+              match
+                Masterdb.Work_item.find_title_opt work_item_db orig_work.title
+              with
+              | None -> Error (Not_found orig_kr)
+              | Some work_item_kr -> (
+                  match
+                    Masterdb.Objective.find_title_opt db.objective_db
+                      work_item_kr.objective
+                  with
+                  | None -> Error (Migrate_work_item orig_kr)
+                  | Some objective_kr ->
+                      let work =
+                        {
+                          Work.id = ID objective_kr.printable_id;
+                          title = objective_kr.title;
+                          quarter = objective_kr.quarter;
+                        }
+                      in
+                      let kr = { orig_kr with kind = Work work } in
+                      Error (Migrate_work_item_to_objective (orig_kr, kr)))))
       | Some db_kr ->
           if orig_work.id = No_KR then
             Log.warn (fun l ->
@@ -385,12 +412,10 @@ let update_from_master_db orig_kr db =
               quarter = db_kr.quarter;
             }
           in
-          let kr =
-            { orig_kr with kind = Work work; objective = db_kr.objective }
-          in
+          let kr = { orig_kr with kind = Work work } in
           (* show the warnings *)
           ignore (merge orig_kr kr);
-          kr)
+          Ok kr)
 
 let items ?(show_time = true) ?(show_time_calc = false) ?(show_engineers = true)
     kr =
@@ -417,3 +442,11 @@ let items ?(show_time = true) ?(show_time_calc = false) ?(show_engineers = true)
           ];
         ] );
   ]
+
+module Unsafe = struct
+  let to_work x =
+    match x.kind with
+    | Work w -> w
+    | Meta m ->
+        Fmt.invalid_arg "Unsafe.to_work %a: expected a Work Item" Meta.pp m
+end

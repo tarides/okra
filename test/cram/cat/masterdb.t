@@ -1,17 +1,17 @@
 Master DB
 ---------
 
-When `--okr-db` is passed, metadata is fixed.
+When `--objective-db` is passed, metadata is fixed.
 
-  $ cat > okrs.csv << EOF
+  $ cat > team-objectives.csv << EOF
   > id,title,objective,status,team,quarter
-  > KR1,Actual title,Actual objective,active,team1,"Q1 2023 - Jan-Mar"
-  > Kr2,Actual title 2,Actual objective,active,team1,"Q2 2021 - Apr-Jun"
-  > KR3,Dropped KR,Actual objective,dropped,team2,"Q2 2024 - Apr-Jun"
-  > KR5,Missing status KR,Actual objective,,team2,"Rolling"
+  > KR1,Actual title,,In Progress,team1,"Q1 2023 - Jan-Mar"
+  > Kr2,Actual title 2,,In Progress,team1,"Q2 2021 - Apr-Jun"
+  > KR3,Dropped KR,,Closed,team2,"Q2 2024 - Apr-Jun"
+  > KR5,Missing status KR,,,team2,"Rolling"
   > EOF
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Wrong project
   > 
   > ## Wrong objective
@@ -23,12 +23,9 @@ When `--okr-db` is passed, metadata is fixed.
   okra: [WARNING] Conflicting titles:
   - "Wrong title"
   - "Actual title"
-  okra: [WARNING] KR Wrong title (KR1) appears in two objectives:
-  - "Wrong objective"
-  - "Actual objective"
   # Wrong project
   
-  ## Actual objective
+  ## Wrong objective
   
   - Actual title (KR1)
     - @a (1 day)
@@ -36,7 +33,7 @@ When `--okr-db` is passed, metadata is fixed.
 
 It is possible to filter by team.
 
-  $ okra cat --okr-db=okrs.csv --include-teams=team1 << EOF
+  $ okra cat --objective-db=team-objectives.csv --include-teams=team1 << EOF
   > # Project
   > 
   > - Actual title (KR1)
@@ -48,8 +45,6 @@ It is possible to filter by team.
   >   - Did more of the things
   > EOF
   # Project
-  
-  ## Actual objective
   
   - Actual title (KR1)
     - @a (1 day)
@@ -57,7 +52,7 @@ It is possible to filter by team.
 
 It is possible to filter on more than one team.
 
-  $ okra cat --okr-db=okrs.csv --include-teams=team1,team2 << EOF
+  $ okra cat --objective-db=team-objectives.csv --include-teams=team1,team2 << EOF
   > # Project
   > 
   > - Actual title (KR1)
@@ -69,8 +64,6 @@ It is possible to filter on more than one team.
   >   - Did more of the things
   > EOF
   # Project
-  
-  ## Actual objective
   
   - Actual title (KR1)
     - @a (1 day)
@@ -83,7 +76,7 @@ It is possible to filter on more than one team.
 Instead of a KR ID, it is possible to put "New KR".
 In that case, metadata is preserved.
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
@@ -119,7 +112,7 @@ In that case, metadata is preserved.
 
 If KR ID is "New KR", look for title in database to get real KR ID.
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
@@ -139,7 +132,7 @@ If KR ID is "New KR", look for title in database to get real KR ID.
 
 If KR ID is "No KR", look for title in database to get real KR ID.
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
@@ -162,7 +155,7 @@ If KR ID is "No KR", look for title in database to get real KR ID.
 
 If WI ID is "No WI", look for title in database to get real WI ID.
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
@@ -185,7 +178,7 @@ If WI ID is "No WI", look for title in database to get real WI ID.
 
 Use same case for KR ID as in database.
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
@@ -213,7 +206,7 @@ Use same case for KR ID as in database.
 
 Warn when using KRs that are not active or missing status
 
-  $ okra cat --okr-db=okrs.csv << EOF
+  $ okra cat --objective-db=team-objectives.csv << EOF
   > # Actual project
   > 
   > ## Actual objective
