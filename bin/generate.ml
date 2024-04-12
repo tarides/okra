@@ -61,6 +61,15 @@ let print_projects =
   in
   Arg.value (Arg.flag info)
 
+let interactive =
+  let info =
+    Arg.info [ "interactive"; "i" ]
+      ~doc:
+        "Create the file containing the activity report, and open it for the \
+         user to edit. Upon close, commit the file."
+  in
+  Arg.value (Arg.flag info)
+
 let with_repositories_term =
   Arg.value
   @@ Arg.opt Arg.(list string) []
@@ -128,10 +137,41 @@ let fetch ~token ~period =
   let token = Gitlab.G.Token.of_string token in
   Gitlab.make_activity ~token ~before ~after
 
+let file_path ~admin_dir ~week ~year ~engineer_name =
+  Format.asprintf "%s/weekly/%4d/%02i/%s.md" admin_dir year week engineer_name
+
+let write_and_commit ~repo ~week ~year ~user pp =
+  let* admin_dir = repo in
+  let file = Fpath.v @@ file_path ~admin_dir ~week ~year ~engineer_name:user in
+  let* () = Bos.OS.File.delete file in
+  let* () = Bos.OS.File.writef file "%a%!" pp () in
+  let* editor = Bos.OS.Env.req_var "EDITOR" in
+  let* () = Bos.OS.Cmd.run @@ Bos.Cmd.(v editor % p file) in
+  let* res = Bos.OS.File.with_ic file (fun ic () -> Okra.Lint.lint ic) () in
+  let* () =
+    Result.map_error
+      (fun errors ->
+        List.iter
+          (fun e ->
+            List.iter print_endline
+              (Okra.Lint.short_messages_of_error (Fpath.to_string file) e))
+          errors;
+        `Msg "linting failed, aborting.")
+      res
+  in
+  let git_cmd = Bos.Cmd.(v "git" % "-C" % p (Fpath.v admin_dir)) in
+  let* () = Bos.OS.Cmd.run @@ Bos.Cmd.(git_cmd % "add" % p file) in
+  let msg = Format.sprintf "%s week %i" user week in
+  let* () =
+    Bos.OS.Cmd.run @@ Bos.Cmd.(git_cmd % "commit" % p file % "-m" % msg)
+  in
+  Ok ()
+
 let run_engineer ppf conf cal projects token no_activity no_links
-    with_repositories user print_projects =
+    with_repositories user print_projects repo interactive =
   let period = Calendar.to_iso8601 cal in
   let week = Calendar.week cal in
+  let year = Calendar.year cal in
   let* activity, _ =
     if no_activity then
       let username =
@@ -185,15 +225,21 @@ let run_engineer ppf conf cal projects token no_activity no_links
       format_date to_
   in
   let pp_footer ppf conf = Fmt.(pf ppf "\n\n%a" string conf) in
+  let user = activity.username in
   let activity = Activity.make ~projects activity in
-  Fmt.pf ppf "%s\n\n%a%a%a%!" header
-    (Activity.pp ~no_links ~print_projects ())
-    activity
-    (Activity.pp_activity ~gitlab:true ~no_links:false ())
-    gitlab_activity
-    Fmt.(option pp_footer)
-    (Conf.footer conf);
-  Ok ()
+  let pp ppf () =
+    Fmt.pf ppf "%s\n\n%a%a%a%!" header
+      (Activity.pp ~no_links ~print_projects ())
+      activity
+      (Activity.pp_activity ~gitlab:true ~no_links:false ())
+      gitlab_activity
+      Fmt.(option pp_footer)
+      (Conf.footer conf)
+  in
+  if interactive then write_and_commit ~repo ~week ~year ~user pp
+  else (
+    pp ppf ();
+    Ok ())
 
 let get_or_error = function
   | Ok v -> v
@@ -212,10 +258,11 @@ let run_monthly ppf cal repos token with_names with_times with_descriptions =
   Ok ()
 
 let run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos user print_projects = function
+    with_descriptions with_repositories repos user print_projects repo
+    interactive = function
   | Engineer ->
       run_engineer ppf conf cal (Conf.projects conf) token no_activity no_links
-        with_repositories user print_projects
+        with_repositories user print_projects repo interactive
   | Repository ->
       run_monthly ppf cal repos token with_names with_times with_descriptions
 
@@ -228,6 +275,7 @@ let term =
   and+ with_repositories = with_repositories_term
   and+ kind = kind_term
   and+ user = user
+  and+ interactive = interactive
   and+ repos = repositories in
   let token =
     (* If [no_activity] is specfied then the token will not be used, don't try
@@ -242,8 +290,10 @@ let term =
   let with_times = Common.with_days c in
   let with_descriptions = Common.with_description c in
   let ppf = Format.formatter_of_out_channel (Common.output c) in
+  let repo = Common.repo c in
   run ppf cal conf token no_activity no_links with_names with_times
-    with_descriptions with_repositories repos user print_projects kind
+    with_descriptions with_repositories repos user print_projects repo
+    interactive kind
 
 let cmd =
   let info =
