@@ -58,7 +58,7 @@ module Issue = struct
 
   let pp ~with_names ~with_times ~with_descriptions ppf
       { author; title; url; created_at; body; _ } =
-    let pp_user ppf u = Fmt.pf ppf "[@%s](https://github.com/%s)" u u in
+    let pp_user = User.pp ~with_link:true in
     let pp_created_at ppf = Fmt.pf ppf " (created/merged: %s)" in
     let pp_author ppf = Fmt.pf ppf " by %a" pp_user in
     Fmt.(
@@ -149,7 +149,7 @@ module PR = struct
 
   let pp ~with_names ~with_times ~with_descriptions ppf
       { author; title; url; created_at; merged_at; reviewers; body; _ } =
-    let pp_user ppf u = Fmt.pf ppf "[@%s](https://github.com/%s)" u u in
+    let pp_user = User.pp ~with_link:true in
     let pp_created_at ppf = Fmt.pf ppf " (created/merged: %s)" in
     let pp_author ppf = Fmt.pf ppf " by %a" pp_user in
     let reviewers =
@@ -175,7 +175,7 @@ module PR = struct
           (Option.value ~default:"No author" author)
           (Option.value ~default:("created: " ^ created_at)
              (Option.map (( ^ ) "merged: ") merged_at))
-          Fmt.(list ~sep:(fun ppf _ -> Fmt.pf ppf ", ") pp_user)
+          (Fmt.list ~sep:(fun ppf _ -> Fmt.pf ppf ", ") pp_user)
           reviewers (option string)
           (if not with_descriptions then None else Some body))
 

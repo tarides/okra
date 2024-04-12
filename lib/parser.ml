@@ -59,28 +59,9 @@ let is_time_block = function
       String.get (String.trim s) 0 = '@'
   | _ -> false
 
-let user_url_regexp ~extract =
-  let open Re in
-  let maybe_group = if extract then group ?name:None else fun x -> x in
-  let username = rep1 (alt [ wordc; char '-' ]) in
-  let txt = seq [ char '@'; maybe_group username ] in
-  let url = seq [ str "https://github.com/"; username ] in
-  seq [ char '['; txt; char ']'; char '('; url; char ')' ]
-
-let user_of_string s =
-  let default = String.sub s 1 (String.length s - 1) in
-  match Re.exec_opt (Re.compile (user_url_regexp ~extract:true)) s with
-  | Some grp -> Option.value (Re.Group.get_opt grp 1) ~default
-  | None -> default
-
 let time_entry_regexp =
   let open Re in
-  let user =
-    let username = rep1 (alt [ wordc; char '-' ]) in
-    let with_url = user_url_regexp ~extract:false in
-    let without_url = seq [ char '@'; username ] in
-    group (alt [ with_url; without_url ])
-  in
+  let user = group User.regexp in
   let number =
     let with_int_part =
       let int_part = rep1 digit in
@@ -228,7 +209,7 @@ let kr ~project ~objective = function
                     match
                       let* grp = Re.exec_opt time_entry_regexp s in
                       let* user = Re.Group.get_opt grp 1 in
-                      let user = user_of_string user in
+                      let user = User.of_string user in
                       let* s_time = Re.Group.get_opt grp 2 in
                       let* f_time = Float.of_string_opt s_time in
                       let* s_unit = Re.Group.get_opt grp 3 in
