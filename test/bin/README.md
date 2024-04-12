@@ -182,7 +182,7 @@ $ cat bactrian.bad.md
 $ okra lint --engineer bactrian.bad.md
 [ERROR(S)]: bactrian.bad.md
 
-Invalid total time found for bactrian (3 days).
+Invalid total time found for bactrian (3 days, expected 5 days).
 [ERROR(S)]: bactrian.bad.md
 
 In KR "Make Okra, the OKR management tool":

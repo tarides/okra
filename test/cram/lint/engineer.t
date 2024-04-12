@@ -92,7 +92,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > EOF
   [ERROR(S)]: <stdin>
   
-  Invalid total time found for eng1 (1 day).
+  Invalid total time found for eng1 (1 day, expected 5 days).
   [ERROR(S)]: <stdin>
   
   In KR "This is a KR (Off KR)":
@@ -178,7 +178,7 @@ The total time reported must be 5 days
   > EOF
   [ERROR(S)]: <stdin>
   
-  Invalid total time found for eng1 (4 days).
+  Invalid total time found for eng1 (4 days, expected 5 days).
   [1]
   $ okra lint --engineer << EOF
   > # Title
@@ -207,5 +207,5 @@ The total time reported must be 5 days
   > EOF
   [ERROR(S)]: <stdin>
   
-  Invalid total time found for eng1 (10 days).
+  Invalid total time found for eng1 (10 days, expected 5 days).
   [1]

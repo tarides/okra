@@ -67,7 +67,9 @@ let pp_error ppf = function
          (x days), @@eng2 (y days)'@ where x and y must be divisible by 0.5@]@,"
         title entry
   | Invalid_total_time (s, t) ->
-      Fmt.pf ppf "@[<hv 2>Invalid total time found for %s (%a).@]@," s Time.pp t
+      Fmt.pf ppf
+        "@[<hv 2>Invalid total time found for %s (%a, expected %a).@]@," s
+        Time.pp t Time.pp (Time.days 5.)
   | Multiple_time_entries (_, s) ->
       Fmt.pf ppf
         "@[<hv 2>In KR %S:@ Multiple time entries found. Only one time entry \
