@@ -136,30 +136,12 @@ let filter =
 
 (* more filters.. *)
 
-let include_categories =
-  let i =
-    Arg.info [ "include-categories" ]
-      ~doc:
-        "If non-empty, only aggregate KRs in these categories. Requires a \
-         database."
-  in
-  Arg.(value & opt (list string) [] i)
-
 let include_teams =
   let i =
     Arg.info [ "include-teams" ]
       ~doc:
         "If non-empty, only aggregate KRs from these teams. Requires a \
          database."
-  in
-  Arg.(value & opt (list string) [] i)
-
-let include_reports =
-  let i =
-    Arg.info [ "include-reports" ]
-      ~doc:
-        "If non-empty, only aggregate KRs that are included in one of these \
-         reports. Requires a database."
   in
   Arg.(value & opt (list string) [] i)
 
@@ -182,9 +164,7 @@ let ignore_sections =
   Arg.(value & opt (list string) [] i)
 
 type includes = {
-  include_categories : string list; (* not totally sure what these are ... *)
-  include_teams : string list; (* TODO: what it is? *)
-  include_reports : string list; (* TODO: what it is? *)
+  include_teams : string list;
   include_sections : string list;
   ignore_sections : string list;
 }
@@ -195,20 +175,12 @@ let includes =
   and+ ignore_sections = ignore_sections
   and+ engineer_report = engineer_report
   and+ team_report = team_report
-  and+ include_categories = include_categories
-  and+ include_reports = include_reports
   and+ include_teams = include_teams in
   let include_sections =
     if engineer_report then [ "Last week" ] else include_sections
   in
   let ignore_sections = if team_report then [] else ignore_sections in
-  {
-    include_sections;
-    ignore_sections;
-    include_teams;
-    include_reports;
-    include_categories;
-  }
+  { include_sections; ignore_sections; include_teams }
 
 (* Calendar term *)
 
@@ -405,9 +377,6 @@ let filter t =
   | Some okr_db ->
       let additional_krs =
         Okra.Masterdb.find_krs_for_teams okr_db t.includes.include_teams
-        @ Okra.Masterdb.find_krs_for_categories okr_db
-            t.includes.include_categories
-        @ Okra.Masterdb.find_krs_for_reports okr_db t.includes.include_reports
       in
       let kr_ids =
         List.map

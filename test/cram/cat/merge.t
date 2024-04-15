@@ -35,9 +35,9 @@ Engineer reports are aggregated correctly
   > EOF
 
   $ cat > okrs.csv << EOF
-  > id,title,objective,status,schedule,lead,team,category,project
-  > KR123,A Kr,Actual objective,active,,,,,Actual project
-  > KR124,A Different Kr,Actual objective,active,,,,,Actual project
+  > id,title,objective,status,team,project
+  > KR123,A Kr,Actual objective,active,,Actual project
+  > KR124,A Different Kr,Actual objective,active,,Actual project
   > EOF
 
 Behaviour without a database

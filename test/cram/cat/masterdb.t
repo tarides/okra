@@ -4,11 +4,11 @@ Master DB
 When `--okr-db` is passed, metadata is fixed.
 
   $ cat > okrs.csv << EOF
-  > id,title,objective,status,links,schedule,lead,team,category,project,reports
-  > KR1,Actual title,Actual objective,active,,,,team1,category1,Actual project,"report1,report2"
-  > Kr2,Actual title 2,Actual objective,active,,,,team1,category2,Actual project,report2
-  > KR3,Dropped KR,Actual objective,dropped,,,,team2,category1,Actual project,report1
-  > KR5,Missing status KR,Actual objective,,,,,team2,category1,Actual project,report1
+  > id,title,objective,status,team,project
+  > KR1,Actual title,Actual objective,active,team1,Actual project
+  > Kr2,Actual title 2,Actual objective,active,team1,Actual project
+  > KR3,Dropped KR,Actual objective,dropped,team2,Actual project
+  > KR5,Missing status KR,Actual objective,,team2,Actual project
   > EOF
 
   $ okra cat --okr-db=okrs.csv << EOF
@@ -29,58 +29,6 @@ When `--okr-db` is passed, metadata is fixed.
   okra: [WARNING] KR "Wrong title" appears in two objectives:
   - "Wrong objective"
   - "Actual objective"
-  # Actual project
-  
-  ## Actual objective
-  
-  - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
-    - Did all the things
-
-It is possible to filter on category.
-
-  $ okra cat --okr-db=okrs.csv --include-categories=category2 << EOF
-  > # Actual project
-  > 
-  > ## Actual objective
-  > 
-  > - Actual title (kr1)
-  >   - @a (1 day)
-  >   - Did all the things
-  > 
-  > - Actual title 2 (KR2)
-  >   - @b (1 day)
-  >   - Did more of the things
-  > 
-  > EOF
-  # Actual project
-  
-  ## Actual objective
-  
-  - Actual title 2 (Kr2)
-    - [@b](https://github.com/b) (1 day)
-    - Did more of the things
-
-It is possible to filter by report.
-
-  $ okra cat --okr-db=okrs.csv --include-reports=report2 << EOF
-  > # Project
-  > 
-  > - Actual title (KR1)
-  >   - @a (1 day)
-  >   - Did all the things
-  > 
-  > - Dropped KR (KR3)
-  >   - @a (1 day)
-  >   - Did more of the things
-  > EOF
-  okra: [WARNING] KR "Actual title" appears in two projects:
-  - "Project"
-  - "Actual project"
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
-  okra: [WARNING] KR "Dropped KR" appears in two projects:
-  - "Project"
-  - "Actual project"
   # Actual project
   
   ## Actual objective

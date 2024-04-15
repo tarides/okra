@@ -23,6 +23,10 @@
 
 - Add `ocaml-re` dependency instead of using `str` (#198, @gpetiot)
 
+### Removed
+
+- Remove (unused) options `--include-categories` and `--include-reports` (#<PR_NUMBER>, @gpetiot)
+
 ## 0.4.0
 
 ### Changed

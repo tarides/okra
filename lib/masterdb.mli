@@ -38,12 +38,7 @@ type elt_t = private {
   title : string;
   objective : string;
   project : string;
-  schedule : string option;
-  lead : string;
   team : string;
-  category : string;
-  links : string option;
-  reports : string list;
   status : status_t option;
 }
 
@@ -55,6 +50,4 @@ val find_kr_opt : t -> string -> elt_t option
 val find_kr : t -> string -> elt_t
 val find_title_opt : t -> string -> elt_t option
 val find_krs_for_teams : t -> string list -> elt_t list
-val find_krs_for_reports : t -> string list -> elt_t list
-val find_krs_for_categories : t -> string list -> elt_t list
 val has_kr : t -> string -> bool
