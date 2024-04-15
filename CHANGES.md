@@ -25,7 +25,7 @@
 
 ### Removed
 
-- Remove (unused) options `--include-categories` and `--include-reports` (#215, @gpetiot)
+- Remove options `--include-categories` and `--include-reports` (#215, @gpetiot)
 
 ## 0.4.0
 
