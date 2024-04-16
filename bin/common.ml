@@ -366,10 +366,14 @@ let okr_db t =
       in
       match db with
       | None -> None
-      | Some f ->
-          let state = Okra.Masterdb.load_csv f in
-          t.okr_db_state <- Some state;
-          Some state)
+      | Some f -> (
+          match Okra.Masterdb.load_csv f with
+          | Ok state ->
+              t.okr_db_state <- Some state;
+              Some state
+          | Error (`Msg e) ->
+              Logs.err (fun m -> m "%s" e);
+              exit 1))
 
 let filter t =
   match okr_db t with

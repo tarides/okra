@@ -14,15 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-exception Missing_ID of int * string
-exception Duplicate_ID of int * string
-exception Missing_objective of int * string
-exception Missing_project of int * string
-exception Missing_title of int * string
-exception KR_not_found of string
-
-type cat_t = Commercial | Community
-
 type status_t =
   | Draft
   | Scheduled
@@ -73,49 +64,48 @@ let normalise_title s =
 let empty_db = Hashtbl.create 13
 
 let load_csv ?(separator = ',') f =
+  let ( let* ) = Result.bind in
   let res = empty_db in
   let line = ref 1 in
   let ic = open_in f in
   try
     let rows = Csv.of_channel ~separator ~has_header:true ic in
-    Csv.Rows.iter
-      ~f:(fun row ->
-        line := !line + 1;
-        let find_and_trim col = Csv.Row.find row col |> String.trim in
-        let printable_id = find_and_trim "id" in
-        let e =
-          {
-            id = String.uppercase_ascii printable_id;
-            printable_id;
-            title = find_and_trim "title" |> normalise_title;
-            objective = find_and_trim "objective";
-            project = find_and_trim "project";
-            team = find_and_trim "team";
-            status = find_and_trim "status" |> status_of_string;
-          }
-        in
-        if e.id = "" then
-          raise (Missing_ID (!line, "A unique KR ID is required per line"));
-        if e.id <> "#" && Hashtbl.mem res e.id then
-          raise
-            (Duplicate_ID (!line, Fmt.str "KR ID \"%s\" is not unique." e.id));
-        if e.title = "" then
-          raise
-            (Missing_title
-               (!line, Fmt.str "KR ID \"%s\" does not have a title" e.id));
-        Hashtbl.add res e.id e)
-      rows;
-    res
+    let* () =
+      Csv.Rows.fold_left ~init:(Ok ())
+        ~f:(fun acc row ->
+          let* () = acc in
+          line := !line + 1;
+          let find_and_trim col = Csv.Row.find row col |> String.trim in
+          let printable_id = find_and_trim "id" in
+          let e =
+            {
+              id = String.uppercase_ascii printable_id;
+              printable_id;
+              title = find_and_trim "title" |> normalise_title;
+              objective = find_and_trim "objective";
+              project = find_and_trim "project";
+              team = find_and_trim "team";
+              status = find_and_trim "status" |> status_of_string;
+            }
+          in
+          if e.id = "" then
+            Fmt.error_msg "line %i: A unique KR ID is required per line" !line
+          else if e.id <> "#" && Hashtbl.mem res e.id then
+            Fmt.error_msg "line %i: KR ID \"%s\" is not unique." !line e.id
+          else if e.title = "" then
+            Fmt.error_msg "line %i: KR ID \"%s\" does not have a title" !line
+              e.id
+          else (
+            Hashtbl.add res e.id e;
+            Ok ()))
+        rows
+    in
+    Ok res
   with e ->
     close_in_noerr ic;
-    raise e
+    Error (`Msg (Printexc.to_string e))
 
 let find_kr_opt t id = Hashtbl.find_opt t (id |> String.uppercase_ascii)
-
-let find_kr t id =
-  match find_kr_opt t id with None -> raise (KR_not_found id) | Some x -> x
-
-let has_kr t id = Hashtbl.mem t (id |> String.uppercase_ascii)
 
 let find_title_opt t title =
   let title_no_case = title |> String.uppercase_ascii |> String.trim in

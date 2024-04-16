@@ -14,15 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-exception Missing_ID of int * string
-exception Duplicate_ID of int * string
-exception Missing_objective of int * string
-exception Missing_project of int * string
-exception Missing_title of int * string
-exception KR_not_found of string
-
-type cat_t = Commercial | Community
-
 type status_t =
   | Draft
   | Scheduled
@@ -45,9 +36,7 @@ type elt_t = private {
 type t = (string, elt_t) Hashtbl.t
 
 val string_of_status : status_t -> string
-val load_csv : ?separator:char -> string -> t
+val load_csv : ?separator:char -> string -> (t, [ `Msg of string ]) result
 val find_kr_opt : t -> string -> elt_t option
-val find_kr : t -> string -> elt_t
 val find_title_opt : t -> string -> elt_t option
 val find_krs_for_teams : t -> string list -> elt_t list
-val has_kr : t -> string -> bool
