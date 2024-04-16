@@ -2,7 +2,6 @@
  (name test)
  (package okra-lib)
  (deps
-  (source_tree lint)
   (source_tree aggregate)
   (source_tree reports))
  (libraries alcotest okra-lib logs.fmt))
