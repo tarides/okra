@@ -42,11 +42,11 @@ Engineer reports are aggregated correctly
   > EOF
 
   $ cat > okrs.csv << EOF
-  > id,title,objective,status,schedule,lead,team,category,project
-  > KR1,Actual title,Actual objective,active,,,,,Actual project
-  > Kr2,Actual title 2,Actual objective,active,,,,,Actual project
-  > KR3,Dropped KR,Actual objective,dropped,,,,,Actual project
-  > KR123,Missing status KR,Actual objective,,,,,,Actual project
+  > id,title,objective,status,team,project
+  > KR1,Actual title,Actual objective,active,,Actual project
+  > Kr2,Actual title 2,Actual objective,active,,Actual project
+  > KR3,Dropped KR,Actual objective,dropped,,Actual project
+  > KR123,Missing status KR,Actual objective,,,Actual project
   > EOF
 
   $ cat eng1.md eng2.md | okra cat --engineer
