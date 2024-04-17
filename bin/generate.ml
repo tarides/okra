@@ -137,6 +137,10 @@ let fetch ~token ~period =
   let token = Gitlab.G.Token.of_string token in
   Gitlab.make_activity ~token ~before ~after
 
+let editor () =
+  let ( or ) x y = Result.value x ~default:y in
+  Bos.OS.Env.req_var "VISUAL" or Bos.OS.Env.req_var "EDITOR" or "vi"
+
 let write_and_commit ~repo ~week ~year ~user pp =
   let* admin_dir = repo in
   let file =
@@ -146,7 +150,7 @@ let write_and_commit ~repo ~week ~year ~user pp =
   in
   let* () = Bos.OS.File.delete file in
   let* () = Bos.OS.File.writef file "%a%!" pp () in
-  let* editor = Bos.OS.Env.req_var "EDITOR" in
+  let editor = editor () in
   let* () = Bos.OS.Cmd.run @@ Bos.Cmd.(v editor % p file) in
   let* res = Bos.OS.File.with_ic file (fun ic () -> Okra.Lint.lint ic) () in
   let* () =
