@@ -167,10 +167,7 @@ let write_and_commit ~repo ~week ~year ~user pp =
   let git_cmd = Bos.Cmd.(v "git" % "-C" % p (Fpath.v admin_dir)) in
   let* () = Bos.OS.Cmd.run @@ Bos.Cmd.(git_cmd % "add" % p file) in
   let msg = Format.sprintf "%s week %i" user week in
-  let* () =
-    Bos.OS.Cmd.run @@ Bos.Cmd.(git_cmd % "commit" % p file % "-m" % msg)
-  in
-  Ok ()
+  Bos.OS.Cmd.run @@ Bos.Cmd.(git_cmd % "commit" % p file % "-m" % msg)
 
 let run_engineer ppf conf cal projects token no_activity no_links
     with_repositories user print_projects repo interactive =
