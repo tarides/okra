@@ -137,12 +137,13 @@ let fetch ~token ~period =
   let token = Gitlab.G.Token.of_string token in
   Gitlab.make_activity ~token ~before ~after
 
-let file_path ~admin_dir ~week ~year ~engineer_name =
-  Format.asprintf "%s/weekly/%4d/%02i/%s.md" admin_dir year week engineer_name
-
 let write_and_commit ~repo ~week ~year ~user pp =
   let* admin_dir = repo in
-  let file = Fpath.v @@ file_path ~admin_dir ~week ~year ~engineer_name:user in
+  let file =
+    Fpath.(
+      v admin_dir / "weekly" / Fmt.str "%4d" year / Fmt.str "%02i" week / user
+      |> add_ext "md")
+  in
   let* () = Bos.OS.File.delete file in
   let* () = Bos.OS.File.writef file "%a%!" pp () in
   let* editor = Bos.OS.Env.req_var "EDITOR" in
