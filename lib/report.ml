@@ -70,44 +70,20 @@ let iter ?(project = skip) ?objective f t =
       iter_project ?objective f p)
     t.projects
 
-let krs t =
-  let l = ref [] in
-  iter_krs (fun x -> l := x :: !l) t.krs;
-  List.rev !l
-
 let all_krs t =
   let l = ref [] in
   iter_krs (fun x -> l := x :: !l) t.all_krs;
-  List.rev !l
-
-let new_krs t =
-  let l = ref [] in
-  iter_krs (fun x -> if is_new_kr x then l := x :: !l) t.all_krs;
-  List.rev !l
-
-let no_krs t =
-  let l = ref [] in
-  iter_krs (fun x -> if is_no_kr x then l := x :: !l) t.all_krs;
   List.rev !l
 
 module Project = struct
   type t = project
 
   let name (t : project) = t.name
-  let objectives t = Hashtbl.to_seq t.objectives |> Seq.map snd |> List.of_seq
-  let find t s = find_no_case t.projects s
-
-  let krs t =
-    let l = ref [] in
-    iter_project (fun x -> l := x :: !l) t;
-    List.rev !l
 end
 
 module Objective = struct
   type t = objective
 
-  let name (t : objective) = t.name
-  let krs = krs
   let find t s = find_no_case t.objectives s
 
   let find_all t s =
@@ -208,34 +184,6 @@ let of_krs ?okr_db entries =
   let t = empty () in
   List.iter (add ?okr_db t) entries;
   t
-
-let of_projects projects =
-  let ids = ref [] in
-  let titles = ref [] in
-  List.iter
-    (fun p ->
-      iter_project
-        (fun x ->
-          titles := (x.title, x) :: !titles;
-          match x.id with ID id -> ids := (id, x) :: !ids | _ -> ())
-        p)
-    projects;
-  let ids = List.to_seq !ids |> Hashtbl.of_seq in
-  let titles = List.to_seq !titles |> Hashtbl.of_seq in
-  let projects =
-    projects |> List.to_seq |> Seq.map (fun p -> (p.name, p)) |> Hashtbl.of_seq
-  in
-  { projects; all_krs = { ids; titles } }
-
-let of_objectives ~project objectives =
-  let objectives =
-    objectives
-    |> List.to_seq
-    |> Seq.map (fun (o : objective) -> (o.name, o))
-    |> Hashtbl.of_seq
-  in
-  let p : project = { name = project; objectives } in
-  of_projects [ p ]
 
 let pp_warning ppf = function
   | Parser.No_time_found s -> Fmt.pf ppf "No time found in %S" s

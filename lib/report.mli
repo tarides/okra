@@ -21,30 +21,20 @@ type project
 type objective
 
 module Project : sig
-  type report := t
   type t = project
 
   val name : t -> string
-  val objectives : t -> objective list
-  val krs : t -> KR.t list
-  val find : report -> string -> t option
 end
 
 module Objective : sig
   type report := t
   type t = objective
 
-  val name : t -> string
-  val krs : t -> KR.t list
-  val find : project -> string -> t option
   val find_all : report -> string -> (project * t) list
 end
 
 val empty : unit -> t
-val dump : t Fmt.t
 val of_krs : ?okr_db:Masterdb.t -> KR.t list -> t
-val of_projects : project list -> t
-val of_objectives : project:string -> objective list -> t
 
 val of_markdown :
   ?existing_report:t ->
@@ -64,8 +54,6 @@ val iter :
 val find : t -> ?title:string -> ?id:KR.id -> unit -> KR.t list
 val add : ?okr_db:Masterdb.t -> t -> KR.t -> unit
 val all_krs : t -> KR.t list
-val new_krs : t -> KR.t list
-val no_krs : t -> KR.t list
 
 val pp :
   ?show_time:bool -> ?show_time_calc:bool -> ?show_engineers:bool -> t Printer.t
