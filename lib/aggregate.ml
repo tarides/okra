@@ -15,6 +15,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+type time_per_engineer = (string, Time.t) Hashtbl.t
+
 let ht_add_or_sum ht k v =
   match Hashtbl.find_opt ht k with
   | None -> Hashtbl.add ht k v
@@ -41,26 +43,31 @@ let by_engineer =
   by_ (fun result e ->
       Hashtbl.iter (fun k w -> ht_add_or_sum result k w) e.time_per_engineer)
 
+let sum tbl =
+  let open Time in
+  Hashtbl.fold (fun _ w acc -> acc +. w) tbl nil
+
 let by_kr =
   by_ (fun result e ->
-      let time =
-        let open Time in
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
-      in
-      Hashtbl.add result (e.title, e.id) time)
+      Hashtbl.add result (e.title, e.id)
+        (sum e.time_per_engineer, e.time_per_engineer))
 
 let by_objective =
   by_ (fun result e ->
-      let time =
-        let open Time in
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
-      in
-      ht_add_or_sum result e.objective time)
+      match Hashtbl.find_opt result e.objective with
+      | None ->
+          Hashtbl.add result e.objective
+            (sum e.time_per_engineer, e.time_per_engineer)
+      | Some (_, x) ->
+          Hashtbl.iter (fun k v -> ht_add_or_sum x k v) e.time_per_engineer;
+          Hashtbl.replace result e.objective (sum x, x))
 
 let by_project =
   by_ (fun result e ->
-      let time =
-        let open Time in
-        Hashtbl.fold (fun _ w acc -> acc +. w) e.time_per_engineer nil
-      in
-      ht_add_or_sum result e.project time)
+      match Hashtbl.find_opt result e.project with
+      | None ->
+          Hashtbl.add result e.project
+            (sum e.time_per_engineer, e.time_per_engineer)
+      | Some (_, x) ->
+          Hashtbl.iter (fun k v -> ht_add_or_sum x k v) e.time_per_engineer;
+          Hashtbl.replace result e.project (sum x, x))

@@ -15,14 +15,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-val by_engineer :
-  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
+type time_per_engineer = (string, Time.t) Hashtbl.t
+
+val by_engineer : ?include_krs:string list -> Report.t -> time_per_engineer
 
 val by_kr :
-  ?include_krs:string list -> Report.t -> (string * KR.id, Time.t) Hashtbl.t
+  ?include_krs:string list ->
+  Report.t ->
+  (string * KR.id, Time.t * time_per_engineer) Hashtbl.t
 
 val by_objective :
-  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
+  ?include_krs:string list ->
+  Report.t ->
+  (string, Time.t * time_per_engineer) Hashtbl.t
 
 val by_project :
-  ?include_krs:string list -> Report.t -> (string, Time.t) Hashtbl.t
+  ?include_krs:string list ->
+  Report.t ->
+  (string, Time.t * time_per_engineer) Hashtbl.t

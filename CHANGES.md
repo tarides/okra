@@ -22,6 +22,7 @@
 
 ### Added
 
+- stats: Add option `--show-details` to print the details of the time per engineer
 - Add `ocaml-re` dependency instead of using `str` (#198, @gpetiot)
 
 ### Removed

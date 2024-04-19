@@ -16,27 +16,46 @@
  *)
 
 type kind = Projects | Objectives | KRs
-type t = { c : Common.t; md : Omd.doc; kind : kind }
+type t = { c : Common.t; md : Omd.doc; kind : kind; show_details : bool }
 
 open Okra
 
+let show_details =
+  let open Cmdliner in
+  let info =
+    Arg.info [ "show-details" ]
+      ~doc:"Show the details of the time per engineer."
+  in
+  Arg.value (Arg.flag info)
+
 (* show largest work items first *)
 let sort_by_days l =
-  let aux (_, x) (_, y) = compare y x in
+  let aux (_, (x, _)) (_, (y, _)) = compare y x in
   List.sort aux l
 
 let green = Fmt.(styled `Green string)
 let cyan = Fmt.(styled `Cyan string)
 let pp_days ppf d = Fmt.(styled `Bold Time.pp) ppf d
 
-let print kind t =
-  match kind with
+let pp_time_per_engineer ppf time_by_engineer =
+  let sep ppf () = Fmt.pf ppf " + " in
+  let pp_engineer_time ppf (e, t) = Fmt.pf ppf "%s (%a)" e pp_days t in
+  Fmt.hashtbl ~sep pp_engineer_time ppf time_by_engineer
+
+let print conf t =
+  let pp_time ppf (total_time, time_by_engineer) =
+    if conf.show_details then
+      Fmt.pf ppf "%a = %a" pp_days total_time pp_time_per_engineer
+        time_by_engineer
+    else Fmt.pf ppf "%a" pp_days total_time
+  in
+  match conf.kind with
   | Projects ->
       let projects =
         Aggregate.by_project t |> Hashtbl.to_seq |> List.of_seq |> sort_by_days
       in
       List.iter
-        (fun (p_name, d) -> Fmt.pr "# %s: %a\n" p_name pp_days d)
+        (fun (p_name, d) -> Fmt.pr "# %s: %a\n" p_name pp_time d)
         projects
   | Objectives ->
       let objectives =
@@ -54,7 +73,7 @@ let print kind t =
           in
           Fmt.pr "## [%a] %s: %a\n"
             Fmt.(styled `Green string)
-            o o_name pp_days d)
+            o o_name pp_time d)
         objectives
   | KRs ->
       let krs =
@@ -72,7 +91,7 @@ let print kind t =
                 Fmt.pf ppf "%a: %a" green kr.KR.project cyan kr.KR.objective)
               ppf ps
           in
-          Fmt.pr "- [%a] %s (%s): %a\n" pp () title id' pp_days d)
+          Fmt.pr "- [%a] %s (%s): %a\n" pp () title id' pp_time d)
         krs
 
 let run conf =
@@ -83,7 +102,7 @@ let run conf =
       conf.md
   in
   let okrs = Okra.Filter.apply (Common.filter conf.c) okrs in
-  print conf.kind okrs
+  print conf okrs
 
 open Cmdliner
 
@@ -97,8 +116,11 @@ let kind =
 
 let term =
   let open Let_syntax_cmdliner in
-  let+ kind = kind and+ c = Common.term and+ md = Common.input in
-  run { c; md; kind }
+  let+ kind = kind
+  and+ c = Common.term
+  and+ md = Common.input
+  and+ show_details = show_details in
+  run { c; md; kind; show_details }
 
 let cmd =
   let info = Cmd.info "stats" ~doc:"show OKR statistics" in
