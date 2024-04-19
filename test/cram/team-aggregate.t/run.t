@@ -69,7 +69,7 @@ The result of aggregate should pass the lint
   $ cat > xxx/weekly/2024/10/eng1.md << EOF
   > # Last week
   > 
-  > - Leave (No KR)
+  > - Leave (#1074)
   >   - @dummy (5 days)
   >   - xxx
   > EOF
@@ -77,7 +77,7 @@ The result of aggregate should pass the lint
   $ cat > xxx/weekly/2024/10/eng2.md << EOF
   > # Last week
   > 
-  > - Leave (No KR)
+  > - Leave (#1074)
   >   - @dummy (5 days)
   >   - xxx
   > EOF
@@ -95,25 +95,14 @@ The result of aggregate should pass the lint
   > EOF
 
   $ okra team aggregate --okr-db db.csv -C xxx -y 2024 -w 10 --conf conf.yml > aggr.md
-  okra: [WARNING] KR ID updated from "No KR" to "ABSENCE":
-  - "Leave"
-  - "Leave"
-  okra: [WARNING] KR ID updated from "No KR" to "ABSENCE":
-  - "Leave"
-  - "Leave"
 
   $ cat aggr.md
-  - Leave (Absence)
+  # Last week
+  
+  - Leave (#1074)
     - [@dummy](https://github.com/dummy) (10 days)
     - xxx
     - xxx
 
   $ cat aggr.md | okra lint
-  [ERROR(S)]: <stdin>
-  
-  In KR "Leave (Absence)":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
-  [ERROR(S)]: <stdin>
-  
-  In KR "Leave (Absence)": No project found (starting with '#')
-  [1]
+  [OK]: <stdin>
