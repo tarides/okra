@@ -48,6 +48,8 @@ let fail_fmt_patterns =
        bullet marker." );
     ( Str.regexp "^[ ]+#",
       "Space found before title marker #. Start titles in first column." );
+    ( Str.regexp "^[ ]+- Work Item 1",
+      "Placeholder text detected. Replace with actual activity." );
   ]
 
 let pp_error ppf = function

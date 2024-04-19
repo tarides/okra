@@ -57,3 +57,19 @@ When errors are found in several files, they are all printed:
   In KR "Everything is great":
     No time entry found. Each KR must be followed by '- @... (x days)'
   [1]
+
+A warning is emitted when the generated report contains placeholder text:
+
+  $ cat > err.md << EOF
+  > # Last week
+  > 
+  > - Everything is great (E1)
+  >   - @a (1 day)
+  >   - Work Item 1
+  > EOF
+  $ okra lint err.md
+  [ERROR(S)]: err.md
+  
+  Line 5: Placeholder text detected. Replace with actual activity.
+  1 formatting errors found. Parsing aborted.
+  [1]

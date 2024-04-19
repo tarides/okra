@@ -2,6 +2,7 @@
 
 ### Changed
 
+- Lint: fail if the placeholder text "Work Item 1" is still present in the report (#<PR_NUMBER>, @gpetiot)
 - Lint: check that the total of days reported for each engineer is 5 days (#178, @gpetiot)
 - No special treatment for "OKR Updates" sections in reports (#211, @gpetiot)
 - Lookup okr-db in the repo directory (set by `--repo-dir`/`-C`) if `--okr-db` is not set (#210, @gpetiot)
