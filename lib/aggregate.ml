@@ -39,10 +39,6 @@ let by_ f ?(include_krs = []) t =
     t;
   result
 
-let by_engineer =
-  by_ (fun result e ->
-      Hashtbl.iter (fun k w -> ht_add_or_sum result k w) e.time_per_engineer)
-
 let sum tbl =
   let open Time in
   Hashtbl.fold (fun _ w acc -> acc +. w) tbl nil

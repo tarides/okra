@@ -41,28 +41,18 @@ let test_newkr_replaced1 () =
 
 let test_newkr_exists1 () =
   let res = aggregate "./reports/newkr_exists1.acc" in
-  Alcotest.(check bool) "new KR exists" true (contains_kr res New_KR);
-  let res = Okra.Aggregate.by_engineer res in
-  Alcotest.(check Alcotest_ext.time)
-    "eng1 time" (T.days 1.0) (Hashtbl.find res "eng1")
+  Alcotest.(check bool) "new KR exists" true (contains_kr res New_KR)
 
 let test_kr_agg1 () =
   let res = aggregate "./reports/kr_agg1.acc" in
   Alcotest.(check bool) "KR123 exists" true (contains_kr res (ID "KR123"));
   Alcotest.(check int)
     "KR123 aggregated into one item" 1
-    (contains_kr_cnt res (ID "KR123"));
-  let res = Okra.Aggregate.by_engineer res in
-  (* also check that time adds up *)
-  Alcotest.(check Alcotest_ext.time)
-    "eng1 time" (T.days 4.0) (Hashtbl.find res "eng1")
+    (contains_kr_cnt res (ID "KR123"))
 
 let test_work_item () =
   let res = aggregate "./reports/work_item.acc" in
-  Alcotest.(check bool) "#123 exists" true (contains_kr res (ID "#123"));
-  let res = Okra.Aggregate.by_engineer res in
-  Alcotest.(check Alcotest_ext.time)
-    "eng1 time" (T.days 1.0) (Hashtbl.find res "eng1")
+  Alcotest.(check bool) "#123 exists" true (contains_kr res (ID "#123"))
 
 let tests =
   [

@@ -17,8 +17,6 @@
 
 type time_per_engineer = (string, Time.t) Hashtbl.t
 
-val by_engineer : ?include_krs:string list -> Report.t -> time_per_engineer
-
 val by_kr :
   ?include_krs:string list ->
   Report.t ->
