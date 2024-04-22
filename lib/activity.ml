@@ -21,9 +21,72 @@ let title { title; _ } = title
 
 type t = { projects : project list; activity : Get_activity.Contributions.t }
 
+(** Grouping the activity items together in a tree: 1 item can have many sub-items *)
+module Tree = struct
+  open Get_activity.Contributions
+
+  type t = (item * item list) list Repo_map.t
+
+  let order_item_kind = function
+    | `New_repo -> 0
+    | `Issue -> 1
+    | `PR -> 2
+    | `Merge -> 3
+    | `Review _ -> 4
+    | `Comment `PR -> 5
+    | `Comment `Issue -> 6
+
+  let sort_items x y =
+    match Int.compare (order_item_kind x.kind) (order_item_kind y.kind) with
+    | 0 -> String.compare x.date y.date
+    | cmp -> cmp
+
+  let root_of_url url =
+    match String.split_on_char '#' url with
+    | [ root_url ] -> root_url
+    | [ root_url; _comment_suffix ] -> root_url
+    | _ ->
+        Logs.warn (fun m -> m "invalid url: %s" url);
+        url
+
+  let contains match_kind url (c, _) =
+    match_kind c.kind && String.equal (root_of_url url) (root_of_url c.url)
+
+  let add_to_maybe_another_item ~can_add_to item acc =
+    let found, rest = List.partition (contains can_add_to item.url) acc in
+    match found with
+    (* the comment is stored as a root item *)
+    | [] -> (item, []) :: rest
+    (* the comment is stored as a subitem of another item *)
+    | (root, subitems) :: _ -> (root, item :: subitems) :: rest
+
+  let make activity : t =
+    activity
+    |> Repo_map.map (fun items ->
+           List.sort sort_items items
+           |> List.fold_left
+                (fun acc item ->
+                  match item.kind with
+                  | `Issue | `PR | `New_repo | `Review _ -> (item, []) :: acc
+                  | `Merge ->
+                      add_to_maybe_another_item item acc ~can_add_to:(function
+                        | `PR -> true
+                        | _ -> false)
+                  | `Comment `PR ->
+                      add_to_maybe_another_item item acc ~can_add_to:(function
+                        | `PR | `Review _ | `Merge | `Comment `PR -> true
+                        | _ -> false)
+                  | `Comment `Issue ->
+                      add_to_maybe_another_item item acc ~can_add_to:(function
+                        | `Issue | `Comment `Issue -> true
+                        | _ -> false))
+                []
+           |> List.rev)
+end
+
 let pp_kind ppf = function
-  | `Issue -> Fmt.sp ppf "issue"
-  | `PR -> Fmt.sp ppf "PR"
+  | `Issue -> Fmt.string ppf "issue"
+  | `PR -> Fmt.string ppf "PR"
 
 let pp_last_week username ppf projects =
   let pp_items ppf t =
@@ -97,69 +160,9 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
             (repo_org ~with_id:false ~no_links)
             t.url)
 
-let order_item_kind = function
-  | `New_repo -> 0
-  | `Issue -> 1
-  | `PR -> 2
-  | `Merge -> 3
-  | `Review _ -> 4
-  | `Comment `PR -> 5
-  | `Comment `Issue -> 56
-
-let sort_items (x : Get_activity.Contributions.item)
-    (y : Get_activity.Contributions.item) =
-  match Int.compare (order_item_kind x.kind) (order_item_kind y.kind) with
-  | 0 -> String.compare x.date y.date
-  | cmp -> cmp
-
-let root_of_url url =
-  match String.split_on_char '#' url with
-  | [ root_url ] -> root_url
-  | [ root_url; _comment_suffix ] -> root_url
-  | _ ->
-      Logs.warn (fun m -> m "invalid url: %s" url);
-      url
-
-let contains match_kind url ((c : Get_activity.Contributions.item), _) =
-  match_kind c.kind && String.equal (root_of_url url) (root_of_url c.url)
-
-let add_to_maybe_another_item ~can_add_to item acc =
-  let found, rest =
-    List.partition (contains can_add_to item.Get_activity.Contributions.url) acc
-  in
-  match found with
-  (* the comment is stored as a root item *)
-  | [] -> (item, []) :: rest
-  (* the comment is stored as a subitem of another item *)
-  | (root, subitems) :: _ -> (root, item :: subitems) :: rest
-
-let build_tree activity =
-  Get_activity.Contributions.Repo_map.map
-    (fun items ->
-      List.sort sort_items items
-      |> List.fold_left
-           (fun acc item ->
-             match item.Get_activity.Contributions.kind with
-             | `Issue | `PR | `New_repo | `Review _ -> (item, []) :: acc
-             | `Merge ->
-                 add_to_maybe_another_item item acc ~can_add_to:(function
-                   | `PR -> true
-                   | _ -> false)
-             | `Comment `PR ->
-                 add_to_maybe_another_item item acc ~can_add_to:(function
-                   | `PR | `Review _ | `Merge | `Comment `PR -> true
-                   | _ -> false)
-             | `Comment `Issue ->
-                 add_to_maybe_another_item item acc ~can_add_to:(function
-                   | `Issue | `Comment `Issue -> true
-                   | _ -> false))
-           []
-      |> List.rev)
-    activity
-
 let pp_activity ?(gitlab = false) ~no_links () ppf activity =
   let open Get_activity.Contributions in
-  let activity = build_tree activity in
+  let activity = Tree.make activity in
   let pp_item ppf (item, sub_items) =
     Fmt.pf ppf "  - %a" (pp_ga_item ~gitlab ~no_links sub_items) item
   in
