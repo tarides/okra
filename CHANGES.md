@@ -14,7 +14,8 @@
 - okra gen report: PR/issue entries formatted the same way as in engineer reports (#201, @gpetiot)
 - List of projects not printed by default anymore in generated reports (#212, @gpetiot).
   Use the new option `--print-projects` to display the list.
-- okra gen: Group activity items together when possible (#208, @gpetiot)
+- okra gen: Group activity items together when possible (#208, @gpetiot).
+  Comments are only listed when there is no other activity on the same issue/PR.
 
 ### Fixed
 
