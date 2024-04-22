@@ -34,7 +34,7 @@ When `--okr-db` is passed, metadata is fixed.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 It is possible to filter by team.
@@ -62,7 +62,7 @@ It is possible to filter by team.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 It is possible to filter on more than one team.
@@ -90,11 +90,11 @@ It is possible to filter on more than one team.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
   
   - Dropped KR (KR3)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did more of the things
 
 Instead of a KR ID, it is possible to put "New KR".
@@ -123,7 +123,7 @@ In that case, metadata is preserved.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
   
   # Another project
@@ -131,7 +131,7 @@ In that case, metadata is preserved.
   ## Another objective
   
   - Something else (New KR)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 If KR ID is "New KR", look for title in database to get real KR ID.
@@ -151,7 +151,7 @@ If KR ID is "New KR", look for title in database to get real KR ID.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 If KR ID is "No KR", look for title in database to get real KR ID.
@@ -174,7 +174,7 @@ If KR ID is "No KR", look for title in database to get real KR ID.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 If WI ID is "No WI", look for title in database to get real WI ID.
@@ -197,7 +197,7 @@ If WI ID is "No WI", look for title in database to get real WI ID.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
 
 Use same case for KR ID as in database.
@@ -221,11 +221,11 @@ Use same case for KR ID as in database.
   ## Actual objective
   
   - Actual title (KR1)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
   
   - Actual title 2 (Kr2)
-    - [@b](https://github.com/b) (1 day)
+    - @b (1 day)
     - Did more of the things
 
 Warn when using KRs that are not active or missing status
@@ -255,13 +255,13 @@ Warn when using KRs that are not active or missing status
   ## Actual objective
   
   - Dropped KR (KR3)
-    - [@a](https://github.com/a) (1 day)
+    - @a (1 day)
     - Did all the things
   
   - Unscheduled KR (KR4)
-    - [@b](https://github.com/b) (1 day)
+    - @b (1 day)
     - Did more of the things
   
   - Missing status KR (KR5)
-    - [@b](https://github.com/b) (1 day)
+    - @b (1 day)
     - Did more of the things

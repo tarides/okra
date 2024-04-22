@@ -50,18 +50,12 @@ let obj_re = Str.regexp "\\(.+\\) (\\([a-zA-Z ]+\\))$"
 (* Header: This is an objective (Tech lead name) *)
 
 let is_time_block = function
-  | [
-      Paragraph
-        ( _,
-          (Text (_, s) | Concat (_, Link (_, { label = Text (_, s); _ }) :: _))
-        );
-    ] ->
-      String.get (String.trim s) 0 = '@'
+  | [ Paragraph (_, Text (_, s)) ] -> String.get (String.trim s) 0 = '@'
   | _ -> false
 
 let time_entry_regexp =
   let open Re in
-  let user = group User.regexp in
+  let user = seq [ char '@'; group (rep1 (alt [ wordc; char '-' ])) ] in
   let number =
     let with_int_part =
       let int_part = rep1 digit in
@@ -209,7 +203,6 @@ let kr ~project ~objective = function
                     match
                       let* grp = Re.exec_opt time_entry_regexp s in
                       let* user = Re.Group.get_opt grp 1 in
-                      let user = User.of_string user in
                       let* s_time = Re.Group.get_opt grp 2 in
                       let* f_time = Float.of_string_opt s_time in
                       let* s_unit = Re.Group.get_opt grp 3 in

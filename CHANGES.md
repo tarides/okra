@@ -7,7 +7,6 @@
 - No special treatment for "OKR Updates" sections in reports (#211, @gpetiot)
 - Lookup okr-db in the repo directory (set by `--repo-dir`/`-C`) if `--okr-db` is not set (#210, @gpetiot)
 - Make github handles clickable in repo reports (#193, #207, @gpetiot)
-- Make github handles clickable in generated engineer reports (#209, @gpetiot)
 - Parser collects all issues instead of raising an exception (#195, @gpetiot).
   Other commands that rely on parsing weekly reports (cat, team, stats) can now be run on reports that don't pass linting, but warnings are reported.
 - Improve the "Invalid time" error messages (#199, @gpetiot)
