@@ -21,6 +21,10 @@ let title { title; _ } = title
 
 type t = { projects : project list; activity : Get_activity.Contributions.t }
 
+let pp_kind ppf = function
+  | `Issue -> Fmt.sp ppf "issue"
+  | `PR -> Fmt.sp ppf "PR"
+
 let pp_last_week username ppf projects =
   let pp_items ppf t =
     let t = if t = [] then [ "Work Item 1" ] else t in
@@ -72,16 +76,10 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
           Fmt.pf f "%s PR: %s %a" status t.title
             (repo_org ~with_id:true ~no_links)
             t.url
-      | `Comment `Issue ->
-          Fmt.pf f "Commented (%i) on issue: %s %a"
+      | `Comment kind ->
+          Fmt.pf f "Commented (%i) on %a: %s %a"
             (List.length sub_items + 1)
-            t.title
-            (repo_org ~with_id:true ~no_links)
-            t.url
-      | `Comment `PR ->
-          Fmt.pf f "Commented (%i) on PR: %s %a"
-            (List.length sub_items + 1)
-            t.title
+            pp_kind kind t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Review s ->
