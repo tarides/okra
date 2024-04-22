@@ -50,12 +50,6 @@ let repo_org ?(with_id = false) ?(no_links = false) f s =
 
 let pp_ga_item ?(gitlab = false) ~no_links sub_items f
     (t : Get_activity.Contributions.item) =
-  let comments =
-    match sub_items with
-    | [] -> ""
-    | [ _ ] -> Format.sprintf " (+ 1 comment)"
-    | _ -> Format.sprintf " (+ %i comments)" (List.length sub_items)
-  in
   match gitlab with
   | true -> (
       match t.kind with
@@ -65,7 +59,7 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
   | false -> (
       match t.kind with
       | `Issue ->
-          Fmt.pf f "Opened issue%s: %s %a" comments t.title
+          Fmt.pf f "Opened issue: %s %a" t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `PR ->
@@ -75,7 +69,7 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
               sub_items
           in
           let status = if merged then "Opened and merged" else "Opened" in
-          Fmt.pf f "%s PR%s: %s %a" status comments t.title
+          Fmt.pf f "%s PR: %s %a" status t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Comment `Issue ->
@@ -91,13 +85,13 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Review s ->
-          Fmt.pf f "%s PR%s: %s %a"
+          Fmt.pf f "%s PR: %s %a"
             (String.capitalize_ascii @@ String.lowercase_ascii s)
-            comments t.title
+            t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Merge ->
-          Fmt.pf f "Merged PR%s: %s %a" comments t.title
+          Fmt.pf f "Merged PR: %s %a" t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `New_repo ->
