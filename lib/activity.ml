@@ -140,9 +140,7 @@ let pp_ga_item ?(gitlab = false) ~no_links sub_items f
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Comment kind ->
-          Fmt.pf f "Commented (%i) on %a: %s %a"
-            (List.length sub_items + 1)
-            pp_kind kind t.title
+          Fmt.pf f "Commented on %a: %s %a" pp_kind kind t.title
             (repo_org ~with_id:true ~no_links)
             t.url
       | `Review s ->
