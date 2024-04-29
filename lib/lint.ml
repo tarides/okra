@@ -28,6 +28,7 @@ type lint_error =
   | No_project_found of int option * string
   | Not_all_includes of string list
   | Invalid_markdown_in_work_items of int option * string
+  | Invalid_quarter of { expected : Quarter.t; found : Quarter.t; kr : KR.t }
 
 type lint_result = (unit, lint_error list) result
 
@@ -96,6 +97,11 @@ let pp_error ppf = function
       Fmt.pf ppf "Missing includes section: %a\n" Fmt.(list ~sep:comma string) s
   | Invalid_markdown_in_work_items (_, s) ->
       Fmt.pf ppf "@[<hv 2>Invalid markdown in work items:@ %s@]@," s
+  | Invalid_quarter { expected; found; kr } ->
+      Fmt.pf ppf
+        "@[<hv 2>In WI %S:@ Work logged on WI scheduled for %a (please use a \
+         WI scheduled for %a)@]@,"
+        kr.title Quarter.pp found Quarter.pp expected
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -150,9 +156,23 @@ let check_total_time ?check_time (krs : KR.t list) =
           else Error (Invalid_total_time (name, time)))
         tbl (Ok ())
 
+let check_quarter (quarter : Quarter.t option) (kr : KR.t) =
+  match (quarter, kr.quarter) with
+  | None, _ | _, None -> Ok ()
+  | Some q, Some kr_q ->
+      Error (Invalid_quarter { expected = q; found = kr_q; kr })
+
+let check_quarters quarter krs warnings =
+  List.fold_left
+    (fun acc kr ->
+      match check_quarter quarter kr with Ok () -> acc | Error w -> w :: acc)
+    warnings krs
+
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
-let check_document ?okr_db ~include_sections ~ignore_sections ?check_time s =
+let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
+    ~filename s =
+  let quarter = Quarter.of_filename ~filename in
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
@@ -166,6 +186,7 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time s =
     | Ok () -> warnings
     | Error w -> w :: warnings
   in
+  let warnings = check_quarters quarter okrs warnings in
   match warnings with
   | [] ->
       let _report = Report.of_krs ?okr_db okrs in
@@ -173,17 +194,19 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time s =
   | warnings -> Error warnings
 
 let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time s =
+    ?check_time ~filename s =
   if !format_errors <> [] then
     Error
       [
         Format_error
           (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors);
       ]
-  else check_document ?okr_db ~include_sections ~ignore_sections ?check_time s
+  else
+    check_document ?okr_db ~include_sections ~ignore_sections ?check_time
+      ~filename s
 
 let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
-    ?check_time lines =
+    ?check_time ~filename lines =
   let format_errors = ref [] in
   let rec check_and_read buf pos = function
     | [] -> Buffer.contents buf
@@ -195,10 +218,10 @@ let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
   in
   let s = check_and_read (Buffer.create 1024) 1 lines in
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time s
+    ?check_time ~filename s
 
-let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time ic
-    =
+let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
+    ~filename ic =
   let format_errors = ref [] in
   let rec check_and_read buf ic pos =
     try
@@ -213,7 +236,7 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time ic
   in
   let s = check_and_read (Buffer.create 1024) ic 1 in
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time s
+    ?check_time ~filename s
 
 let short_messages_of_error file_name =
   let short_message line_number msg =
@@ -246,3 +269,6 @@ let short_messages_of_error file_name =
       short_messagef None "Missing includes section: %s" (String.concat ", " l)
   | Invalid_markdown_in_work_items (line_number, s) ->
       short_messagef line_number "Invalid markdown in work items: %s" s
+  | Invalid_quarter { expected = _; found; kr } ->
+      short_messagef None "Using KR of invalid quarter: %S (%a)" kr.title
+        Quarter.pp found

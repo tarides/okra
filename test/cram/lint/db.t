@@ -45,18 +45,14 @@ No check on WIs without the DB:
 The DB can be passed through the [--okr-db] option:
 
   $ okra lint -e --okr-db admin/data/db.csv weekly.md
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Multicore OCaml Merlin project" ("#1053")
   okra: [WARNING] Conflicting titles:
   - "Invalid name"
   - "Property-Based Testing for Multicore"
-  okra: [WARNING] Work logged on KR marked as "Draft": "General okra maintenance" ("#1115")
   [OK]: weekly.md
 
 The DB can be looked up in the [repo-dir] passed through the [-C]/[--repo-dir] option:
   $ okra lint -e -C admin weekly.md
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Multicore OCaml Merlin project" ("#1053")
   okra: [WARNING] Conflicting titles:
   - "Invalid name"
   - "Property-Based Testing for Multicore"
-  okra: [WARNING] Work logged on KR marked as "Draft": "General okra maintenance" ("#1115")
   [OK]: weekly.md

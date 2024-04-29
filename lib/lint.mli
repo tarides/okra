@@ -26,6 +26,7 @@ type lint_error =
   | No_project_found of int option * string
   | Not_all_includes of string list
   | Invalid_markdown_in_work_items of int option * string
+  | Invalid_quarter of { expected : Quarter.t; found : Quarter.t; kr : KR.t }
 
 type lint_result = (unit, lint_error list) result
 
@@ -34,6 +35,7 @@ val lint :
   ?include_sections:string list ->
   ?ignore_sections:string list ->
   ?check_time:Time.t ->
+  filename:string ->
   in_channel ->
   lint_result
 
@@ -42,6 +44,7 @@ val lint_string_list :
   ?include_sections:string list ->
   ?ignore_sections:string list ->
   ?check_time:Time.t ->
+  filename:string ->
   string list ->
   lint_result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)

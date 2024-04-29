@@ -33,6 +33,7 @@ type t = {
   objective : string;
   title : string;
   id : id;
+  quarter : Quarter.t option;
   time_entries : (string * Time.t) list list;
   time_per_engineer : (string, Time.t) Hashtbl.t;
   work : Item.t list list;
@@ -45,7 +46,7 @@ let counter =
     incr c;
     i
 
-let v ~project ~objective ~title ~id ~time_entries work =
+let v ~project ~objective ~title ~id ~quarter ~time_entries work =
   let counter = counter () in
   (* Sum time per engineer *)
   let time_per_engineer =
@@ -66,6 +67,7 @@ let v ~project ~objective ~title ~id ~time_entries work =
     objective;
     title;
     id;
+    quarter;
     time_entries;
     time_per_engineer;
     work;
@@ -128,6 +130,16 @@ let merge x y =
               l "KR %S appears in two objectives:\n- %S\n- %S" title x y);
         x
   in
+  let quarter =
+    match (x.quarter, y.quarter) with
+    | None, q | q, None -> q
+    | Some x, Some y ->
+        if Quarter.compare x y <> 0 then
+          Log.warn (fun l ->
+              l "KR %S appears in two quarters:\n- %a\n- %a" title Quarter.pp x
+                Quarter.pp y);
+        Some x
+  in
   let id =
     match (x.id, y.id) with
     | ID x, ID y ->
@@ -162,6 +174,7 @@ let merge x y =
     objective;
     title;
     id;
+    quarter;
     time_entries;
     time_per_engineer;
     work;
@@ -207,19 +220,6 @@ let update_from_master_db t db =
           Log.warn (fun l ->
               l "KR ID updated from \"No KR\" to %S:\n- %S\n- %S" db_kr.id
                 orig_kr.title db_kr.title);
-        (match db_kr.status with
-        | Some Active -> ()
-        | Some s ->
-            Log.warn (fun l ->
-                l "Work logged on KR marked as %S: %S (%S)"
-                  (Masterdb.string_of_status s)
-                  db_kr.title db_kr.id)
-        | None ->
-            Log.warn (fun l ->
-                l
-                  "Work logged on KR with no status set, status should be \
-                   Active: %S (%S)"
-                  db_kr.title db_kr.id));
         let kr =
           {
             orig_kr with

@@ -33,6 +33,7 @@ type t = private {
   objective : string;
   title : string;
   id : id;
+  quarter : Quarter.t option;
   time_entries : (string * Time.t) list list;
   time_per_engineer : (string, Time.t) Hashtbl.t;
   work : Item.t list list;
@@ -43,6 +44,7 @@ val v :
   objective:string ->
   title:string ->
   id:id ->
+  quarter:Quarter.t option ->
   time_entries:(string * Time.t) list list ->
   Item.t list list ->
   t

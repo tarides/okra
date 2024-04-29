@@ -140,7 +140,7 @@ let apply f (t : Report.t) =
               in
               let kr =
                 KR.v ~project:kr.project ~objective:kr.objective ~title:kr.title
-                  ~time_entries ~id:kr.id work
+                  ~time_entries ~id:kr.id ~quarter:kr.quarter work
               in
               Report.add new_t kr
         in

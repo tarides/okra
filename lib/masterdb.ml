@@ -30,6 +30,7 @@ type elt_t = {
   objective : string;
   team : string;
   status : status_t option;
+  quarter : Quarter.t option;
 }
 
 type t = (string, elt_t) Hashtbl.t
@@ -76,6 +77,7 @@ let load_csv ?(separator = ',') f =
           line := !line + 1;
           let find_and_trim col = Csv.Row.find row col |> String.trim in
           let printable_id = find_and_trim "id" in
+          let* quarter = find_and_trim "quarter" |> Quarter.of_string in
           let e =
             {
               id = String.uppercase_ascii printable_id;
@@ -84,6 +86,7 @@ let load_csv ?(separator = ',') f =
               objective = find_and_trim "objective";
               team = find_and_trim "team";
               status = find_and_trim "status" |> status_of_string;
+              quarter;
             }
           in
           if e.id = "" then

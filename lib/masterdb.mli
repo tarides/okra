@@ -30,6 +30,7 @@ type elt_t = private {
   objective : string;
   team : string;
   status : status_t option;
+  quarter : Quarter.t option;
 }
 
 type t = (string, elt_t) Hashtbl.t

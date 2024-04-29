@@ -50,7 +50,7 @@ let lint_member_week admin_dir member ~week ~year =
            mode. *)
         match
           Lint.lint ~include_sections:[ "Last week" ] ~ignore_sections:[] ic
-            ~check_time:(Time.days 5.)
+            ~check_time:(Time.days 5.) ~filename:fname
         with
         | Ok () -> Complete
         | Error e -> Not_lint e)

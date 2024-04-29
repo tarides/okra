@@ -30,7 +30,7 @@ let pp_status style ppf s = Fmt.(pf ppf "[%a]" style s)
 let run conf =
   let collect_errors name ic =
     match
-      Okra.Lint.lint ?okr_db:(Common.okr_db conf.c)
+      Okra.Lint.lint ~filename:name ?okr_db:(Common.okr_db conf.c)
         ?check_time:(Common.check_time conf.c)
         ~include_sections:(Common.include_sections conf.c)
         ~ignore_sections:(Common.ignore_sections conf.c)

@@ -254,9 +254,12 @@ let kr ~project ~objective = function
       let project = String.trim project in
       if project = "" then err_no_project title;
       let objective = String.trim objective in
+      let quarter = None in
 
       (* Construct final entry *)
-      let kr = KR.v ~project ~objective ~title ~id ~time_entries work in
+      let kr =
+        KR.v ~project ~objective ~title ~id ~time_entries ~quarter work
+      in
       Some kr
 
 let block_okr = function

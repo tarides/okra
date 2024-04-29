@@ -4,11 +4,11 @@ Master DB
 When `--okr-db` is passed, metadata is fixed.
 
   $ cat > okrs.csv << EOF
-  > id,title,objective,status,team
-  > KR1,Actual title,Actual objective,active,team1
-  > Kr2,Actual title 2,Actual objective,active,team1
-  > KR3,Dropped KR,Actual objective,dropped,team2
-  > KR5,Missing status KR,Actual objective,,team2
+  > id,title,objective,status,team,quarter
+  > KR1,Actual title,Actual objective,active,team1,"Q1 2023 - Jan-Mar"
+  > Kr2,Actual title 2,Actual objective,active,team1,"Q2 2021 - Apr-Jun"
+  > KR3,Dropped KR,Actual objective,dropped,team2,"Q2 2024 - Apr-Jun"
+  > KR5,Missing status KR,Actual objective,,team2,"Rolling"
   > EOF
 
   $ okra cat --okr-db=okrs.csv << EOF
@@ -47,7 +47,6 @@ It is possible to filter by team.
   >   - @a (1 day)
   >   - Did more of the things
   > EOF
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
   # Project
   
   ## Actual objective
@@ -69,7 +68,6 @@ It is possible to filter on more than one team.
   >   - @a (1 day)
   >   - Did more of the things
   > EOF
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
   # Project
   
   ## Actual objective
@@ -233,8 +231,6 @@ Warn when using KRs that are not active or missing status
   >   - Did more of the things
   > 
   > EOF
-  okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
-  okra: [WARNING] Work logged on KR with no status set, status should be Active: "Missing status KR" ("KR5")
   # Actual project
   
   ## Actual objective
