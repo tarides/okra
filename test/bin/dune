@@ -1,4 +1,0 @@
-(mdx
- (deps
-  (package okra))
- (files README.md))

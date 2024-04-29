@@ -1,0 +1,18 @@
+# A User's Guide to Okra
+
+Table of contents
+- [Engineer's Manual](engineers-manual.md)
+  - [Generating a report](engineers-manual.md#generating-a-report)
+    - [Configuration](engineers-manual.md#configuration)
+  - [Linting your weekly report](engineers-manual.md#linting-your-weekly-report)
+- [Team Lead's Manual](team-leads-manual.md)
+  - [Aggregating reports](team-leads-manual.md#aggregating-reports)
+    - [Aggregating engineer reports](team-leads-manual.md#aggregating-engineer-reports)
+    - [Aggregating team reports](team-leads-manual.md#aggregating-team-reports)
+  - [Linting reports](team-leads-manual.md#linting-reports)
+    - [Linting team reports](team-leads-manual.md#linting-team-reports)
+    - [Linting engineer reports](team-leads-manual.md#linting-engineer-reports)
+- [Github token](github-token.md)
+- [Report formats](report-formats.md)
+- [Configuration file](configuration-file.md)
+- [Vim integration](vim-integration.md)
