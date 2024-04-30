@@ -28,7 +28,6 @@ type elt_t = private {
   printable_id : string;
   title : string;
   objective : string;
-  project : string;
   team : string;
   status : status_t option;
 }

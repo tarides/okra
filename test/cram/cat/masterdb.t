@@ -4,11 +4,11 @@ Master DB
 When `--okr-db` is passed, metadata is fixed.
 
   $ cat > okrs.csv << EOF
-  > id,title,objective,status,team,project
-  > KR1,Actual title,Actual objective,active,team1,Actual project
-  > Kr2,Actual title 2,Actual objective,active,team1,Actual project
-  > KR3,Dropped KR,Actual objective,dropped,team2,Actual project
-  > KR5,Missing status KR,Actual objective,,team2,Actual project
+  > id,title,objective,status,team
+  > KR1,Actual title,Actual objective,active,team1
+  > Kr2,Actual title 2,Actual objective,active,team1
+  > KR3,Dropped KR,Actual objective,dropped,team2
+  > KR5,Missing status KR,Actual objective,,team2
   > EOF
 
   $ okra cat --okr-db=okrs.csv << EOF
@@ -23,13 +23,10 @@ When `--okr-db` is passed, metadata is fixed.
   okra: [WARNING] Conflicting titles:
   - "Wrong title"
   - "Actual title"
-  okra: [WARNING] KR "Wrong title" appears in two projects:
-  - "Wrong project"
-  - "Actual project"
   okra: [WARNING] KR "Wrong title" appears in two objectives:
   - "Wrong objective"
   - "Actual objective"
-  # Actual project
+  # Wrong project
   
   ## Actual objective
   
@@ -50,14 +47,8 @@ It is possible to filter by team.
   >   - @a (1 day)
   >   - Did more of the things
   > EOF
-  okra: [WARNING] KR "Actual title" appears in two projects:
-  - "Project"
-  - "Actual project"
   okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
-  okra: [WARNING] KR "Dropped KR" appears in two projects:
-  - "Project"
-  - "Actual project"
-  # Actual project
+  # Project
   
   ## Actual objective
   
@@ -78,14 +69,8 @@ It is possible to filter on more than one team.
   >   - @a (1 day)
   >   - Did more of the things
   > EOF
-  okra: [WARNING] KR "Actual title" appears in two projects:
-  - "Project"
-  - "Actual project"
   okra: [WARNING] Work logged on KR marked as "Dropped": "Dropped KR" ("KR3")
-  okra: [WARNING] KR "Dropped KR" appears in two projects:
-  - "Project"
-  - "Actual project"
-  # Actual project
+  # Project
   
   ## Actual objective
   

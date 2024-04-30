@@ -28,7 +28,6 @@ type elt_t = {
   printable_id : string;
   title : string;
   objective : string;
-  project : string;
   team : string;
   status : status_t option;
 }
@@ -83,7 +82,6 @@ let load_csv ?(separator = ',') f =
               printable_id;
               title = find_and_trim "title" |> normalise_title;
               objective = find_and_trim "objective";
-              project = find_and_trim "project";
               team = find_and_trim "team";
               status = find_and_trim "status" |> status_of_string;
             }
