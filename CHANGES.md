@@ -1,3 +1,9 @@
+## unreleased
+
+### Changed
+
+- Lint: check the quarter instead of the status (#228, @gpetiot)
+
 ## 0.5.0
 
 ### Changed
