@@ -62,8 +62,6 @@ Workitems can be checked when a DB of this form is provided:
   $ okra lint -e -C admin admin/weekly/2023/50/eng2.md
   [OK]: admin/weekly/2023/50/eng2.md
 
-  $ cat > admin/weekly/2024/01/eng1.md << EOF
-  > EOF
   $ cp admin/weekly/2023/50/eng1.md admin/weekly/2024/01/eng1.md
 
   $ okra lint -e -C admin admin/weekly/2024/01/eng1.md
