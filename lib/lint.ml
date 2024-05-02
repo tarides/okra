@@ -161,6 +161,11 @@ let check_quarters quarter krs warnings =
       else Invalid_quarter kr :: acc)
     warnings krs
 
+let maybe_emit warnings =
+  match warnings with [] -> Ok () | warnings -> Error warnings
+
+let ( let* ) = Result.bind
+
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
 let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
@@ -179,13 +184,12 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
     | Ok () -> warnings
     | Error w -> w :: warnings
   in
-  match warnings with
-  | [] -> (
-      let report = Report.of_krs ?okr_db okrs in
-      let krs = Report.all_krs report in
-      let warnings = check_quarters quarter krs warnings in
-      match warnings with [] -> Ok () | warnings -> Error warnings)
-  | warnings -> Error warnings
+  let* () = maybe_emit warnings in
+  let report = Report.of_krs ?okr_db okrs in
+  let krs = Report.all_krs report in
+  let warnings = check_quarters quarter krs warnings in
+  let* () = maybe_emit warnings in
+  Ok ()
 
 let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
     ?check_time ~filename s =
