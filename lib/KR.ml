@@ -226,6 +226,7 @@ let update_from_master_db t db =
             id = ID db_kr.printable_id;
             title = db_kr.title;
             objective = db_kr.objective;
+            quarter = db_kr.quarter;
           }
         in
         (* show the warnings *)

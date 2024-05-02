@@ -53,3 +53,8 @@ let of_filename ~filename =
           | _ -> None)
       | None -> None)
   | _ -> None
+
+let check q kr_q =
+  match (q, kr_q) with
+  | None, _ | _, None -> true
+  | Some q, Some kr_q -> compare q kr_q = 0

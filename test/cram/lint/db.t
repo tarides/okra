@@ -1,6 +1,8 @@
 Workitems can be checked when a DB of this form is provided:
 
   $ mkdir -p admin/data
+  $ mkdir -p admin/weekly/2023/50
+  $ mkdir -p admin/weekly/2024/01
 
   $ cat > admin/data/db.csv << EOF
   > "id","title","status","quarter","team","pillar","objective","funder","labels","progress"
@@ -13,6 +15,63 @@ Workitems can be checked when a DB of this form is provided:
   > "#1090","Property-Based Testing for Multicore","Active 🏗","Q1 2024 - Jan - Mar","Compiler and language","Compiler","Property-Based Testing for Multicore","","pillar/compiler,team/compiler&language,Proposal","25."
   > "#1115","General okra maintenance","Draft","","","","Maintenance - internal tooling","","pillar/ecosystem,team/internal-tooling",""
   > EOF
+
+  $ cat > admin/weekly/2023/50/eng1.md << EOF
+  > # Last week
+  > 
+  > - Application and Operational Metrics (#1058)
+  >   - @eng1 (2 days)
+  >   - Something
+  > 
+  > - Property-Based Testing for Multicore (#1090)
+  >   - @eng1 (1 day)
+  >   - Something
+  > 
+  > - General okra maintenance (#1115)
+  >   - @eng1 (1 day)
+  >   - Something
+  > 
+  > - Leave (#1074)
+  >   - @eng1 (1 day)
+  >   - off
+  > EOF
+
+  $ cat > admin/weekly/2023/50/eng2.md << EOF
+  > # Last week
+  > 
+  > - Application and Operational Metrics (#1058)
+  >   - @eng2 (2 days)
+  >   - Something
+  > 
+  > - General okra maintenance (#1115)
+  >   - @eng2 (2 days)
+  >   - Something
+  > 
+  > - Leave (#1074)
+  >   - @eng2 (1 day)
+  >   - off
+  > EOF
+
+  $ okra lint -e -C admin admin/weekly/2023/50/eng1.md
+  [ERROR(S)]: admin/weekly/2023/50/eng1.md
+  
+  In WI "Property-Based Testing for Multicore":
+    Work logged on WI scheduled for 2024 Q1
+  [1]
+
+  $ okra lint -e -C admin admin/weekly/2023/50/eng2.md
+  [OK]: admin/weekly/2023/50/eng2.md
+
+  $ cat > admin/weekly/2024/01/eng1.md << EOF
+  > EOF
+  $ cp admin/weekly/2023/50/eng1.md admin/weekly/2024/01/eng1.md
+
+  $ okra lint -e -C admin admin/weekly/2024/01/eng1.md
+  [ERROR(S)]: admin/weekly/2024/01/eng1.md
+  
+  In WI "Application and Operational Metrics":
+    Work logged on WI scheduled for 2023 Q4
+  [1]
 
   $ cat > weekly.md << EOF
   > # Last week

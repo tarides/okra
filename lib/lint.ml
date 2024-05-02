@@ -28,7 +28,7 @@ type lint_error =
   | No_project_found of int option * string
   | Not_all_includes of string list
   | Invalid_markdown_in_work_items of int option * string
-  | Invalid_quarter of { expected : Quarter.t; found : Quarter.t; kr : KR.t }
+  | Invalid_quarter of KR.t
 
 type lint_result = (unit, lint_error list) result
 
@@ -97,11 +97,9 @@ let pp_error ppf = function
       Fmt.pf ppf "Missing includes section: %a\n" Fmt.(list ~sep:comma string) s
   | Invalid_markdown_in_work_items (_, s) ->
       Fmt.pf ppf "@[<hv 2>Invalid markdown in work items:@ %s@]@," s
-  | Invalid_quarter { expected; found; kr } ->
-      Fmt.pf ppf
-        "@[<hv 2>In WI %S:@ Work logged on WI scheduled for %a (please use a \
-         WI scheduled for %a)@]@,"
-        kr.title Quarter.pp found Quarter.pp expected
+  | Invalid_quarter kr ->
+      Fmt.pf ppf "@[<hv 2>In WI %S:@ Work logged on WI scheduled for %a@]@,"
+        kr.title (Fmt.option Quarter.pp) kr.quarter
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -156,16 +154,11 @@ let check_total_time ?check_time (krs : KR.t list) =
           else Error (Invalid_total_time (name, time)))
         tbl (Ok ())
 
-let check_quarter (quarter : Quarter.t option) (kr : KR.t) =
-  match (quarter, kr.quarter) with
-  | None, _ | _, None -> Ok ()
-  | Some q, Some kr_q ->
-      Error (Invalid_quarter { expected = q; found = kr_q; kr })
-
 let check_quarters quarter krs warnings =
   List.fold_left
     (fun acc kr ->
-      match check_quarter quarter kr with Ok () -> acc | Error w -> w :: acc)
+      if Quarter.check quarter kr.KR.quarter then acc
+      else Invalid_quarter kr :: acc)
     warnings krs
 
 (* Parse document as a string to check for aggregation errors (assumes no
@@ -186,11 +179,12 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
     | Ok () -> warnings
     | Error w -> w :: warnings
   in
-  let warnings = check_quarters quarter okrs warnings in
   match warnings with
-  | [] ->
-      let _report = Report.of_krs ?okr_db okrs in
-      Ok ()
+  | [] -> (
+      let report = Report.of_krs ?okr_db okrs in
+      let krs = Report.all_krs report in
+      let warnings = check_quarters quarter krs warnings in
+      match warnings with [] -> Ok () | warnings -> Error warnings)
   | warnings -> Error warnings
 
 let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
@@ -269,6 +263,6 @@ let short_messages_of_error file_name =
       short_messagef None "Missing includes section: %s" (String.concat ", " l)
   | Invalid_markdown_in_work_items (line_number, s) ->
       short_messagef line_number "Invalid markdown in work items: %s" s
-  | Invalid_quarter { expected = _; found; kr } ->
+  | Invalid_quarter kr ->
       short_messagef None "Using KR of invalid quarter: %S (%a)" kr.title
-        Quarter.pp found
+        (Fmt.option Quarter.pp) kr.quarter
