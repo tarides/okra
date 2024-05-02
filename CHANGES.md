@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Lint: check the quarter instead of the status (#228, @gpetiot)
+- Lint: check the quarter of workitems instead of their status (#228, @gpetiot)
 
 ## 0.5.0
 
