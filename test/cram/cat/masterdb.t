@@ -23,7 +23,7 @@ When `--okr-db` is passed, metadata is fixed.
   okra: [WARNING] Conflicting titles:
   - "Wrong title"
   - "Actual title"
-  okra: [WARNING] KR "Wrong title" appears in two objectives:
+  okra: [WARNING] KR Wrong title (KR1) appears in two objectives:
   - "Wrong objective"
   - "Actual objective"
   # Wrong project

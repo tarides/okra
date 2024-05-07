@@ -99,7 +99,7 @@ The result of aggregate should pass the lint
   $ cat aggr.md
   # Last week
   
-  - Leave (#1074)
+  - Leave
     - @dummy (10 days)
     - xxx
     - xxx

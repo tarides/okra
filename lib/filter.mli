@@ -5,11 +5,11 @@ type t
 val empty : t
 val apply : t -> Report.t -> Report.t
 
-val kr_of_string : string -> KR.id
+val kr_of_string : string -> KR.Work.Id.t
 (** [kr_of_string s] is [`New_KR] iff [s="New KR"], [`No_kr] iff [s="No KR"],
     and [`ID s] otherwise. *)
 
-val string_of_kr : KR.id -> string
+val string_of_kr : KR.Work.Id.t -> string
 
 val union : t -> t -> t
 (** Combine two filters into a new filter *)
@@ -19,8 +19,8 @@ val v :
   ?exclude_projects:string list ->
   ?include_objectives:string list ->
   ?exclude_objectives:string list ->
-  ?include_krs:KR.id list ->
-  ?exclude_krs:KR.id list ->
+  ?include_krs:KR.Work.Id.t list ->
+  ?exclude_krs:KR.Work.Id.t list ->
   ?include_engineers:string list ->
   ?exclude_engineers:string list ->
   unit ->

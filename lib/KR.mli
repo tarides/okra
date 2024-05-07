@@ -16,35 +16,69 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type id =
-  | New_KR
-  | No_KR
-  | ID of string
-      (** The kinds of KR identifiers that are possible, a new KR, a no KR and a
+module Meta : sig
+  type t = Community | Hack | Learning | Leave | Management | Meet | Onboard
+
+  val pp : t Fmt.t
+  val compare : t -> t -> int
+end
+
+module Work : sig
+  module Id : sig
+    type t =
+      | New_KR
+      | No_KR
+      | ID of string
+          (** The kinds of KR identifiers that are possible, a new KR, a no KR and a
           KR with an concrete identifier. *)
 
-val equal_id : id -> id -> bool
-(** [equal_id a b] compares ids [a] and [b] for equality. Matching identifiers
+    val equal : t -> t -> bool
+    (** [equal a b] compares ids [a] and [b] for equality. Matching identifiers
     is not case sensitive. *)
+
+    val pp : t Fmt.t
+  end
+
+  type t = { id : Id.t; title : string; quarter : Quarter.t option }
+
+  val v : title:string -> id:Id.t -> quarter:Quarter.t option -> t
+end
+
+(** For type [t]. *)
+module Kind : sig
+  type t = Meta of Meta.t | Work of Work.t
+end
 
 type t = private {
   counter : int;
+  kind : Kind.t;
   project : string;
   objective : string;
-  title : string;
-  id : id;
-  quarter : Quarter.t option;
   time_entries : (string * Time.t) list list;
   time_per_engineer : (string, Time.t) Hashtbl.t;
   work : Item.t list list;
 }
 
+(** For [Parser.of_markdown]. *)
+module Heading : sig
+  type t = Meta of Meta.t | Work of string * Work.Id.t option
+
+  val of_string : string -> t
+  val pp : t Fmt.t
+end
+
+(** For [Aggregate.by_kr] and [Report.find]. *)
+module Id : sig
+  type t = Kind.t
+
+  val pp : t Fmt.t
+  val compare : t -> t -> int
+end
+
 val v :
+  kind:Kind.t ->
   project:string ->
   objective:string ->
-  title:string ->
-  id:id ->
-  quarter:Quarter.t option ->
   time_entries:(string * Time.t) list list ->
   Item.t list list ->
   t

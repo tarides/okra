@@ -80,18 +80,15 @@ let print conf t =
         Aggregate.by_kr t |> Hashtbl.to_seq |> List.of_seq |> sort_by_days
       in
       List.iter
-        (fun ((title, id), d) ->
-          let id' =
-            match id with KR.New_KR -> "New KR" | No_KR -> "No KR" | ID s -> s
-          in
-          let ps = Report.find t ~title ~id () in
+        (fun (kr_id, d) ->
+          let ps = Report.find t kr_id in
           let pp ppf () =
             Fmt.list ~sep:(Fmt.any "|")
               (fun ppf kr ->
                 Fmt.pf ppf "%a: %a" green kr.KR.project cyan kr.KR.objective)
               ppf ps
           in
-          Fmt.pr "- [%a] %s (%s): %a\n" pp () title id' pp_time d)
+          Fmt.pr "- [%a] %a: %a\n" pp () KR.Id.pp kr_id pp_time d)
         krs
 
 let run conf =

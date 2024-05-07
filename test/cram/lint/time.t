@@ -12,7 +12,7 @@ Invalid time
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR123)":
     Invalid time entry "@eng1 (1 day), eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
@@ -25,7 +25,7 @@ Invalid time
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR123)":
     Invalid time entry "@eng1 (1 day); @eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
@@ -38,7 +38,7 @@ Invalid time
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR123)":
     Invalid time entry "@eng1 (1 day) @eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
@@ -51,7 +51,7 @@ Invalid time
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR123)":
     Invalid time entry "@eng1 (. days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]

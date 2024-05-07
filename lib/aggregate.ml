@@ -31,9 +31,16 @@ let by_ f ?(include_krs = []) t =
       if
         include_krs = []
         ||
-        match e.id with
-        | ID id -> List.mem (String.uppercase_ascii id) uppercase_include_krs
-        | _ -> false
+        match e.kind with
+        | Meta m ->
+            List.mem
+              (String.uppercase_ascii (Format.asprintf "%a" KR.Meta.pp m))
+              uppercase_include_krs
+        | Work w -> (
+            match w.id with
+            | ID id ->
+                List.mem (String.uppercase_ascii id) uppercase_include_krs
+            | _ -> false)
       then f result e
       else ()) (* skip this KR *)
     t;
@@ -45,8 +52,7 @@ let sum tbl =
 
 let by_kr =
   by_ (fun result e ->
-      Hashtbl.add result (e.title, e.id)
-        (sum e.time_per_engineer, e.time_per_engineer))
+      Hashtbl.add result e.kind (sum e.time_per_engineer, e.time_per_engineer))
 
 let by_objective =
   by_ (fun result e ->

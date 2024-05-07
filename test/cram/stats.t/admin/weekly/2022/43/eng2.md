@@ -1,5 +1,8 @@
 # Last Week
 
+- Leave
+  - @eng2 (1 day)
+
 ## Project 1
 
 - AA (#123)
@@ -17,5 +20,5 @@
   - Work
 
 - DD (#420)
-  - @eng2 (4 days)
+  - @eng2 (3 days)
   - Work

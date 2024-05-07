@@ -23,7 +23,7 @@ No KR ID found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR": No project found (starting with '#')
+  In KR "This is a KR (KR123)": No project found (starting with '#')
   [1]
 
 No work items found:
@@ -36,11 +36,11 @@ No work items found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KRID)":
+  In KR "This is a KR":
     No work items found. This may indicate an unreported parsing error. Remove the KR if it is without work.
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KRID)":
+  In KR "This is a KR":
     No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
   [1]
 
@@ -55,7 +55,7 @@ No time entry found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR12)":
     No time entry found. Each KR must be followed by '- @... (x days)'
   [1]
 
@@ -72,7 +72,7 @@ Multiple time entries:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
+  In KR "This is a KR (KR12)":
     Multiple time entries found. Only one time entry should follow immediately after the KR.
   [1]
 
@@ -137,11 +137,11 @@ Format errors
   $ okra lint err-no-time.md
   [ERROR(S)]: err-no-time.md
   
-  In KR "Everything is great":
+  In KR "Everything is great (E1)":
     No time entry found. Each KR must be followed by '- @... (x days)'
   [1]
   $ okra lint --short err-no-time.md
-  err-no-time.md:3:No time found in "Everything is great"
+  err-no-time.md:3:No time found in "Everything is great (E1)"
   [1]
 
   $ cat > err-invalid-time.md << EOF
@@ -154,12 +154,12 @@ Format errors
   $ okra lint err-invalid-time.md
   [ERROR(S)]: err-invalid-time.md
   
-  In KR "Everything is great":
+  In KR "Everything is great (E1)":
     Invalid time entry "@a (day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
   $ okra lint --short err-invalid-time.md
-  err-invalid-time.md:4:Invalid time entry "@a (day)" in "Everything is great"
+  err-invalid-time.md:4:Invalid time entry "@a (day)" in "Everything is great (E1)"
   [1]
 
   $ cat > err-multiple-time.md << EOF
@@ -173,11 +173,11 @@ Format errors
   $ okra lint err-multiple-time.md
   [ERROR(S)]: err-multiple-time.md
   
-  In KR "Everything is great":
+  In KR "Everything is great (E1)":
     Multiple time entries found. Only one time entry should follow immediately after the KR.
   [1]
   $ okra lint --short err-multiple-time.md
-  err-multiple-time.md:3:Multiple time entries for "Everything is great"
+  err-multiple-time.md:3:Multiple time entries for "Everything is great (E1)"
   [1]
 
   $ cat > err-no-work.md << EOF
@@ -189,11 +189,11 @@ Format errors
   $ okra lint err-no-work.md
   [ERROR(S)]: err-no-work.md
   
-  In KR "Everything is great":
+  In KR "Everything is great (E1)":
     No work items found. This may indicate an unreported parsing error. Remove the KR if it is without work.
   [1]
   $ okra lint --short err-no-work.md
-  err-no-work.md:3:No work found for "Everything is great"
+  err-no-work.md:3:No work found for "Everything is great (E1)"
   [1]
 
   $ cat > err-no-kr-id.md << EOF
@@ -221,10 +221,10 @@ Format errors
   $ okra lint err-no-project.md
   [ERROR(S)]: err-no-project.md
   
-  In KR "Everything is great": No project found (starting with '#')
+  In KR "Everything is great (E1)": No project found (starting with '#')
   [1]
   $ okra lint --short err-no-project.md
-  err-no-project.md:1:No project found for "Everything is great"
+  err-no-project.md:1:No project found for "Everything is great (E1)"
   [1]
 
   $ cat > err-not-all-includes.md << EOF

@@ -35,16 +35,16 @@ let id2 = "Id2"
 let id3 = "ID3"
 
 let kr1 =
-  KR.v ~project:p1 ~objective:o1 ~title:t1 ~id:KR.New_KR ~time_entries:te1
-    ~quarter:None []
+  let kind = KR.Kind.Work (KR.Work.v ~title:t1 ~id:New_KR ~quarter:None) in
+  KR.v ~kind ~project:p1 ~objective:o1 ~time_entries:te1 []
 
 let kr2 =
-  KR.v ~project:p2 ~objective:o2 ~title:t2 ~id:(ID id2) ~time_entries:te2
-    ~quarter:None []
+  let kind = KR.Kind.Work (KR.Work.v ~title:t2 ~id:(ID id2) ~quarter:None) in
+  KR.v ~kind ~project:p2 ~objective:o2 ~time_entries:te2 []
 
 let kr3 =
-  KR.v ~project:p2 ~objective:o2 ~title:t3 ~id:(ID id3) ~time_entries:te3
-    ~quarter:None []
+  let kind = KR.Kind.Work (KR.Work.v ~title:t3 ~id:(ID id3) ~quarter:None) in
+  KR.v ~kind ~project:p2 ~objective:o2 ~time_entries:te3 []
 
 let report () = Okra.Report.of_krs [ kr1; kr2; kr3 ]
 

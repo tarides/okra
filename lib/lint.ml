@@ -28,7 +28,7 @@ type lint_error =
   | No_project_found of int option * string
   | Not_all_includes of string list
   | Invalid_markdown_in_work_items of int option * string
-  | Invalid_quarter of KR.t
+  | Invalid_quarter of KR.Work.t
 
 type lint_result = (unit, lint_error list) result
 
@@ -157,8 +157,11 @@ let check_total_time ?check_time (krs : KR.t list) =
 let check_quarters quarter krs warnings =
   List.fold_left
     (fun acc kr ->
-      if Quarter.check quarter kr.KR.quarter then acc
-      else Invalid_quarter kr :: acc)
+      match kr.KR.kind with
+      | Meta _ -> acc
+      | Work w ->
+          if Quarter.check quarter w.quarter then acc
+          else Invalid_quarter w :: acc)
     warnings krs
 
 let maybe_emit warnings =

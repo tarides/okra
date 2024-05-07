@@ -20,14 +20,22 @@ let src = Logs.Src.create "okra.report"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
+(* TODO: merge all tables and index with KR.Id.t? *)
 type krs = {
   (* KRs are indexed by ID *)
   ids : (string, KR.t) Hashtbl.t;
   (* New KRs do not have an ID, so they are indexed by title *)
   titles : (string, KR.t) Hashtbl.t;
+  (* meta KRs *)
+  meta : (KR.Meta.t, KR.t) Hashtbl.t;
 }
 
-let empty_krs () = { ids = Hashtbl.create 13; titles = Hashtbl.create 13 }
+let empty_krs () =
+  {
+    ids = Hashtbl.create 13;
+    titles = Hashtbl.create 13;
+    meta = Hashtbl.create 7;
+  }
 
 type objective = { name : string; krs : krs }
 type project = { name : string; objectives : (string, objective) Hashtbl.t }
@@ -46,12 +54,19 @@ let find_no_case t k = Hashtbl.find_opt t (String.uppercase_ascii k)
 let add_no_case t k v = Hashtbl.add t (String.uppercase_ascii k) v
 let replace_no_case t k v = Hashtbl.replace t (String.uppercase_ascii k) v
 let remove_no_case t k = Hashtbl.remove t (String.uppercase_ascii k)
-let is_new_kr kr = kr.KR.id = New_KR
-let is_no_kr kr = kr.KR.id = No_KR
+
+let is_new_kr = function
+  | { KR.kind = Work { id = New_KR; _ }; _ } -> true
+  | _ -> false
+
+let is_no_kr = function
+  | { KR.kind = Work { id = No_KR; _ }; _ } -> true
+  | _ -> false
 
 let iter_krs f t =
   Hashtbl.iter (fun _ kr -> f kr) t.ids;
-  Hashtbl.iter (fun _ kr -> if is_new_kr kr then f kr) t.titles
+  Hashtbl.iter (fun _ kr -> if is_new_kr kr then f kr) t.titles;
+  Hashtbl.iter (fun _ kr -> f kr) t.meta
 
 let iter_objective f t = iter_krs f t.krs
 let skip _ _ = ()
@@ -93,13 +108,9 @@ module Objective = struct
       t.projects []
 end
 
-let find t ?title ?id () =
+let find t id =
   let l = ref [] in
-  iter_krs
-    (fun kr ->
-      if Some kr.KR.title = title || Option.equal KR.equal_id (Some kr.KR.id) id
-      then l := kr :: !l)
-    t.all_krs;
+  iter_krs (fun kr -> if compare kr.kind id = 0 then l := kr :: !l) t.all_krs;
   List.rev !l
 
 let dump ppf t = Fmt.iter iter KR.dump ppf t
@@ -112,8 +123,11 @@ let compare_projects (x : project) (y : project) = compare_no_case x.name y.name
 let remove (t : t) (e : KR.t) =
   Log.debug (fun l -> l "Report.remove %a" KR.dump e);
   let remove t =
-    remove_no_case t.titles e.title;
-    match e.id with ID id -> remove_no_case t.ids id | _ -> ()
+    match e.kind with
+    | Meta m -> Hashtbl.remove t.meta m
+    | Work w -> (
+        remove_no_case t.titles w.title;
+        match w.id with ID id -> remove_no_case t.ids id | _ -> ())
   in
   let () =
     match find_no_case t.projects e.project with
@@ -128,55 +142,87 @@ let remove (t : t) (e : KR.t) =
 let add ?okr_db (t : t) (e : KR.t) =
   Log.debug (fun l -> l "Report.add %a %a" dump t KR.dump e);
 
-  (* replace e fields with master db lookup if possible *)
-  let e =
-    match okr_db with
-    | None -> e (* no db *)
-    | Some db -> KR.update_from_master_db e db
-  in
-  let existing_kr =
-    match e.id with
-    | No_KR | New_KR -> find_no_case t.all_krs.titles e.title
-    | ID id -> (
-        match find_no_case t.all_krs.ids id with
-        | Some kr -> Some kr
-        | None -> (
-            match find_no_case t.all_krs.titles e.title with
-            | Some kr when is_new_kr kr -> Some kr
-            | Some kr when is_no_kr kr -> Some kr
-            | _ -> None))
-  in
-  let e =
-    match existing_kr with
-    | None -> e
-    | Some kr ->
-        (* cleanup existing KR if needed *)
-        if kr.title = "" || kr.objective = "" || kr.project = "" then
-          remove t kr;
-        KR.merge kr e
-  in
-  let update t =
-    replace_no_case t.titles e.title e;
-    match e.id with ID id -> replace_no_case t.ids id e | _ -> ()
-  in
-  let p =
-    match find_no_case t.projects e.project with
-    | Some p -> p
-    | None ->
-        let p = { name = e.project; objectives = Hashtbl.create 13 } in
-        add_no_case t.projects e.project p;
-        p
-  in
-  let o =
-    match find_no_case p.objectives e.objective with
-    | Some o -> o
-    | None ->
-        let o = { name = e.objective; krs = empty_krs () } in
-        add_no_case p.objectives e.objective o;
-        o
-  in
-  update t.all_krs;
-  update o.krs
+  match e.kind with
+  | Meta m ->
+      (* replace e fields with master db lookup if possible *)
+      let e =
+        match okr_db with
+        | None -> e (* no db *)
+        | Some db -> KR.update_from_master_db e db
+      in
+      let existing_kr = Hashtbl.find_opt t.all_krs.meta m in
+      let e = match existing_kr with None -> e | Some kr -> KR.merge kr e in
+      let p =
+        match find_no_case t.projects e.project with
+        | Some p -> p
+        | None ->
+            let p = { name = e.project; objectives = Hashtbl.create 13 } in
+            add_no_case t.projects e.project p;
+            p
+      in
+      let o =
+        match find_no_case p.objectives e.objective with
+        | Some o -> o
+        | None ->
+            let o = { name = e.objective; krs = empty_krs () } in
+            add_no_case p.objectives e.objective o;
+            o
+      in
+      Hashtbl.replace o.krs.meta m e;
+      Hashtbl.replace t.all_krs.meta m e
+  | Work _ ->
+      (* replace e fields with master db lookup if possible *)
+      let e =
+        match okr_db with
+        | None -> e (* no db *)
+        | Some db -> KR.update_from_master_db e db
+      in
+      let w = match e.kind with Meta _ -> assert false | Work w -> w in
+      let existing_kr =
+        match w.id with
+        | No_KR | New_KR -> find_no_case t.all_krs.titles w.title
+        | ID id -> (
+            match find_no_case t.all_krs.ids id with
+            | Some kr -> Some kr
+            | None -> (
+                match find_no_case t.all_krs.titles w.title with
+                | Some kr when is_new_kr kr -> Some kr
+                | Some kr when is_no_kr kr -> Some kr
+                | _ -> None))
+      in
+      let e =
+        match existing_kr with
+        | None -> e
+        | Some kr ->
+            let w = match kr.kind with Meta _ -> assert false | Work w -> w in
+            (* cleanup existing KR if needed *)
+            if w.title = "" || kr.objective = "" || kr.project = "" then
+              remove t kr;
+            KR.merge kr e
+      in
+      let w = match e.kind with Meta _ -> assert false | Work w -> w in
+      let update t =
+        replace_no_case t.titles w.title e;
+        match w.id with ID id -> replace_no_case t.ids id e | _ -> ()
+      in
+      let p =
+        match find_no_case t.projects e.project with
+        | Some p -> p
+        | None ->
+            let p = { name = e.project; objectives = Hashtbl.create 13 } in
+            add_no_case t.projects e.project p;
+            p
+      in
+      let o =
+        match find_no_case p.objectives e.objective with
+        | Some o -> o
+        | None ->
+            let o = { name = e.objective; krs = empty_krs () } in
+            add_no_case p.objectives e.objective o;
+            o
+      in
+      update t.all_krs;
+      update o.krs
 
 let empty () = { projects = Hashtbl.create 13; all_krs = empty_krs () }
 
@@ -223,10 +269,12 @@ let make_objective ?show_time ?show_time_calc ?show_engineers o =
     |> Seq.filter is_no_kr
     |> List.of_seq
   in
+  let meta_krs = Hashtbl.to_seq o.krs.meta |> Seq.map snd |> List.of_seq in
   let krs =
     List.sort KR.compare krs
     @ List.sort KR.compare new_krs
     @ List.sort KR.compare no_krs
+    @ List.sort KR.compare meta_krs
   in
   match
     List.concat_map (KR.items ?show_time ?show_time_calc ?show_engineers) krs

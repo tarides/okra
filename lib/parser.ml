@@ -33,8 +33,7 @@ type warning =
 
 (* Types for parsing the AST *)
 type t =
-  | KR_id of KR.id (* ID of KR *)
-  | KR_title of string (* Title without ID, tech lead *)
+  | KR_heading of KR.Heading.t (* Title and ID of workitem *)
   | Work of Item.t list (* Work items *)
   | Time of string
 
@@ -42,10 +41,6 @@ type markdown = Omd.doc
 
 let warnings : warning list ref = ref []
 let add_warning w = warnings := w :: !warnings
-let okr_re = Str.regexp "\\(.+\\) (\\([a-zA-Z#]+[0-9]+\\))$"
-(* Header: This is a legacy KR (KR12) *)
-(* Header: This is a GitHub WI (12) *)
-
 let obj_re = Str.regexp "\\(.+\\) (\\([a-zA-Z ]+\\))$"
 (* Header: This is an objective (Tech lead name) *)
 
@@ -69,52 +64,8 @@ let time_entry_regexp =
   let time = seq [ number; rep space; time_unit; opt (char 's') ] in
   compile @@ seq [ start; user; rep space; char '('; time; char ')'; stop ]
 
-let is_suffix suffix s =
-  String.length s >= String.length suffix
-  &&
-  let suffix = String.uppercase_ascii suffix in
-  let s = String.uppercase_ascii s in
-  String.equal suffix
-    (String.sub s
-       (String.length s - String.length suffix)
-       (String.length suffix))
-
-let parse_okr_title s =
-  (* todo: could match on ??) too? *)
-  if is_suffix "(new kr)" s || is_suffix "(new okr)" s || is_suffix "(new wi)" s
-  then
-    let i = String.rindex s '(' in
-    let t = String.trim (String.sub s 0 i) in
-    Some (t, KR.New_KR)
-  else if
-    String.lowercase_ascii s = "other"
-    || String.lowercase_ascii s = "others"
-    || String.lowercase_ascii s = "off-kr"
-    || String.lowercase_ascii s = "off kr"
-    || String.lowercase_ascii s = "misc"
-  then Some (s, No_KR)
-  else if
-    is_suffix "(no kr)" s || is_suffix "(no okr)" s || is_suffix "(no wi)" s
-  then
-    let i = String.rindex s '(' in
-    let t = String.trim (String.sub s 0 i) in
-    Some (t, No_KR)
-  else
-    match Str.string_match okr_re s 0 with
-    | false -> None
-    | true ->
-        let t = String.trim (Str.matched_group 1 s) in
-        let id = String.trim (Str.matched_group 2 s) in
-        Some (t, ID id)
-
-let dump_id ppf = function
-  | KR.No_KR -> Fmt.string ppf "No KR"
-  | New_KR -> Fmt.string ppf "New KR"
-  | ID i -> Fmt.string ppf i
-
 let dump_elt ppf = function
-  | KR_id s -> Fmt.pf ppf "KR id: %a" dump_id s
-  | KR_title s -> Fmt.pf ppf "KR title: %s" s
+  | KR_heading x -> Fmt.pf ppf "KR %a" KR.Heading.pp x
   | Work w -> Fmt.pf ppf "W: %a" Fmt.Dump.(list Item.dump) w
   | Time _ -> Fmt.pf ppf "Time: <not shown>"
 
@@ -181,8 +132,9 @@ let kr ~project ~objective = function
 
          This function will aggregate all entries for the same KR in an
          okr_entry record for easier processing later. *)
+      let kr_heading = ref None in
+      (* for error messages only *)
       let title = ref "" in
-      let id = ref None in
       let time_entries = ref [] in
 
       (* Assume each item in list has the same O/KR/Proj, so just parse the
@@ -191,8 +143,9 @@ let kr ~project ~objective = function
          same KR/O *)
       List.iter
         (function
-          | KR_title s -> title := s
-          | KR_id s -> id := Some s
+          | KR_heading s ->
+              kr_heading := Some s;
+              title := Format.asprintf "%a" KR.Heading.pp s
           | Time t ->
               let t_split = String.split_on_char ',' (String.trim t) in
               let entry =
@@ -225,20 +178,33 @@ let kr ~project ~objective = function
       let () =
         match l with
         | [] -> ()
-        | KR_title _ :: Time _ :: _ -> ()
-        | KR_title _ :: KR_id _ :: Time _ :: _ -> ()
+        | KR_heading _ :: Time _ :: _ -> ()
         | _ -> err_no_time title
       in
 
       let work = List.filter_map (function Work e -> Some e | _ -> None) l in
-      if work = [] then err_no_work title;
+      (if work = [] then
+         match !kr_heading with
+         | Some (KR.Heading.Meta KR.Meta.Leave) -> ()
+         | Some _ -> err_no_work title
+         | None -> ());
 
-      let id =
-        match !id with
-        | Some id -> id
+      let kind =
+        let quarter = None in
+        match !kr_heading with
+        | Some (Meta x) -> KR.Kind.Meta x
+        | Some (Work (title, id)) ->
+            let id =
+              match id with
+              | None ->
+                  err_no_id title;
+                  KR.Work.Id.No_KR
+              | Some id -> id
+            in
+            KR.Kind.Work (KR.Work.v ~title ~id ~quarter)
         | None ->
-            err_no_id title;
-            No_KR
+            let id = KR.Work.Id.No_KR in
+            KR.Kind.Work (KR.Work.v ~title ~id ~quarter)
       in
 
       let time_entries =
@@ -254,20 +220,12 @@ let kr ~project ~objective = function
       let project = String.trim project in
       if project = "" then err_no_project title;
       let objective = String.trim objective in
-      let quarter = None in
-
-      (* Construct final entry *)
-      let kr =
-        KR.v ~project ~objective ~title ~id ~time_entries ~quarter work
-      in
-      Some kr
+      Some (KR.v ~kind ~project ~objective ~time_entries work)
 
 let block_okr = function
-  | Paragraph (_, x) -> (
+  | Paragraph (_, x) ->
       let okr_title = String.trim (inline_to_string (inline x)) in
-      match parse_okr_title okr_title with
-      | None -> [ KR_title okr_title ]
-      | Some (title, id) -> [ KR_title title; KR_id id ])
+      [ KR_heading (KR.Heading.of_string okr_title) ]
   | List (_, _, _, bls) ->
       List.map
         (fun bl ->

@@ -17,13 +17,13 @@ type t = {
 }
 
 let string_of_kr = function
-  | KR.No_KR -> "NO KR"
+  | KR.Work.Id.No_KR -> "NO KR"
   | New_KR -> "NEW KR"
   | ID s -> String.uppercase_ascii s
 
 let kr_of_string s =
   match String.uppercase_ascii s with
-  | "NEW KR" | "NEW WI" -> KR.New_KR
+  | "NEW KR" | "NEW WI" -> KR.Work.Id.New_KR
   | "NO KR" | "NO WI" -> No_KR
   | _ -> ID s
 
@@ -90,7 +90,11 @@ let apply f (t : Report.t) =
       (fun (kr : KR.t) ->
         let p = String.uppercase_ascii kr.project in
         let o = String.uppercase_ascii kr.objective in
-        let id = string_of_kr kr.KR.id in
+        let id =
+          match kr.kind with
+          | Meta m -> Format.asprintf "%a" KR.Meta.pp m
+          | Work w -> string_of_kr w.id
+        in
         let es =
           Hashtbl.to_seq kr.time_per_engineer
           |> Seq.map fst
@@ -139,8 +143,8 @@ let apply f (t : Report.t) =
                 :: kr.work
               in
               let kr =
-                KR.v ~project:kr.project ~objective:kr.objective ~title:kr.title
-                  ~time_entries ~id:kr.id ~quarter:kr.quarter work
+                KR.v ~project:kr.project ~objective:kr.objective ~time_entries
+                  ~kind:kr.kind work
               in
               Report.add new_t kr
         in

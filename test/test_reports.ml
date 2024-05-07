@@ -26,7 +26,10 @@ let aggregate f =
 let contains_kr_cnt p kr_id =
   let found = ref 0 in
   Okra.Report.iter
-    (fun kr -> if kr.id = kr_id then found := !found + 1 else ())
+    (fun kr ->
+      match kr.kind with
+      | Meta _ -> ()
+      | Work w -> if w.id = kr_id then found := !found + 1 else ())
     p;
   !found
 

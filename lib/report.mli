@@ -51,7 +51,7 @@ val iter :
   t ->
   unit
 
-val find : t -> ?title:string -> ?id:KR.id -> unit -> KR.t list
+val find : t -> KR.Id.t -> KR.t list
 val add : ?okr_db:Masterdb.t -> t -> KR.t -> unit
 val all_krs : t -> KR.t list
 
