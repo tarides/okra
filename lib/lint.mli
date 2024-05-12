@@ -19,7 +19,7 @@ type lint_error =
   | Format_error of (int * string) list
   | No_time_found of int option * string
   | Invalid_time of { lnum : int option; title : string; entry : string }
-  | Invalid_total_time of string * Time.t
+  | Invalid_total_time of string * Time.t * Time.t
   | Multiple_time_entries of int option * string
   | No_work_found of int option * string
   | No_KR_ID_found of int option * string

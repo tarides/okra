@@ -333,7 +333,12 @@ let term =
   and+ output = output
   and+ repo = repo
   and+ engineer_report = engineer_report in
-  let check_time = if engineer_report then Some (Okra.Time.days 5.) else None in
+  let check_time =
+    match Conf.work_days_in_a_week conf with
+    | Some f when engineer_report -> Some (Okra.Time.days f)
+    | _ when engineer_report -> Some (Okra.Time.days 5.)
+    | _ -> None
+  in
   {
     okr_db;
     filter;

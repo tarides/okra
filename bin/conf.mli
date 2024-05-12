@@ -38,6 +38,11 @@ val gitlab_token : t -> string option
 (** [gitlab_token] is the optional Gitlab token, if present your Gitlab activity
     will also be queried. *)
 
+val work_days_in_a_week : t -> float option
+(** [work_days_in_a_week] is an optional override for the number of days you work 
+    in a given week, this is useful for contractors so [okra lint -e] doesn't report
+    errors for working less than five days a week. *)
+
 val load : string -> (t, [ `Msg of string ]) result
 (** [load file] attempts to load a configuration from [file] *)
 

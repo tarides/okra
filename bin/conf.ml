@@ -48,6 +48,7 @@ type t = {
   okr_db : string option;
   admin_dir : string option;
   gitlab_token : string option;
+  work_days_in_a_week : float option;
 }
 [@@deriving yaml]
 
@@ -59,6 +60,7 @@ let default =
     okr_db = None;
     admin_dir = None;
     gitlab_token = None;
+    work_days_in_a_week = None;
   }
 
 let teams { teams; _ } =
@@ -78,6 +80,7 @@ let footer { footer; _ } = footer
 let okr_db t = t.okr_db
 let admin_dir t = t.admin_dir
 let gitlab_token t = t.gitlab_token
+let work_days_in_a_week t = t.work_days_in_a_week
 
 let load file =
   let open Rresult in

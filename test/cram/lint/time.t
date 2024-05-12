@@ -82,3 +82,28 @@ Valid time
   >   - My work
   > EOF
   [OK]: <stdin>
+
+Using the configuration file to change the default number of working days.
+
+  $ cat > valid-conf.yaml << EOF
+  > work_days_in_a_week: 1.5
+  > EOF
+  $ okra lint --engineer --conf valid-conf.yaml << EOF
+  > # Last week
+  > 
+  > - This is a KR (KR1)
+  >   - @eng1 (1.5 days)
+  >   - My work
+  > EOF
+  [OK]: <stdin>
+  $ okra lint --engineer --conf valid-conf.yaml << EOF
+  > # Last week
+  > 
+  > - This is a KR (KR1)
+  >   - @eng1 (0.5 days)
+  >   - My work
+  > EOF
+  [ERROR(S)]: <stdin>
+  
+  Invalid total time found for eng1 (reported 0.5 days, expected 1.5 days).
+  [1]

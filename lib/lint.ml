@@ -21,7 +21,7 @@ type lint_error =
   | Format_error of (int * string) list
   | No_time_found of int option * string
   | Invalid_time of { lnum : int option; title : string; entry : string }
-  | Invalid_total_time of string * Time.t
+  | Invalid_total_time of string * Time.t * Time.t
   | Multiple_time_entries of int option * string
   | No_work_found of int option * string
   | No_KR_ID_found of int option * string
@@ -69,10 +69,10 @@ let pp_error ppf = function
         "@[<hv 2>In KR %S:@ Invalid time entry %S found. Format is '- @@eng1 \
          (x days), @@eng2 (y days)'@ where x and y must be divisible by 0.5@]@,"
         title entry
-  | Invalid_total_time (s, t) ->
+  | Invalid_total_time (s, t, total) ->
       Fmt.pf ppf
         "@[<hv 2>Invalid total time found for %s (reported %a, expected %a).@]@,"
-        s Time.pp t Time.pp (Time.days 5.)
+        s Time.pp t Time.pp total
   | Multiple_time_entries (_, s) ->
       Fmt.pf ppf
         "@[<hv 2>In KR %S:@ Multiple time entries found. Only one time entry \
@@ -151,7 +151,7 @@ let check_total_time ?check_time (krs : KR.t list) =
         (fun name time acc ->
           let* () = acc in
           if Time.equal time expected then Ok ()
-          else Error (Invalid_total_time (name, time)))
+          else Error (Invalid_total_time (name, time, expected)))
         tbl (Ok ())
 
 let check_quarters quarter krs warnings =
@@ -253,8 +253,9 @@ let short_messages_of_error file_name =
       short_messagef line_number "No time found in %S" kr
   | Invalid_time { lnum; title; entry } ->
       short_messagef lnum "Invalid time entry %S in %S" entry title
-  | Invalid_total_time (s, t) ->
-      short_messagef None "Invalid total time for %S (%a)" s Time.pp t
+  | Invalid_total_time (s, t, total) ->
+      short_messagef None "Invalid total time for %S (%a/%a)" s Time.pp t
+        Time.pp total
   | Multiple_time_entries (line_number, kr) ->
       short_messagef line_number "Multiple time entries for %S" kr
   | No_work_found (line_number, kr) ->
