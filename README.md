@@ -50,7 +50,8 @@ Then you can install okra. If you had it installed previously through pinning si
 opam pin remove okra
 ```
 
-(This will both remove the pinned version and install the new one.)
+This will both remove the pinned version and install the new one. You may also need to
+`opam pin remove okra-lib` too.
 
 If okra is not installed yet, run:
 ```sh
