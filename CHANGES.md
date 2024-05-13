@@ -4,6 +4,10 @@
 
 - Lint: check the quarter of workitems instead of their status (#228, @gpetiot)
 
+### Added
+
+- Allow engineers to specify the number of working days (#232, @patricoferris)
+
 ## 0.5.0
 
 ### Changed
