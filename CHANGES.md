@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Dedicated names for meta-items: Community, Hack, Learning, Leave, Management, Meet and Onboard (#230, @gpetiot)
+- Use standardized categories for reporting non-engineering work time: Community, Hack, Learning, Leave, Management, Meet and Onboard (#230, @gpetiot)
 - Lint: check the quarter of workitems instead of their status (#228, @gpetiot)
 
 ### Added
