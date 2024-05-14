@@ -53,7 +53,7 @@ projects:
   - title: "Improve OKRA (#123)"
 ```
 
-More information about the configuraiton file is provided [here](configuration-file.md).
+More information about the configuration file is provided [here](configuration-file.md).
 
 ## Linting your weekly report
 
