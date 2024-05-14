@@ -1,5 +1,12 @@
 # Last Week
 
+- Learning
+  - @eng1 (0.5 day)
+  - Learn
+
+- Leave
+  - @eng1 (0.5 day)
+
 ## Project 1
 
 - AA (#123)
@@ -7,7 +14,7 @@
   - Work
 
 - BB (#120)
-  - @eng1 (3 day)
+  - @eng1 (2 days)
   - Work
 
 ## Project 2
