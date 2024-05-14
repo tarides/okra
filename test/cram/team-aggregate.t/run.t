@@ -16,6 +16,13 @@ Team aggregate example
   - A KR (KR124)
     - @eng2 (1 day)
     - Work 1
+  
+  - Learning
+    - @eng2 (1 day)
+    - Learn 1
+  
+  - Leave
+    - @eng2 (1 day)
 
 Only select a few okrs
 
@@ -39,6 +46,13 @@ Exclude a few okrs
   - A KR (KR100)
     - @eng1 (1 day)
     - Work 1
+  
+  - Learning
+    - @eng2 (1 day)
+    - Learn 1
+  
+  - Leave
+    - @eng2 (1 day)
 
 Multiple weeks
 
@@ -61,6 +75,13 @@ Multiple weeks
     - @eng2 (2 days)
     - Work 1
     - Work 1
+  
+  - Learning
+    - @eng2 (1 day)
+    - Learn 1
+  
+  - Leave
+    - @eng1 (1 day), @eng2 (1 day)
 
 The result of aggregate should pass the lint
 
