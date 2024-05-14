@@ -33,13 +33,13 @@ There are a few rules:
 ### Non-engineering work time
 
 Special workitems can be used to report the following activities:
-- Community: Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
-- Hack: Hacking Days
-- Learning: Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
-- Leave: Any kind of leaves, holidays, time off from work, including the 2-week August company break
-- Management: TL and EM work other than meetings
-- Meet: Meetings, Offsite
-- Onboard: Onboarding time
+- `Community`: Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
+- `Hack`: Hacking Days
+- `Learning`: Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
+- `Leave`: Any kind of leaves, holidays, time off from work, including the 2-week August company break
+- `Management`: TL and EM work other than meetings
+- `Meet`: Meetings, Offsite
+- `Onboard`: Onboarding time
 
 Here is an example:
 ```md
