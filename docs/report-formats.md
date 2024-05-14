@@ -2,6 +2,7 @@
 
 These are the formats currently recognised by the tool:
 - [Engineer Report](#engineer-report)
+  - [Non-engineering work time](#non-engineering-work-time)
 - [Repository Report](#repository-report)
 - [Team activity report](#team-activity-report)
 
@@ -28,6 +29,29 @@ There are a few rules:
 - Each workitem needs an ID (you can refer to the workitem database, or use "New ID" or "No ID" if you don't know the ID)
 - The total time reported must be 5 days (time off or partial work time must be reported)
 - The time must be reported in multiples of 0.5 days
+
+### Non-engineering work time
+
+Special workitems can be used to report the following activities:
+- Community: Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
+- Hack: Hacking Days
+- Learning: Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
+- Leave: Any kind of leaves, holidays, time off from work, including the 2-week August company break
+- Management: TL and EM work other than meetings
+- Meet: Meetings, Offsite
+- Onboard: Onboarding time
+
+Here is an example:
+```md
+# Last Week
+
+- Leave
+  - @jack (1 day)
+
+- Learning
+  - @jack (1 day)
+  - Studied something
+```
 
 ## Repository Report
 
