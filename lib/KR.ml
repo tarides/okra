@@ -323,43 +323,39 @@ let make_time_entries t =
   let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
-let update_from_master_db t db =
-  let update (orig_kr : t) (orig_work : Work.t) (db_kr : Masterdb.elt_t option)
-      =
-    match db_kr with
-    | None ->
-        if orig_work.id = New_KR then
-          Log.warn (fun l -> l "KR ID not found for new KR %S" orig_work.title);
-        orig_kr
-    | Some db_kr ->
-        if orig_work.id = No_KR then
-          Log.warn (fun l ->
-              l "KR ID updated from \"No KR\" to %S:\n- %S\n- %S" db_kr.id
-                orig_work.title db_kr.title);
-        let work =
-          {
-            Work.id = ID db_kr.printable_id;
-            title = db_kr.title;
-            quarter = db_kr.quarter;
-          }
-        in
-        let kr =
-          { orig_kr with kind = Work work; objective = db_kr.objective }
-        in
-        (* show the warnings *)
-        ignore (merge orig_kr kr);
-        kr
-  in
-  match t.kind with
-  | Meta _ -> t
-  | Work x -> (
-      match x.id with
-      | ID id ->
-          let db_kr = Masterdb.find_kr_opt db id in
-          update t x db_kr
-      | _ ->
-          let db_kr = Masterdb.find_title_opt db x.title in
-          update t x db_kr)
+let update_from_master_db orig_kr db =
+  match orig_kr.kind with
+  | Meta _ -> orig_kr
+  | Work orig_work -> (
+      let db_kr =
+        match orig_work.id with
+        | ID id -> Masterdb.find_kr_opt db id
+        | _ -> Masterdb.find_title_opt db orig_work.title
+      in
+      match db_kr with
+      | None ->
+          if orig_work.id = New_KR then
+            Log.warn (fun l ->
+                l "KR ID not found for new KR %S" orig_work.title);
+          orig_kr
+      | Some db_kr ->
+          if orig_work.id = No_KR then
+            Log.warn (fun l ->
+                l "KR ID updated from \"No KR\" to %S:\n- %S\n- %S" db_kr.id
+                  orig_work.title db_kr.title);
+          let work =
+            {
+              Work.id = ID db_kr.printable_id;
+              title = db_kr.title;
+              quarter = db_kr.quarter;
+            }
+          in
+          let kr =
+            { orig_kr with kind = Work work; objective = db_kr.objective }
+          in
+          (* show the warnings *)
+          ignore (merge orig_kr kr);
+          kr)
 
 let items ?(show_time = true) ?(show_time_calc = false) ?(show_engineers = true)
     kr =
