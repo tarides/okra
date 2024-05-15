@@ -31,6 +31,7 @@ val filter : t -> Okra.Filter.t
 val repo : t -> (string, [ `Msg of string ]) result
 val output : ?input_files:string list -> ?in_place:bool -> t -> out_channel
 val conf : t -> Conf.t
+val report_kind : t -> Okra.Parser.report_kind option
 
 (* sections *)
 

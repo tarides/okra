@@ -57,6 +57,7 @@ let run conf =
       Okra.Report.of_markdown ?existing_report
         ~ignore_sections:(Common.ignore_sections conf.c)
         ~include_sections:(Common.include_sections conf.c)
+        ?report_kind:(Common.report_kind conf.c)
         ?okr_db conf.md
     with e ->
       Logs.err (fun l ->

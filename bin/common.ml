@@ -173,13 +173,7 @@ let includes =
   let open Let_syntax_cmdliner in
   let+ include_sections = include_sections
   and+ ignore_sections = ignore_sections
-  and+ engineer_report = engineer_report
-  and+ team_report = team_report
   and+ include_teams = include_teams in
-  let include_sections =
-    if engineer_report then [ "Last week" ] else include_sections
-  in
-  let ignore_sections = if team_report then [] else ignore_sections in
   { include_sections; ignore_sections; include_teams }
 
 (* Calendar term *)
@@ -292,6 +286,7 @@ type t = {
   repo : string option;
   conf : Conf.t;
   check_time : Okra.Time.t option;
+  report_kind : Okra.Parser.report_kind option;
 }
 
 let setup () =
@@ -332,13 +327,17 @@ let term =
   and+ calendar = calendar
   and+ output = output
   and+ repo = repo
+  and+ team_report = team_report
   and+ engineer_report = engineer_report in
-  let check_time =
-    match Conf.work_days_in_a_week conf with
-    | Some f when engineer_report -> Some (Okra.Time.days f)
-    | _ when engineer_report -> Some (Okra.Time.days 5.)
-    | _ -> None
+  let report_kind =
+    match (team_report, engineer_report) with
+    | true, true ->
+        Fmt.invalid_arg "[--engineer] and [--team] are mutually exclusive."
+    | true, false -> Some Okra.Parser.Team
+    | false, true -> Some Okra.Parser.Engineer
+    | false, false -> None
   in
+  let check_time = Option.map Okra.Time.days (Conf.work_days_in_a_week conf) in
   {
     okr_db;
     filter;
@@ -350,6 +349,7 @@ let term =
     repo;
     okr_db_state = None;
     check_time;
+    report_kind;
   }
 
 let okr_db t =
@@ -417,6 +417,7 @@ let with_links t = t.printconf.links
 let with_description t = t.printconf.descriptions
 let conf t = t.conf
 let check_time t = t.check_time
+let report_kind t = t.report_kind
 
 let output ?(input_files = []) ?(in_place = false) t =
   match t.output with

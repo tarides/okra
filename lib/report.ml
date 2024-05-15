@@ -223,9 +223,11 @@ let pp_warning ppf = function
   | Invalid_markdown_in_work_items s ->
       Fmt.pf ppf "Invalid markdown in work items: %s" s
 
-let of_markdown ?existing_report ?ignore_sections ?include_sections ?okr_db m =
+let of_markdown ?existing_report ?ignore_sections ?include_sections ?okr_db
+    ?report_kind m =
+  let kind = Option.value report_kind ~default:Parser.default_report_kind in
   let new_krs, warnings =
-    Parser.of_markdown ?ignore_sections ?include_sections m
+    Parser.of_markdown ?ignore_sections ?include_sections kind m
   in
   List.iter
     (fun w -> Logs.warn (fun m -> m "@[<v 0>%a@]" pp_warning w))

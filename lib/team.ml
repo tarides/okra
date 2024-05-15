@@ -48,10 +48,7 @@ let lint_member_week admin_dir member ~week ~year =
         let ic = open_in fname in
         (* We lint week-by-week so we use the default options of the [engineer]
            mode. *)
-        match
-          Lint.lint ~include_sections:[ "Last week" ] ~ignore_sections:[] ic
-            ~check_time:(Time.days 5.) ~filename:fname
-        with
+        match Lint.lint ic ~report_kind:Engineer ~filename:fname with
         | Ok () -> Complete
         | Error e -> Not_lint e)
   in
@@ -177,9 +174,7 @@ let aggregate ?okr_db admin_dir ~year ~weeks teams =
   in
   let md = Omd.of_string content in
   let report =
-    try
-      Report.of_markdown ~ignore_sections:[] ~include_sections:[ "Last week" ]
-        ?okr_db md
+    try Report.of_markdown ~report_kind:Engineer ?okr_db md
     with e ->
       Printf.eprintf
         "An error ocurred while parsing the input file(s). Run `lint` for more \

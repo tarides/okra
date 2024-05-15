@@ -41,6 +41,7 @@ val of_markdown :
   ?ignore_sections:string list ->
   ?include_sections:string list ->
   ?okr_db:Masterdb.t ->
+  ?report_kind:Parser.report_kind ->
   Parser.markdown ->
   t
 

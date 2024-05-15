@@ -96,6 +96,7 @@ let run conf =
     Okra.Report.of_markdown
       ~ignore_sections:(Common.ignore_sections conf.c)
       ~include_sections:(Common.include_sections conf.c)
+      ?report_kind:(Common.report_kind conf.c)
       conf.md
   in
   let okrs = Okra.Filter.apply (Common.filter conf.c) okrs in

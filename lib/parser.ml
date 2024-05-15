@@ -38,6 +38,7 @@ type t =
   | Time of string
 
 type markdown = Omd.doc
+type report_kind = Engineer | Team
 
 let warnings : warning list ref = ref []
 let add_warning w = warnings := w :: !warnings
@@ -328,8 +329,19 @@ let check_includes u_includes (includes : string list) =
   in
   if missing = [] then () else err_missing_includes missing
 
-let of_markdown ?(ignore_sections = []) ?(include_sections = []) ast =
+let default_report_kind = Team
+
+let of_markdown ?(ignore_sections = []) ?(include_sections = []) report_kind ast
+    =
   warnings := [];
+  let include_sections =
+    match report_kind with
+    | Engineer -> [ "Last week" ]
+    | Team -> include_sections
+  in
+  let ignore_sections =
+    match report_kind with Engineer -> ignore_sections | Team -> []
+  in
   let u_ignore = List.map String.uppercase_ascii ignore_sections in
   let u_include = List.map String.uppercase_ascii include_sections in
   let state = init ~ignore_sections:u_ignore ~include_sections:u_include () in

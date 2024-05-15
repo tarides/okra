@@ -129,10 +129,11 @@ let add_context lines = function
   | Parser.Invalid_markdown_in_work_items s ->
       Invalid_markdown_in_work_items (grep_n s lines, s)
 
-let check_total_time ?check_time (krs : KR.t list) =
-  match check_time with
-  | None -> Ok ()
-  | Some expected ->
+let check_total_time ?check_time (krs : KR.t list) report_kind =
+  match report_kind with
+  | Parser.Team -> Ok ()
+  | Parser.Engineer ->
+      let expected = Option.value check_time ~default:(Time.days 5.) in
       let tbl = Hashtbl.create 7 in
       List.iter
         (fun (kr : KR.t) ->
@@ -172,18 +173,19 @@ let ( let* ) = Result.bind
 (* Parse document as a string to check for aggregation errors (assumes no
    formatting errors) *)
 let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
-    ~filename s =
+    ?report_kind ~filename s =
   let quarter = Quarter.of_filename ~filename in
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
   let md = Omd.of_string s in
+  let kind = Option.value report_kind ~default:Parser.default_report_kind in
   let okrs, warnings =
-    Parser.of_markdown ~include_sections ~ignore_sections md
+    Parser.of_markdown ~include_sections ~ignore_sections kind md
   in
   let warnings =
     let warnings = List.map (add_context lines) warnings in
-    match check_total_time ?check_time okrs with
+    match check_total_time ?check_time okrs kind with
     | Ok () -> warnings
     | Error w -> w :: warnings
   in
@@ -195,7 +197,7 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
   Ok ()
 
 let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time ~filename s =
+    ?check_time ?report_kind ~filename s =
   if !format_errors <> [] then
     Error
       [
@@ -204,10 +206,10 @@ let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
       ]
   else
     check_document ?okr_db ~include_sections ~ignore_sections ?check_time
-      ~filename s
+      ?report_kind ~filename s
 
 let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
-    ?check_time ~filename lines =
+    ?check_time ?report_kind ~filename lines =
   let format_errors = ref [] in
   let rec check_and_read buf pos = function
     | [] -> Buffer.contents buf
@@ -219,10 +221,10 @@ let lint_string_list ?okr_db ?(include_sections = []) ?(ignore_sections = [])
   in
   let s = check_and_read (Buffer.create 1024) 1 lines in
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time ~filename s
+    ?check_time ?report_kind ~filename s
 
 let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
-    ~filename ic =
+    ?report_kind ~filename ic =
   let format_errors = ref [] in
   let rec check_and_read buf ic pos =
     try
@@ -237,7 +239,7 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
   in
   let s = check_and_read (Buffer.create 1024) ic 1 in
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
-    ?check_time ~filename s
+    ?check_time ?report_kind ~filename s
 
 let short_messages_of_error file_name =
   let short_message line_number msg =

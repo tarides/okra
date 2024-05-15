@@ -32,6 +32,7 @@ let run conf =
     match
       Okra.Lint.lint ~filename:name ?okr_db:(Common.okr_db conf.c)
         ?check_time:(Common.check_time conf.c)
+        ?report_kind:(Common.report_kind conf.c)
         ~include_sections:(Common.include_sections conf.c)
         ~ignore_sections:(Common.ignore_sections conf.c)
         ic

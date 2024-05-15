@@ -32,9 +32,14 @@ type warning =
 type markdown = Omd.doc
 (** The type for markdown files. *)
 
+type report_kind = Engineer | Team
+
+val default_report_kind : report_kind
+
 val of_markdown :
   ?ignore_sections:string list ->
   ?include_sections:string list ->
+  report_kind ->
   markdown ->
   KR.t list * warning list
 (** Process markdown data from omd. Optionally [ignore_sections] can be used to

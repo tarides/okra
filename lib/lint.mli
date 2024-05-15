@@ -35,6 +35,7 @@ val lint :
   ?include_sections:string list ->
   ?ignore_sections:string list ->
   ?check_time:Time.t ->
+  ?report_kind:Parser.report_kind ->
   filename:string ->
   in_channel ->
   lint_result
@@ -44,6 +45,7 @@ val lint_string_list :
   ?include_sections:string list ->
   ?ignore_sections:string list ->
   ?check_time:Time.t ->
+  ?report_kind:Parser.report_kind ->
   filename:string ->
   string list ->
   lint_result
