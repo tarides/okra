@@ -8,7 +8,7 @@
 ### Added
 
 - Allow engineers to specify the number of working days (#232, @patricoferris)
-- Check that [--engineer] and [--team] are not both true (#<PR_NUMBER>, @gpetiot)
+- Check that [--engineer] and [--team] are not both true (#233, @gpetiot)
 
 ## 0.5.0
 
