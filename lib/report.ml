@@ -148,11 +148,7 @@ let add ?okr_db (t : t) (e : KR.t) =
     | Some db -> (
         match KR.update_from_master_db e db with
         | Ok x as result -> (result, x)
-        | Error
-            ( Not_found x
-            | Migrate_work_item x
-            | Migrate_work_item_to_objective (_, x) ) as result ->
-            (result, x))
+        | Error _ as result -> (result, e))
   in
   (* lookup an existing KR in the report *)
   let existing_kr =
