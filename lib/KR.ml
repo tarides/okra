@@ -397,9 +397,9 @@ let update_from_master_db orig_kr db =
                   (* Not found in objectives, found in WI db, has objective *)
                   | Some { printable_id = id; title; quarter; _ } ->
                       let work = { Work.id = ID id; title; quarter } in
-                      let objective = Some work in
                       let kr = { orig_kr with kind = Work work } in
-                      (kr, Some (Migration { work_item; objective })))))
+                      (kr, Some (Migration { work_item; objective = Some work }))
+                  )))
       | Some db_kr ->
           if orig_work.id = No_KR then
             Log.warn (fun l ->
