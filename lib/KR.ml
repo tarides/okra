@@ -362,13 +362,13 @@ type warning =
   | Objective_not_found of Work.t
   | Migration of { work_item : Work.t; objective : Work.t option }
 
-let update_from_master_db orig_kr (db : Masterdb.t) =
+let update_from_master_db orig_kr db =
   match orig_kr.kind with
   | Meta _ -> (orig_kr, None)
   | Work orig_work -> (
       let db_kr =
         match orig_work.id with
-        | ID id -> Masterdb.Objective.find_kr_opt db.objective_db id
+        | ID id -> Masterdb.Objective.find_kr_opt db.Masterdb.objective_db id
         | _ -> Masterdb.Objective.find_title_opt db.objective_db orig_work.title
       in
       match db_kr with
