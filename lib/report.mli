@@ -53,7 +53,7 @@ val iter :
   unit
 
 val find : t -> KR.Id.t -> KR.t list
-val add : ?okr_db:Masterdb.t -> t -> KR.t -> (KR.t, KR.warning) result
+val add : ?okr_db:Masterdb.t -> t -> KR.t -> KR.warning option
 val all_krs : t -> KR.t list
 
 val pp :

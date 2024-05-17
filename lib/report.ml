@@ -142,13 +142,10 @@ let remove (t : t) (e : KR.t) =
 let add ?okr_db (t : t) (e : KR.t) =
   Log.debug (fun l -> l "Report.add %a %a" dump t KR.dump e);
   (* replace [e] fields with master db lookup if possible *)
-  let lookup_result, e =
+  let e, lookup_warning =
     match okr_db with
-    | None -> (Ok e, e (* no db *))
-    | Some db -> (
-        match KR.update_from_master_db e db with
-        | Ok x as result -> (result, x)
-        | Error _ as result -> (result, e))
+    | None -> (e, None)
+    | Some db -> KR.update_from_master_db e db
   in
   (* lookup an existing KR in the report *)
   let existing_kr =
@@ -205,18 +202,13 @@ let add ?okr_db (t : t) (e : KR.t) =
   update t.all_krs;
   (* update [objectives] and [projects] lists *)
   update o.krs;
-  lookup_result
+  lookup_warning
 
 let empty () = { projects = Hashtbl.create 13; all_krs = empty_krs () }
 
 let of_krs ?okr_db entries =
   let t = empty () in
-  let warnings =
-    List.fold_left
-      (fun acc kr ->
-        match add ?okr_db t kr with Ok _ -> acc | Error e -> e :: acc)
-      [] entries
-  in
+  let warnings = List.rev @@ List.filter_map (add ?okr_db t) entries in
   (t, warnings)
 
 let pp_warning ppf = function

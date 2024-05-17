@@ -101,7 +101,7 @@ type warning =
       (** For retro-compatibility only.
           This case should be removed once everything has migrated to objectives. *)
 
-val update_from_master_db : t -> Masterdb.t -> (t, warning) result
+val update_from_master_db : t -> Masterdb.t -> t * warning option
 
 (** {2 Pretty-print} *)
 
