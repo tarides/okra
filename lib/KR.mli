@@ -95,13 +95,6 @@ val merge : t -> t -> t
 val compare : t -> t -> int
 val update_from_master_db : t -> Masterdb.t -> t * warning option
 
-(** Functions in this module can raise exceptions.
-    Use at your own risk. *)
-module Unsafe : sig
-  val to_work : t -> Work.t
-  (** @raise Invalid_argument if the argument kind is of type [Meta.t]. *)
-end
-
 (** {2 Pretty-print} *)
 
 val items :

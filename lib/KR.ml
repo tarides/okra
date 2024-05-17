@@ -442,11 +442,3 @@ let items ?(show_time = true) ?(show_time_calc = false) ?(show_engineers = true)
           ];
         ] );
   ]
-
-module Unsafe = struct
-  let to_work x =
-    match x.kind with
-    | Work w -> w
-    | Meta m ->
-        Fmt.invalid_arg "Unsafe.to_work %a: expected a Work Item" Meta.pp m
-end
