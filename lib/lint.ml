@@ -29,11 +29,7 @@ type lint_error =
   | Not_all_includes of string list
   | Invalid_markdown_in_work_items of int option * string
   | Invalid_quarter of KR.Work.t
-  | Invalid_objective of KR.t
-  | Invalid_objective_but_work_item of {
-      work_item : KR.t;
-      objective : KR.t option;
-    }
+  | Invalid_objective of KR.warning
 
 type lint_result = (unit, lint_error list) result
 
@@ -105,22 +101,20 @@ let pp_error ppf = function
   | Invalid_quarter kr ->
       Fmt.pf ppf "@[<hv 2>In WI %S:@ Work logged on WI scheduled for %a@]@,"
         kr.title (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective x ->
-      let x = KR.Unsafe.to_work x in
-      Fmt.pf ppf "@[<hv 2>Invalid objective:@ %S@]@," x.title
-  | Invalid_objective_but_work_item { work_item; objective = None } ->
-      let wi = KR.Unsafe.to_work work_item in
-      Fmt.pf ppf
-        "@[<hv 2>Invalid objective:@ %S is a work-item, you should use an \
-         objective instead@]@,"
-        wi.title
-  | Invalid_objective_but_work_item { work_item; objective = Some objective } ->
-      let wi = KR.Unsafe.to_work work_item in
-      let obj = KR.Unsafe.to_work objective in
-      Fmt.pf ppf
-        "@[<hv 2>Invalid objective:@ %S is a work-item, you should use its \
-         parent objective %S instead@]@,"
-        wi.title obj.title
+  | Invalid_objective w -> (
+      match w with
+      | Objective_not_found x ->
+          Fmt.pf ppf "@[<hv 2>Invalid objective:@ %S@]@," x.title
+      | Migration { work_item; objective = None } ->
+          Fmt.pf ppf
+            "@[<hv 2>Invalid objective:@ %S is a work-item, you should use an \
+             objective instead@]@,"
+            work_item.title
+      | Migration { work_item; objective = Some obj } ->
+          Fmt.pf ppf
+            "@[<hv 2>Invalid objective:@ %S is a work-item, you should use its \
+             parent objective %S instead@]@,"
+            work_item.title obj.title)
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -214,16 +208,7 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
   let report, report_warnings = Report.of_krs ?okr_db okrs in
   let warnings =
     List.fold_left
-      (fun acc w ->
-        match w with
-        | KR.Not_found x -> Invalid_objective x :: acc
-        | Migrate_work_item x ->
-            Invalid_objective_but_work_item { work_item = x; objective = None }
-            :: acc
-        | Migrate_work_item_to_objective (x, y) ->
-            Invalid_objective_but_work_item
-              { work_item = x; objective = Some y }
-            :: acc)
+      (fun acc w -> Invalid_objective w :: acc)
       warnings report_warnings
   in
   let* () = maybe_emit warnings in
@@ -312,19 +297,17 @@ let short_messages_of_error file_name =
   | Invalid_quarter kr ->
       short_messagef None "Using KR of invalid quarter: %S (%a)" kr.title
         (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective x ->
-      let x = KR.Unsafe.to_work x in
-      short_messagef None "Invalid objective: %S" x.title
-  | Invalid_objective_but_work_item { work_item; objective = None } ->
-      let wi = KR.Unsafe.to_work work_item in
-      short_messagef None
-        "Invalid objective:@ %S is a work-item, an objective should be used \
-         instead"
-        wi.title
-  | Invalid_objective_but_work_item { work_item; objective = Some objective } ->
-      let wi = KR.Unsafe.to_work work_item in
-      let obj = KR.Unsafe.to_work objective in
-      short_messagef None
-        "Invalid objective:@ %S is a work-item, its parent objective %S should \
-         be used instead"
-        wi.title obj.title
+  | Invalid_objective w -> (
+      match w with
+      | Objective_not_found x ->
+          short_messagef None "Invalid objective: %S" x.title
+      | Migration { work_item; objective = None } ->
+          short_messagef None
+            "Invalid objective:@ %S is a work-item, an objective should be \
+             used instead"
+            work_item.title
+      | Migration { work_item; objective = Some obj } ->
+          short_messagef None
+            "Invalid objective:@ %S is a work-item, its parent objective %S \
+             should be used instead"
+            work_item.title obj.title)

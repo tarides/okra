@@ -95,12 +95,13 @@ module Unsafe : sig
   (** @raise Invalid_argument if the argument kind is of type [Meta.t]. *)
 end
 
-type kr_lookup_error =
-  | Not_found of t
-  | Migrate_work_item of t
-  | Migrate_work_item_to_objective of t * t
+type warning =
+  | Objective_not_found of Work.t
+  | Migration of { work_item : Work.t; objective : Work.t option }
+      (** For retro-compatibility only.
+          This case should be removed once everything has migrated to objectives. *)
 
-val update_from_master_db : t -> Masterdb.t -> (t, kr_lookup_error) result
+val update_from_master_db : t -> Masterdb.t -> (t, warning) result
 
 (** {2 Pretty-print} *)
 

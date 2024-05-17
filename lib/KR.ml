@@ -358,10 +358,9 @@ let make_time_entries t =
   let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
-type kr_lookup_error =
-  | Not_found of t
-  | Migrate_work_item of t
-  | Migrate_work_item_to_objective of t * t
+type warning =
+  | Objective_not_found of Work.t
+  | Migration of { work_item : Work.t; objective : Work.t option }
 
 let update_from_master_db orig_kr (db : Masterdb.t) =
   match orig_kr.kind with
@@ -378,28 +377,28 @@ let update_from_master_db orig_kr (db : Masterdb.t) =
             Log.warn (fun l ->
                 l "KR ID not found for new KR %S" orig_work.title);
           match db.work_item_db with
-          | None -> Ok orig_kr
+          (* Not found in objectives, no WI database *)
+          | None -> Error (Objective_not_found orig_work)
           | Some work_item_db -> (
               match
                 Masterdb.Work_item.find_title_opt work_item_db orig_work.title
               with
-              | None -> Error (Not_found orig_kr)
-              | Some work_item_kr -> (
-                  match
-                    Masterdb.Objective.find_title_opt db.objective_db
-                      work_item_kr.objective
-                  with
-                  | None -> Error (Migrate_work_item orig_kr)
-                  | Some objective_kr ->
-                      let work =
-                        {
-                          Work.id = ID objective_kr.printable_id;
-                          title = objective_kr.title;
-                          quarter = objective_kr.quarter;
-                        }
-                      in
-                      let kr = { orig_kr with kind = Work work } in
-                      Error (Migrate_work_item_to_objective (orig_kr, kr)))))
+              (* Not found in objectives, not found in workitems *)
+              | None -> Error (Objective_not_found orig_work)
+              | Some work_item_kr ->
+                  let work_item = orig_work in
+                  let objective =
+                    match
+                      Masterdb.Objective.find_title_opt db.objective_db
+                        work_item_kr.objective
+                    with
+                    (* Not found in objectives, found in WI db, no objective *)
+                    | None -> None
+                    (* Not found in objectives, found in WI db, has objective *)
+                    | Some { printable_id = id; title; quarter; _ } ->
+                        Some { Work.id = ID id; title; quarter }
+                  in
+                  Error (Migration { work_item; objective })))
       | Some db_kr ->
           if orig_work.id = No_KR then
             Log.warn (fun l ->
