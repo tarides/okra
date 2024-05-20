@@ -12,7 +12,7 @@ Table of contents
 
 ### Aggregating engineer reports
 
-`okra cat` can be used to aggregate weekly engineer or team reports in a single report. The tool will attempt to group data by project, objective and KR if these match.
+`okra cat` can be used to aggregate weekly engineer or team reports in a single report. The tool will attempt to group data by project and objective if these match.
 
 The code reads data from stdin, aggregates per KR and outputs the result.
 
@@ -47,7 +47,7 @@ $ cat report.md report2.md | okra cat --engineer --show-time-calc=true
     ...
 ```
 
-Several other options are available for modifying the output format, see `okra cat --help` for details. For example, only specific KRs can be included with `--include-krs=123`. Time can optionally be removed with `--show-time=false`. Sections can be ignored and removed from the final output using `--ignore-sections`.
+Several other options are available for modifying the output format, see `okra cat --help` for details. For example, only specific objectives can be included with `--include-krs=123`. Time can optionally be removed with `--show-time=false`. Sections can be ignored and removed from the final output using `--ignore-sections`.
 
 ### Aggregating team reports
 

@@ -27,7 +27,7 @@ autocmd BufRead,BufNewFile ~/src/weekly-reports/* let g:syntastic_markdown_check
 
 ## Workitem name completion
 
-While not strictly related to `okra` it can be handy to complete workitem names from a
+While not strictly related to `okra` it can be handy to complete objective names from a
 fixed list.
 
 To do so it is possible to rely on the `fzf.vim` plugin:
@@ -37,14 +37,14 @@ To do so it is possible to rely on the `fzf.vim` plugin:
 Plug 'junegunn/fzf.vim'
 
 " Later
-inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /path/to/.okrs')
+inoremap <expr> <c-x><c-k> fzf#vim#complete('cat /path/to/.objectives')
 ```
 
-And create a file at `/path/to/.okrs` with one line per workitem, for example:
+And create a file at `/path/to/.objectives` with one line per objective, for example:
 
 ```
-- libsomething supports Windows (Some1)
-- program P is integrated with dune (P12)
+- libsomething supports Windows (#101)
+- program P is integrated with dune (#102)
 ```
 
 Now when in insert mode, <kbd>Ctrl</kbd>+<kbd>X</kbd> followed by

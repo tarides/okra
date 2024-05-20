@@ -17,22 +17,22 @@ Engineer reports should be in the following format. Only a section called `Last 
 ```
 # Last week
 
-- My workitem (#123)
+- My objective (#123)
   - @engineer1 (1 day)
-  - Work item 1
+  - Some work
 
 # Notes
 ...
 ```
 
 There are a few rules:
-- Each workitem needs an ID (you can refer to the workitem database, or use "New ID" or "No ID" if you don't know the ID)
+- Each objective needs an ID (you can refer to the objective database, or use "New ID" or "No ID" if you don't know the ID)
 - The total time reported must be 5 days (time off or partial work time must be reported)
 - The time must be reported in multiples of 0.5 days
 
 ### Non-engineering work time
 
-Special workitems can be used to report the following activities:
+Special objectives can be used to report the following activities:
 - `Community`: Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
 - `Hack`: Hacking Days
 - `Learning`: Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
@@ -67,20 +67,20 @@ By default the repository report does not contain author names, time of creation
 
 ## Team activity report
 
-The expected team report format is similar, but here every section is parsed and multiple engineers may have worked on each workitem.
+The expected team report format is similar, but here every section is parsed and multiple engineers may have worked on each objective.
 
-```
+```md
 # Project
 
 ## Objective
 
-- My workitem (#123)
+- My objective (#123)
   - @engineer1 (1 day), @engineer2 (2 days)
-  - work item 1
+  - item 1
     - subitem
-  - work item 2
+  - item 2
 ```
 
-If the workitem hasn't been created yet, "new KR" is recognised by the parser as a placeholder and can be used instead. If a workitem of the same name is found in the database, they will be combined.
+If the objective hasn't been created yet, "new KR" is recognised by the parser as a placeholder and can be used instead. If an objective of the same name is found in the database, they will be combined.
 
-The `okra cat` command can be used to aggregate multiple engineer reports into one team report grouped by workitem.
+The `okra cat` command can be used to aggregate multiple engineer reports into one team report grouped by objective.
