@@ -51,12 +51,11 @@ This weekly is using objectives:
   >   - This is an objective
   > 
   > - Improve OCaml experience on Windows (#677)
-  >   - @eng (1 days)
+  >   - @eng2 (1 day)
   >   - This is an objective
   > 
   > - Leave
   >   - @eng2 (2 days)
-  > 
   > EOF
 
   $ cat eng1.md eng2.md | okra cat -C admin --engineer
@@ -72,7 +71,7 @@ This weekly is using objectives:
     - This is an objective
   
   - Improve OCaml experience on Windows (#677)
-    - @eng (1 day)
+    - @eng2 (1 day)
     - This is an objective
   
   - Leave

@@ -127,3 +127,72 @@ The result of aggregate should pass the lint
 
   $ cat aggr.md | okra lint
   [OK]: <stdin>
+
+We used to report on workitems and now we use objectives.
+
+During the transition, using workitems makes the linting fail
+and the error message points to the corresponding objective.
+
+  $ mkdir -p xxx/data
+  $ cp db.csv xxx/data
+  $ cat > xxx/data/team-objectives.csv << EOF
+  > "id","title","status","quarter","team","pillar","objective","funder","labels","progress"
+  > "#558","Property-Based Testing for Multicore","In Progress","Q2 2024","Compiler & Language","Compiler","","","Proposal",""
+  > "#677","Improve OCaml experience on Windows","Todo","Q2 2024","Multicore applications","Ecosystem","","","",""
+  > "#701","JSOO Effect Performance","","Q2 2024","Compiler & Language","Compiler","","","focus/technology,level/team",""
+  > EOF
+
+This weekly is using using workitems:
+
+  $ mkdir -p xxx/weekly/2024/01
+  $ cat > xxx/weekly/2024/01/eng1.md << EOF
+  > # Last Week
+  > 
+  > - Property-Based Testing for Multicore (#1090)
+  >   - @eng1 (2 days)
+  >   - This is a workitem with a parent objective in the DB
+  > 
+  > - Application and Operational Metrics (#1058)
+  >   - @eng1 (1 day)
+  >   - This is a workitem with no parent objective in the DB
+  > 
+  > - Leave
+  >   - @eng1 (2 days)
+  > EOF
+
+This weekly is using objectives:
+
+  $ mkdir -p xxx/weekly/2024/02
+  $ cat > xxx/weekly/2024/02/eng2.md << EOF
+  > # Last Week
+  > 
+  > - Property-Based Testing for Multicore (#558)
+  >   - @eng2 (2 days)
+  >   - This is an objective
+  > 
+  > - Improve OCaml experience on Windows (#677)
+  >   - @eng2 (1 day)
+  >   - This is an objective
+  > 
+  > - Leave
+  >   - @eng2 (2 days)
+  > EOF
+
+  $ okra team aggregate -C xxx -y 2024 -w 01-02 --conf conf.yml
+  # Last Week
+  
+  - Application and Operational Metrics (#1058)
+    - @eng1 (1 day)
+    - This is a workitem with no parent objective in the DB
+  
+  - Property-Based Testing for Multicore (#558)
+    - @eng1 (2 days), @eng2 (2 days)
+    - This is a workitem with a parent objective in the DB
+    - This is an objective
+  
+  - Improve OCaml experience on Windows (#677)
+    - @eng2 (1 day)
+    - This is an objective
+  
+  - Leave
+    - @eng1 (2 days), @eng2 (2 days)
