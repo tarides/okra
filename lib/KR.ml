@@ -50,6 +50,41 @@ module Meta = struct
 
   let compare x y =
     String.compare (Fmt.to_to_string pp x) (Fmt.to_to_string pp y)
+
+  let pp_template ~username ppf () =
+    let pp_user = User.pp ~with_link:false in
+    Fmt.pf ppf
+      {|
+- Leave
+  - %a (0 days)
+  - Any kind of leaves, holidays, time off from work, incl 2-week Aug company break
+
+- Community
+  - %a (0 days)
+  - Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
+
+- Hack
+  - %a (0 days)
+  - Hacking Days
+
+- Learning
+  - %a (0 days)
+  - Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
+
+- Management
+  - %a (0 days)
+  - TL and EM work other than meetings
+
+- Meet
+  - %a (0 days)
+  - Meetings, Offsite
+
+- Onboard
+  - %a (0 days)
+  - Onboarding time
+|}
+      pp_user username pp_user username pp_user username pp_user username
+      pp_user username pp_user username pp_user username
 end
 
 module Work = struct

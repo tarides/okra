@@ -21,6 +21,7 @@ module Meta : sig
 
   val pp : t Fmt.t
   val compare : t -> t -> int
+  val pp_template : username:string -> Format.formatter -> unit -> unit
 end
 
 module Work : sig

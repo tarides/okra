@@ -9,6 +9,7 @@
 
 - Allow engineers to specify the number of working days (#232, @patricoferris)
 - Check that [--engineer] and [--team] are not both true (#233, @gpetiot)
+- Gen: add example entries for standardized categories (#<PR_NUMBER>, @gpetiot)
 
 ## 0.5.0
 

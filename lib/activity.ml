@@ -186,14 +186,18 @@ let pp_projects ~print_projects ppf projects =
 let pp ?(gitlab = false) ?(no_links = false) ~print_projects () ppf
     { projects; activity = { username; activity } } =
   pp_projects ~print_projects ppf projects;
-  Fmt.pf ppf {|# Last Week
+  Fmt.pf ppf
+    {|# Last Week
 
+%a
 %a
 # Activity (move these items to last week)
 
 %a
 |}
     (pp_last_week username) projects
+    (KR.Meta.pp_template ~username)
+    ()
     (pp_activity ~gitlab ~no_links ())
     activity
 
