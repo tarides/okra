@@ -107,14 +107,14 @@ let pp_error ppf = function
           Fmt.pf ppf "@[<hv 2>Invalid objective:@ %S@]@," x.title
       | Migration { work_item; objective = None } ->
           Fmt.pf ppf
-            "@[<hv 2>Invalid objective:@ %S is a work-item, you should use an \
-             objective instead@]@,"
-            work_item.title
+            "@[<hv 2>Invalid objective:@ \"%a\" is a work-item, you should use \
+             an objective instead@]@,"
+            KR.Work.pp work_item
       | Migration { work_item; objective = Some obj } ->
           Fmt.pf ppf
-            "@[<hv 2>Invalid objective:@ %S is a work-item, you should use its \
-             parent objective %S instead@]@,"
-            work_item.title obj.title)
+            "@[<hv 2>Invalid objective:@ \"%a\" is a work-item, you should use \
+             its parent objective \"%a\" instead@]@,"
+            KR.Work.pp work_item KR.Work.pp obj)
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -303,11 +303,11 @@ let short_messages_of_error file_name =
           short_messagef None "Invalid objective: %S" x.title
       | Migration { work_item; objective = None } ->
           short_messagef None
-            "Invalid objective:@ %S is a work-item, an objective should be \
+            "Invalid objective:@ \"%a\" is a work-item, an objective should be \
              used instead"
-            work_item.title
+            KR.Work.pp work_item
       | Migration { work_item; objective = Some obj } ->
           short_messagef None
-            "Invalid objective:@ %S is a work-item, its parent objective %S \
-             should be used instead"
-            work_item.title obj.title)
+            "Invalid objective:@ \"%a\" is a work-item, its parent objective \
+             \"%a\" should be used instead"
+            KR.Work.pp work_item KR.Work.pp obj)

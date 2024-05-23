@@ -43,6 +43,7 @@ module Work : sig
   type t = { id : Id.t; title : string; quarter : Quarter.t option }
 
   val v : title:string -> id:Id.t -> quarter:Quarter.t option -> t
+  val pp : t Fmt.t
 end
 
 (** For type [t]. *)

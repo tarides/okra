@@ -55,9 +55,9 @@ and the error message points to the corresponding objective.
   [ERROR(S)]: weekly.md
   
   Invalid objective:
-    "General okra maintenance" is a work-item, you should use an objective instead
+    "General okra maintenance (#1115)" is a work-item, you should use an objective instead
   [ERROR(S)]: weekly.md
   
   Invalid objective:
-    "Property-Based Testing for Multicore" is a work-item, you should use its parent objective "Property-Based Testing for Multicore" instead
+    "Property-Based Testing for Multicore (#1090)" is a work-item, you should use its parent objective "Property-Based Testing for Multicore (#558)" instead
   [1]

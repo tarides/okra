@@ -93,7 +93,7 @@ $ okra lint -C admin -e old_weekly.md
 [ERROR(S)]: old_weekly.md
   
 Invalid objective:
-  "Workitem you have been using" is a work-item, you should use its parent objective "Objective you should use now" instead
+  "Workitem you have been using (#1090)" is a work-item, you should use its parent objective "Objective you should use now (#558)" instead
 [1]
 ```
 

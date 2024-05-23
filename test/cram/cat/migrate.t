@@ -96,7 +96,7 @@ Linting of the original file fails because we used workitems
   [ERROR(S)]: eng1.workitems.md
   
   Invalid objective:
-    "Property-Based Testing for Multicore" is a work-item, you should use its parent objective "Property-Based Testing for Multicore" instead
+    "Property-Based Testing for Multicore (#1090)" is a work-item, you should use its parent objective "Property-Based Testing for Multicore (#558)" instead
   [1]
 
 We rewrite the file using okra cat
