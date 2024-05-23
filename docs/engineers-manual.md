@@ -4,6 +4,7 @@ Table of contents
 - [Generating a report](#generating-a-report)
   - [Configuration](#configuration)
 - [Linting your weekly report](#linting-your-weekly-report)
+- [Rewriting your workitems into objectives with okra cat](#rewriting-your-workitems-into-objectives-with-okra-cat)
 
 ## Generating a report
 
@@ -69,3 +70,52 @@ okra lint --engineer -C /path/to/admin/ report.md
 Do not forget the `--engineer` (or `-e` for short) flag, otherwise your report will be considered as a team report and it will return errors (mostly because `okra` will then check every section of your report).
 
 The expected format of engineer reports is presented [here](report-formats.md#engineer-report)
+
+## Rewriting your workitems into objectives with okra cat
+
+Let's suppose you have the following weekly report:
+
+```md
+# Last Week
+
+- Workitem you have been using (#1090)
+  - @jack (3 days)
+  - Some work you did
+
+- Leave
+  - @eng1 (2 days)
+```
+
+Linting of the original file fails because we used workitems:
+
+```sh
+$ okra lint -C admin -e old_weekly.md
+[ERROR(S)]: old_weekly.md
+  
+Invalid objective:
+  "Workitem you have been using" is a work-item, you should use its parent objective "Objective you should use now" instead
+[1]
+```
+
+We use `okra cat` to automatically rewrite the report using the objectives:
+
+```sh
+$ okra cat -C /path/to/admin -e old_weekly.md -o new_weekly.md
+```
+```md
+# Last Week
+  
+- Property-Based Testing for Multicore (#558)
+  - @eng1 (3 days)
+  - This is a workitem with a parent objective in the DB
+  
+- Leave
+  - @eng1 (2 days)
+```
+
+Linting of the produced file succeeds because we now use objectives:
+
+```sh
+$ okra lint -C admin -e new_weekly.md
+[OK]: new_weekly.md
+```

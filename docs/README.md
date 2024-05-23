@@ -5,6 +5,7 @@ Table of contents
   - [Generating a report](engineers-manual.md#generating-a-report)
     - [Configuration](engineers-manual.md#configuration)
   - [Linting your weekly report](engineers-manual.md#linting-your-weekly-report)
+  - [Rewriting your workitems into objectives with okra cat](#rewriting-your-workitems-into-objectives-with-okra-cat)
 - [Team Lead's Manual](team-leads-manual.md)
   - [Aggregating reports](team-leads-manual.md#aggregating-reports)
     - [Aggregating engineer reports](team-leads-manual.md#aggregating-engineer-reports)
