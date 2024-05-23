@@ -83,6 +83,16 @@ module Warning = struct
         Fmt.pf ppf "Missing includes section: %s" (String.concat ", " l)
     | Invalid_markdown_in_work_items s ->
         Fmt.pf ppf "Invalid markdown in work items: %s" s
+
+  let greppable = function
+    | No_time_found s -> Some (Fmt.str "%a" KR.Heading.pp s)
+    | Invalid_time { kr = _; entry } -> Some entry
+    | Multiple_time_entries s -> Some (Fmt.str "%a" KR.Heading.pp s)
+    | No_work_found s -> Some (Fmt.str "%a" KR.Heading.pp s)
+    | No_KR_ID_found s -> Some s
+    | No_project_found s -> Some (Fmt.str "%a" KR.Heading.pp s)
+    | Not_all_includes_accounted_for _ -> None
+    | Invalid_markdown_in_work_items s -> Some s
 end
 
 (* Types for parsing the AST *)

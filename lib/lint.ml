@@ -81,25 +81,13 @@ let grep_n s lines =
     (fun (i, line) -> if Str.string_match re line 0 then Some i else None)
     lines
 
-let lines_of_kr s lines = grep_n (Fmt.str "%a" KR.Heading.pp s) lines
-
-let add_context lines = function
-  | Parser.Warning.No_time_found s ->
-      Parsing_error (lines_of_kr s lines, No_time_found s)
-  | Parser.Warning.Invalid_time { kr; entry } ->
-      Parsing_error (grep_n entry lines, Invalid_time { kr; entry })
-  | Parser.Warning.Multiple_time_entries s ->
-      Parsing_error (lines_of_kr s lines, Multiple_time_entries s)
-  | Parser.Warning.No_work_found s ->
-      Parsing_error (lines_of_kr s lines, No_work_found s)
-  | Parser.Warning.No_KR_ID_found s ->
-      Parsing_error (grep_n s lines, No_KR_ID_found s)
-  | Parser.Warning.No_project_found s ->
-      Parsing_error (lines_of_kr s lines, No_project_found s)
-  | Parser.Warning.Not_all_includes_accounted_for s ->
-      Parsing_error (None, Not_all_includes_accounted_for s)
-  | Parser.Warning.Invalid_markdown_in_work_items s ->
-      Parsing_error (grep_n s lines, Invalid_markdown_in_work_items s)
+let add_context lines w =
+  let line_number =
+    match Parser.Warning.greppable w with
+    | Some s -> grep_n s lines
+    | None -> None
+  in
+  Parsing_error (line_number, w)
 
 let check_total_time ?check_time (krs : KR.t list) report_kind =
   match report_kind with

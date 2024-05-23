@@ -33,6 +33,7 @@ module Warning : sig
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
+  val greppable : t -> string option
 end
 
 type markdown = Omd.doc
