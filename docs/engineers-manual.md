@@ -105,9 +105,9 @@ $ okra cat -C /path/to/admin -e old_weekly.md -o new_weekly.md
 ```md
 # Last Week
   
-- Property-Based Testing for Multicore (#558)
+- Objective you should use now (#558)
   - @jack (3 days)
-  - This is a workitem with a parent objective in the DB
+  - Some work you did
   
 - Leave
   - @jack (2 days)
