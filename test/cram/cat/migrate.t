@@ -76,3 +76,43 @@ This weekly is using objectives:
   
   - Leave
     - @eng1 (2 days), @eng2 (2 days)
+
+# Automatic update of weekly using okra cat
+
+  $ cat > eng1.workitems.md << EOF
+  > # Last Week
+  > 
+  > - Property-Based Testing for Multicore (#1090)
+  >   - @eng1 (3 days)
+  >   - This is a workitem with a parent objective in the DB
+  > 
+  > - Leave
+  >   - @eng1 (2 days)
+  > EOF
+
+Linting of the original file fails because we used workitems
+
+  $ okra lint -e -C admin eng1.workitems.md
+  [ERROR(S)]: eng1.workitems.md
+  
+  Invalid objective:
+    "Property-Based Testing for Multicore" is a work-item, you should use its parent objective "Property-Based Testing for Multicore" instead
+  [1]
+
+We rewrite the file using okra cat
+
+  $ okra cat -e -C admin eng1.workitems.md -o eng1.objectives.md
+  $ cat eng1.objectives.md
+  # Last Week
+  
+  - Property-Based Testing for Multicore (#558)
+    - @eng1 (3 days)
+    - This is a workitem with a parent objective in the DB
+  
+  - Leave
+    - @eng1 (2 days)
+
+Linting of the produced file succeeds because we now use objectives
+
+  $ okra lint -e -C admin eng1.objectives.md
+  [OK]: eng1.objectives.md
