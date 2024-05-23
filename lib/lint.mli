@@ -20,7 +20,7 @@ type lint_error =
   | Parsing_error of int option * Parser.Warning.t
   | Invalid_total_time of string * Time.t * Time.t
   | Invalid_quarter of KR.Work.t
-  | Invalid_objective of KR.warning
+  | Invalid_objective of KR.Warning.t
 
 type lint_result = (unit, lint_error list) result
 

@@ -358,9 +358,37 @@ let make_time_entries t =
   let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
-type warning =
-  | Objective_not_found of Work.t
-  | Migration of { work_item : Work.t; objective : Work.t option }
+module Warning = struct
+  type t =
+    | Objective_not_found of Work.t
+    | Migration of { work_item : Work.t; objective : Work.t option }
+
+  let pp ppf = function
+    | Objective_not_found x -> Fmt.pf ppf "Invalid objective:@ %S" x.title
+    | Migration { work_item; objective = None } ->
+        Fmt.pf ppf
+          "Invalid objective:@ \"%a\" is a work-item, you should use an \
+           objective instead"
+          Work.pp work_item
+    | Migration { work_item; objective = Some obj } ->
+        Fmt.pf ppf
+          "Invalid objective:@ \"%a\" is a work-item, you should use its \
+           parent objective \"%a\" instead"
+          Work.pp work_item Work.pp obj
+
+  let pp_short ppf = function
+    | Objective_not_found x -> Fmt.pf ppf "Invalid objective: %S" x.title
+    | Migration { work_item; objective = None } ->
+        Fmt.pf ppf
+          "Invalid objective:@ \"%a\" is a work-item, an objective should be \
+           used instead"
+          Work.pp work_item
+    | Migration { work_item; objective = Some obj } ->
+        Fmt.pf ppf
+          "Invalid objective:@ \"%a\" is a work-item, its parent objective \
+           \"%a\" should be used instead"
+          Work.pp work_item Work.pp obj
+end
 
 let update_from_master_db orig_kr db =
   match orig_kr.kind with
@@ -378,7 +406,7 @@ let update_from_master_db orig_kr db =
                 l "KR ID not found for new KR %S" orig_work.title);
           match db.work_item_db with
           (* Not found in objectives, no WI database *)
-          | None -> (orig_kr, Some (Objective_not_found orig_work))
+          | None -> (orig_kr, Some (Warning.Objective_not_found orig_work))
           | Some work_item_db -> (
               match
                 Masterdb.Work_item.find_title_opt work_item_db orig_work.title

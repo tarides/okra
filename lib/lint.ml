@@ -22,7 +22,7 @@ type lint_error =
   | Parsing_error of int option * Parser.Warning.t
   | Invalid_total_time of string * Time.t * Time.t
   | Invalid_quarter of KR.Work.t
-  | Invalid_objective of KR.warning
+  | Invalid_objective of KR.Warning.t
 
 type lint_result = (unit, lint_error list) result
 
@@ -63,20 +63,7 @@ let pp_error ppf = function
         "@[<hv 2>In objective \"%a\":@ Work logged on objective scheduled for \
          %a@]@,"
         KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective w -> (
-      match w with
-      | Objective_not_found x ->
-          Fmt.pf ppf "@[<hv 2>Invalid objective:@ %S@]@," x.title
-      | Migration { work_item; objective = None } ->
-          Fmt.pf ppf
-            "@[<hv 2>Invalid objective:@ \"%a\" is a work-item, you should use \
-             an objective instead@]@,"
-            KR.Work.pp work_item
-      | Migration { work_item; objective = Some obj } ->
-          Fmt.pf ppf
-            "@[<hv 2>Invalid objective:@ \"%a\" is a work-item, you should use \
-             its parent objective \"%a\" instead@]@,"
-            KR.Work.pp work_item KR.Work.pp obj)
+  | Invalid_objective w -> Fmt.pf ppf "@[<hv 2>%a@]@," KR.Warning.pp w
 
 let string_of_error = Fmt.to_to_string pp_error
 
@@ -253,17 +240,4 @@ let short_messages_of_error file_name =
   | Invalid_quarter kr ->
       short_messagef None "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp
         kr (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective w -> (
-      match w with
-      | Objective_not_found x ->
-          short_messagef None "Invalid objective: %S" x.title
-      | Migration { work_item; objective = None } ->
-          short_messagef None
-            "Invalid objective:@ \"%a\" is a work-item, an objective should be \
-             used instead"
-            KR.Work.pp work_item
-      | Migration { work_item; objective = Some obj } ->
-          short_messagef None
-            "Invalid objective:@ \"%a\" is a work-item, its parent objective \
-             \"%a\" should be used instead"
-            KR.Work.pp work_item KR.Work.pp obj)
+  | Invalid_objective w -> short_messagef None "%a" KR.Warning.pp_short w
