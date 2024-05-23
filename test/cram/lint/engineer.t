@@ -62,12 +62,12 @@ Errors in include section are detected even if the rest is ignored.
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No time entry found. Each KR must be followed by '- @... (x days)'
+  In objective "This is a KR":
+    No time entry found. Each objective must be followed by '- @... (x days)'
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  In objective "This is a KR":
+    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
 Only "No KR" and "New KR" are supported for KR's without identifiers
@@ -95,8 +95,8 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   Invalid total time found for eng1 (reported 1 day, expected 5 days).
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  In objective "This is a KR":
+    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
   $ okra lint --engineer << EOF
@@ -119,7 +119,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KR1)":
+  In objective "This is a KR (KR1)":
     Invalid time entry "@eng1 (1.1 day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
@@ -144,7 +144,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KR1)":
+  In objective "This is a KR (KR1)":
     Invalid time entry "@eng1 ( day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]

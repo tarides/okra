@@ -17,13 +17,13 @@
  *)
 
 type warning =
-  | No_time_found of string  (** Record found without a time record *)
-  | Multiple_time_entries of string  (** More than one time entry found *)
-  | Invalid_time of { title : string; entry : string }
+  | No_time_found of KR.Heading.t  (** Record found without a time record *)
+  | Multiple_time_entries of KR.Heading.t  (** More than one time entry found *)
+  | Invalid_time of { kr : KR.Heading.t; entry : string }
       (** Time record found, but has errors *)
-  | No_work_found of string  (** No work items found under KR *)
+  | No_work_found of KR.Heading.t  (** No work items found under KR *)
   | No_KR_ID_found of string  (** Empty or no KR ID *)
-  | No_project_found of string  (** No project found *)
+  | No_project_found of KR.Heading.t  (** No project found *)
   | Not_all_includes_accounted_for of string list
       (** There should be a section for all include sections passed to the parser *)
   | Invalid_markdown_in_work_items of string

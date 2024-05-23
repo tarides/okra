@@ -212,13 +212,16 @@ let of_krs ?okr_db entries =
   (t, warnings)
 
 let pp_warning ppf = function
-  | Parser.No_time_found s -> Fmt.pf ppf "No time found in %S" s
-  | Invalid_time { title; entry } ->
-      Fmt.pf ppf "Invalid time entry %S in %S" entry title
-  | Multiple_time_entries s -> Fmt.pf ppf "Multiple time entries for %S" s
-  | No_work_found s -> Fmt.pf ppf "No work found for %S" s
+  | Parser.No_time_found s ->
+      Fmt.pf ppf "No time found in \"%a\"" KR.Heading.pp s
+  | Invalid_time { kr; entry } ->
+      Fmt.pf ppf "Invalid time entry %S in \"%a\"" entry KR.Heading.pp kr
+  | Multiple_time_entries s ->
+      Fmt.pf ppf "Multiple time entries for \"%a\"" KR.Heading.pp s
+  | No_work_found s -> Fmt.pf ppf "No work found for \"%a\"" KR.Heading.pp s
   | No_KR_ID_found s -> Fmt.pf ppf "No KR ID found for %S" s
-  | No_project_found s -> Fmt.pf ppf "No project found for %S" s
+  | No_project_found s ->
+      Fmt.pf ppf "No project found for \"%a\"" KR.Heading.pp s
   | Not_all_includes_accounted_for s ->
       Fmt.pf ppf "Missing includes section: %a" Fmt.(list ~sep:comma string) s
   | Invalid_markdown_in_work_items s ->

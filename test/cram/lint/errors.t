@@ -12,8 +12,8 @@ No KR ID found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  In objective "This is a KR":
+    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
   $ okra lint << EOF
@@ -23,7 +23,7 @@ No KR ID found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KR123)": No project found (starting with '#')
+  In objective "This is a KR (KR123)": No project found (starting with '#')
   [1]
 
 No work items found:
@@ -36,12 +36,12 @@ No work items found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No work items found. This may indicate an unreported parsing error. Remove the KR if it is without work.
+  In objective "This is a KR":
+    No work items found. This may indicate an unreported parsing error. Remove the objective if it is without work.
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  In objective "This is a KR":
+    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
 No time entry found:
@@ -55,8 +55,8 @@ No time entry found:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KR12)":
-    No time entry found. Each KR must be followed by '- @... (x days)'
+  In objective "This is a KR (KR12)":
+    No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
 
 Multiple time entries:
@@ -72,8 +72,8 @@ Multiple time entries:
   > EOF
   [ERROR(S)]: <stdin>
   
-  In KR "This is a KR (KR12)":
-    Multiple time entries found. Only one time entry should follow immediately after the KR.
+  In objective "This is a KR (KR12)":
+    Multiple time entries found. Only one time entry should follow immediately after the objective.
   [1]
 
 Format errors
@@ -137,8 +137,8 @@ Format errors
   $ okra lint err-no-time.md
   [ERROR(S)]: err-no-time.md
   
-  In KR "Everything is great (E1)":
-    No time entry found. Each KR must be followed by '- @... (x days)'
+  In objective "Everything is great (E1)":
+    No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
   $ okra lint --short err-no-time.md
   err-no-time.md:3:No time found in "Everything is great (E1)"
@@ -154,7 +154,7 @@ Format errors
   $ okra lint err-invalid-time.md
   [ERROR(S)]: err-invalid-time.md
   
-  In KR "Everything is great (E1)":
+  In objective "Everything is great (E1)":
     Invalid time entry "@a (day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
     where x and y must be divisible by 0.5
   [1]
@@ -173,8 +173,8 @@ Format errors
   $ okra lint err-multiple-time.md
   [ERROR(S)]: err-multiple-time.md
   
-  In KR "Everything is great (E1)":
-    Multiple time entries found. Only one time entry should follow immediately after the KR.
+  In objective "Everything is great (E1)":
+    Multiple time entries found. Only one time entry should follow immediately after the objective.
   [1]
   $ okra lint --short err-multiple-time.md
   err-multiple-time.md:3:Multiple time entries for "Everything is great (E1)"
@@ -189,8 +189,8 @@ Format errors
   $ okra lint err-no-work.md
   [ERROR(S)]: err-no-work.md
   
-  In KR "Everything is great (E1)":
-    No work items found. This may indicate an unreported parsing error. Remove the KR if it is without work.
+  In objective "Everything is great (E1)":
+    No work items found. This may indicate an unreported parsing error. Remove the objective if it is without work.
   [1]
   $ okra lint --short err-no-work.md
   err-no-work.md:3:No work found for "Everything is great (E1)"
@@ -206,8 +206,8 @@ Format errors
   $ okra lint err-no-kr-id.md
   [ERROR(S)]: err-no-kr-id.md
   
-  In KR "Everything is great":
-    No KR ID found. WIs should be in the format "This is a WI (#123)", where 123 is the WI issue ID. Legacy KRs should be in the format "This is a KR (PLAT123)", where PLAT123 is the KR ID. For WIs that don't have an ID yet, use "New WI" and for work without a WI use "No WI".
+  In objective "Everything is great":
+    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
   $ okra lint --short err-no-kr-id.md
   err-no-kr-id.md:3:No KR ID found for "Everything is great"
@@ -221,7 +221,7 @@ Format errors
   $ okra lint err-no-project.md
   [ERROR(S)]: err-no-project.md
   
-  In KR "Everything is great (E1)": No project found (starting with '#')
+  In objective "Everything is great (E1)": No project found (starting with '#')
   [1]
   $ okra lint --short err-no-project.md
   err-no-project.md:1:No project found for "Everything is great (E1)"
