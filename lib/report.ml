@@ -211,22 +211,6 @@ let of_krs ?okr_db entries =
   let warnings = List.rev @@ List.filter_map (add ?okr_db t) entries in
   (t, warnings)
 
-let pp_warning ppf = function
-  | Parser.Warning.No_time_found s ->
-      Fmt.pf ppf "No time found in \"%a\"" KR.Heading.pp s
-  | Invalid_time { kr; entry } ->
-      Fmt.pf ppf "Invalid time entry %S in \"%a\"" entry KR.Heading.pp kr
-  | Multiple_time_entries s ->
-      Fmt.pf ppf "Multiple time entries for \"%a\"" KR.Heading.pp s
-  | No_work_found s -> Fmt.pf ppf "No work found for \"%a\"" KR.Heading.pp s
-  | No_KR_ID_found s -> Fmt.pf ppf "No KR ID found for %S" s
-  | No_project_found s ->
-      Fmt.pf ppf "No project found for \"%a\"" KR.Heading.pp s
-  | Not_all_includes_accounted_for s ->
-      Fmt.pf ppf "Missing includes section: %a" Fmt.(list ~sep:comma string) s
-  | Invalid_markdown_in_work_items s ->
-      Fmt.pf ppf "Invalid markdown in work items: %s" s
-
 let of_markdown ?existing_report ?ignore_sections ?include_sections ?okr_db
     ?report_kind m =
   let kind = Option.value report_kind ~default:Parser.default_report_kind in
@@ -234,7 +218,7 @@ let of_markdown ?existing_report ?ignore_sections ?include_sections ?okr_db
     Parser.of_markdown ?ignore_sections ?include_sections kind m
   in
   List.iter
-    (fun w -> Logs.warn (fun m -> m "@[<v 0>%a@]" pp_warning w))
+    (fun w -> Logs.warn (fun m -> m "@[<v 0>%a@]" Parser.Warning.pp_short w))
     warnings;
   let old_krs = match existing_report with None -> [] | Some t -> all_krs t in
   let krs = old_krs @ new_krs in
