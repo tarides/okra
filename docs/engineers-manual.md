@@ -83,7 +83,7 @@ Let's suppose you have the following weekly report:
   - Some work you did
 
 - Leave
-  - @eng1 (2 days)
+  - @jack (2 days)
 ```
 
 Linting of the original file fails because we used workitems:
@@ -106,11 +106,11 @@ $ okra cat -C /path/to/admin -e old_weekly.md -o new_weekly.md
 # Last Week
   
 - Property-Based Testing for Multicore (#558)
-  - @eng1 (3 days)
+  - @jack (3 days)
   - This is a workitem with a parent objective in the DB
   
 - Leave
-  - @eng1 (2 days)
+  - @jack (2 days)
 ```
 
 Linting of the produced file succeeds because we now use objectives:
