@@ -212,7 +212,7 @@ let of_krs ?okr_db entries =
   (t, warnings)
 
 let pp_warning ppf = function
-  | Parser.No_time_found s ->
+  | Parser.Warning.No_time_found s ->
       Fmt.pf ppf "No time found in \"%a\"" KR.Heading.pp s
   | Invalid_time { kr; entry } ->
       Fmt.pf ppf "Invalid time entry %S in \"%a\"" entry KR.Heading.pp kr

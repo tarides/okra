@@ -16,18 +16,24 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type warning =
-  | No_time_found of KR.Heading.t  (** Record found without a time record *)
-  | Multiple_time_entries of KR.Heading.t  (** More than one time entry found *)
-  | Invalid_time of { kr : KR.Heading.t; entry : string }
-      (** Time record found, but has errors *)
-  | No_work_found of KR.Heading.t  (** No work items found under KR *)
-  | No_KR_ID_found of string  (** Empty or no KR ID *)
-  | No_project_found of KR.Heading.t  (** No project found *)
-  | Not_all_includes_accounted_for of string list
-      (** There should be a section for all include sections passed to the parser *)
-  | Invalid_markdown_in_work_items of string
-      (** Subset of markdown not supported in work items *)
+module Warning : sig
+  type t =
+    | No_time_found of KR.Heading.t  (** Record found without a time record *)
+    | Multiple_time_entries of KR.Heading.t
+        (** More than one time entry found *)
+    | Invalid_time of { kr : KR.Heading.t; entry : string }
+        (** Time record found, but has errors *)
+    | No_work_found of KR.Heading.t  (** No work items found under KR *)
+    | No_KR_ID_found of string  (** Empty or no KR ID *)
+    | No_project_found of KR.Heading.t  (** No project found *)
+    | Not_all_includes_accounted_for of string list
+        (** There should be a section for all include sections passed to the parser *)
+    | Invalid_markdown_in_work_items of string
+        (** Subset of markdown not supported in work items *)
+
+  val pp : t Fmt.t
+  val pp_short : t Fmt.t
+end
 
 type markdown = Omd.doc
 (** The type for markdown files. *)
@@ -41,7 +47,7 @@ val of_markdown :
   ?include_sections:string list ->
   report_kind ->
   markdown ->
-  KR.t list * warning list
+  KR.t list * Warning.t list
 (** Process markdown data from omd. Optionally [ignore_sections] can be used to
     ignore specific sections, or [include_sections] can be used to only process
     specific sections. *)

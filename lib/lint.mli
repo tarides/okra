@@ -17,7 +17,7 @@
 
 type lint_error =
   | Format_error of (int * string) list
-  | Parsing_error of int option * Parser.warning
+  | Parsing_error of int option * Parser.Warning.t
   | Invalid_total_time of string * Time.t * Time.t
   | Invalid_quarter of KR.Work.t
   | Invalid_objective of KR.warning

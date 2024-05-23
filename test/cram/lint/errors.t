@@ -237,8 +237,7 @@ Format errors
   $ okra lint --include-sections "Section A,Section B" err-not-all-includes.md
   [ERROR(S)]: err-not-all-includes.md
   
-  Missing includes section: SECTION B,
-  SECTION A
+  Missing includes section: SECTION B, SECTION A
   [1]
   $ okra lint --include-sections "Section A,Section B" --short err-not-all-includes.md
   err-not-all-includes.md:1:Missing includes section: SECTION B, SECTION A

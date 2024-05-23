@@ -48,6 +48,5 @@ The include_section checker looks for all passed sections
   > EOF
   [ERROR(S)]: <stdin>
   
-  Missing includes section: NEXT WEEK,
-  LAST WEEK
+  Missing includes section: NEXT WEEK, LAST WEEK
   [1]
