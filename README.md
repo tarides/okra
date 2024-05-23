@@ -67,6 +67,11 @@ To generate your last week report:
 okra gen
 ```
 
+To update your report by rewriting workitems into objectives:
+```sh
+okra cat -C /path/to/admin -e old_weekly.md -o new_weekly.md
+```
+
 To lint your report:
 ```sh
 okra lint -e -C /path/to/admin/ report.md

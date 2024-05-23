@@ -4,7 +4,7 @@ Table of contents
 - [Generating a report](#generating-a-report)
   - [Configuration](#configuration)
 - [Linting your weekly report](#linting-your-weekly-report)
-- [Rewriting your workitems into objectives with okra cat](#rewriting-your-workitems-into-objectives-with-okra-cat)
+- [Rewriting workitems into objectives](#rewriting-workitems-into-objectives)
 
 ## Generating a report
 
@@ -71,7 +71,7 @@ Do not forget the `--engineer` (or `-e` for short) flag, otherwise your report w
 
 The expected format of engineer reports is presented [here](report-formats.md#engineer-report)
 
-## Rewriting your workitems into objectives with okra cat
+## Rewriting workitems into objectives
 
 Let's suppose you have the following weekly report:
 
