@@ -17,15 +17,8 @@
 
 type lint_error =
   | Format_error of (int * string) list
-  | No_time_found of int option * KR.Heading.t
-  | Invalid_time of { lnum : int option; kr : KR.Heading.t; entry : string }
+  | Parsing_error of int option * Parser.warning
   | Invalid_total_time of string * Time.t * Time.t
-  | Multiple_time_entries of int option * KR.Heading.t
-  | No_work_found of int option * KR.Heading.t
-  | No_KR_ID_found of int option * string
-  | No_project_found of int option * KR.Heading.t
-  | Not_all_includes of string list
-  | Invalid_markdown_in_work_items of int option * string
   | Invalid_quarter of KR.Work.t
   | Invalid_objective of KR.warning
 

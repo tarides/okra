@@ -19,15 +19,8 @@ let ( let* ) = Result.bind
 
 type lint_error =
   | Format_error of (int * string) list
-  | No_time_found of int option * KR.Heading.t
-  | Invalid_time of { lnum : int option; kr : KR.Heading.t; entry : string }
+  | Parsing_error of int option * Parser.warning
   | Invalid_total_time of string * Time.t * Time.t
-  | Multiple_time_entries of int option * KR.Heading.t
-  | No_work_found of int option * KR.Heading.t
-  | No_KR_ID_found of int option * string
-  | No_project_found of int option * KR.Heading.t
-  | Not_all_includes of string list
-  | Invalid_markdown_in_work_items of int option * string
   | Invalid_quarter of KR.Work.t
   | Invalid_objective of KR.warning
 
@@ -60,12 +53,12 @@ let pp_error ppf = function
       Fmt.pf ppf "@[<v 0>%a@,%d formatting errors found. Parsing aborted.@]"
         (Fmt.list ~sep:Fmt.sp pp_msg)
         x (List.length x)
-  | No_time_found (_, kr) ->
+  | Parsing_error (_, No_time_found kr) ->
       Fmt.pf ppf
         "@[<hv 2>In objective \"%a\":@ No time entry found. Each objective \
          must be followed by '- @@... (x days)'@]@,"
         KR.Heading.pp kr
-  | Invalid_time { lnum = _; kr; entry } ->
+  | Parsing_error (_, Invalid_time { kr; entry }) ->
       Fmt.pf ppf
         "@[<hv 2>In objective \"%a\":@ Invalid time entry %S found. Format is \
          '- @@eng1 (x days), @@eng2 (y days)'@ where x and y must be divisible \
@@ -75,31 +68,31 @@ let pp_error ppf = function
       Fmt.pf ppf
         "@[<hv 2>Invalid total time found for %s (reported %a, expected %a).@]@,"
         s Time.pp t Time.pp total
-  | Multiple_time_entries (_, kr) ->
+  | Parsing_error (_, Multiple_time_entries kr) ->
       Fmt.pf ppf
         "@[<hv 2>In objective \"%a\":@ Multiple time entries found. Only one \
          time entry should follow immediately after the objective.@]@,"
         KR.Heading.pp kr
-  | No_work_found (_, kr) ->
+  | Parsing_error (_, No_work_found kr) ->
       Fmt.pf ppf
         "@[<hv 2>In objective \"%a\":@ No work items found. This may indicate \
          an unreported parsing error. Remove the objective if it is without \
          work.@]@,"
         KR.Heading.pp kr
-  | No_KR_ID_found (_, s) ->
+  | Parsing_error (_, No_KR_ID_found s) ->
       Fmt.pf ppf
         "@[<hv 2>In objective %S:@ No ID found. Objectives should be in the \
          format \"This is an objective (#123)\", where 123 is the objective \
          issue ID. For objectives that don't have an ID yet, use \"New KR\" \
          and for work without an objective use \"No KR\".@]@,"
         s
-  | No_project_found (_, kr) ->
+  | Parsing_error (_, No_project_found kr) ->
       Fmt.pf ppf
         "@[<hv 2>In objective \"%a\":@ No project found (starting with '#')@]@,"
         KR.Heading.pp kr
-  | Not_all_includes s ->
+  | Parsing_error (_, Not_all_includes_accounted_for s) ->
       Fmt.pf ppf "Missing includes section: %a\n" Fmt.(list ~sep:comma string) s
-  | Invalid_markdown_in_work_items (_, s) ->
+  | Parsing_error (_, Invalid_markdown_in_work_items s) ->
       Fmt.pf ppf "@[<hv 2>Invalid markdown:@ %s@]@," s
   | Invalid_quarter kr ->
       Fmt.pf ppf
@@ -140,17 +133,21 @@ let grep_n s lines =
 let lines_of_kr s lines = grep_n (Fmt.str "%a" KR.Heading.pp s) lines
 
 let add_context lines = function
-  | Parser.No_time_found s -> No_time_found (lines_of_kr s lines, s)
+  | Parser.No_time_found s ->
+      Parsing_error (lines_of_kr s lines, No_time_found s)
   | Parser.Invalid_time { kr; entry } ->
-      Invalid_time { lnum = grep_n entry lines; kr; entry }
+      Parsing_error (grep_n entry lines, Invalid_time { kr; entry })
   | Parser.Multiple_time_entries s ->
-      Multiple_time_entries (lines_of_kr s lines, s)
-  | Parser.No_work_found s -> No_work_found (lines_of_kr s lines, s)
-  | Parser.No_KR_ID_found s -> No_KR_ID_found (grep_n s lines, s)
-  | Parser.No_project_found s -> No_project_found (lines_of_kr s lines, s)
-  | Parser.Not_all_includes_accounted_for s -> Not_all_includes s
+      Parsing_error (lines_of_kr s lines, Multiple_time_entries s)
+  | Parser.No_work_found s ->
+      Parsing_error (lines_of_kr s lines, No_work_found s)
+  | Parser.No_KR_ID_found s -> Parsing_error (grep_n s lines, No_KR_ID_found s)
+  | Parser.No_project_found s ->
+      Parsing_error (lines_of_kr s lines, No_project_found s)
+  | Parser.Not_all_includes_accounted_for s ->
+      Parsing_error (None, Not_all_includes_accounted_for s)
   | Parser.Invalid_markdown_in_work_items s ->
-      Invalid_markdown_in_work_items (grep_n s lines, s)
+      Parsing_error (grep_n s lines, Invalid_markdown_in_work_items s)
 
 let check_total_time ?check_time (krs : KR.t list) report_kind =
   match report_kind with
@@ -283,26 +280,27 @@ let short_messages_of_error file_name =
       List.concat_map
         (fun (line_number, message) -> short_message line_number message)
         errs
-  | No_time_found (line_number, kr) ->
+  | Parsing_error (line_number, No_time_found kr) ->
       short_messagef line_number "No time found in \"%a\"" KR.Heading.pp kr
-  | Invalid_time { lnum; kr; entry } ->
-      short_messagef lnum "Invalid time entry %S in \"%a\"" entry KR.Heading.pp
-        kr
+  | Parsing_error (line_number, Invalid_time { kr; entry }) ->
+      short_messagef line_number "Invalid time entry %S in \"%a\"" entry
+        KR.Heading.pp kr
   | Invalid_total_time (s, t, total) ->
       short_messagef None "Invalid total time for %S (%a/%a)" s Time.pp t
         Time.pp total
-  | Multiple_time_entries (line_number, kr) ->
+  | Parsing_error (line_number, Multiple_time_entries kr) ->
       short_messagef line_number "Multiple time entries for \"%a\""
         KR.Heading.pp kr
-  | No_work_found (line_number, kr) ->
+  | Parsing_error (line_number, No_work_found kr) ->
       short_messagef line_number "No work found for \"%a\"" KR.Heading.pp kr
-  | No_KR_ID_found (line_number, kr) ->
+  | Parsing_error (line_number, No_KR_ID_found kr) ->
       short_messagef line_number "No KR ID found for %S" kr
-  | No_project_found (line_number, kr) ->
+  | Parsing_error (line_number, No_project_found kr) ->
       short_messagef line_number "No project found for \"%a\"" KR.Heading.pp kr
-  | Not_all_includes l ->
-      short_messagef None "Missing includes section: %s" (String.concat ", " l)
-  | Invalid_markdown_in_work_items (line_number, s) ->
+  | Parsing_error (line_number, Not_all_includes_accounted_for l) ->
+      short_messagef line_number "Missing includes section: %s"
+        (String.concat ", " l)
+  | Parsing_error (line_number, Invalid_markdown_in_work_items s) ->
       short_messagef line_number "Invalid markdown in work items: %s" s
   | Invalid_quarter kr ->
       short_messagef None "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp
