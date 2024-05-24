@@ -20,7 +20,7 @@ module Error : sig
     | Format_error of (int * string) list
     | Parsing_error of int option * Parser.Warning.t
     | Invalid_total_time of string * Time.t * Time.t
-    | Invalid_quarter of KR.Work.t
+    | Invalid_quarter of int option * KR.Work.t
     | Invalid_objective of KR.Warning.t
 
   val pp_short : filename:string -> t Fmt.t

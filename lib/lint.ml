@@ -22,7 +22,7 @@ module Error = struct
     | Format_error of (int * string) list
     | Parsing_error of int option * Parser.Warning.t
     | Invalid_total_time of string * Time.t * Time.t
-    | Invalid_quarter of KR.Work.t
+    | Invalid_quarter of int option * KR.Work.t
     | Invalid_objective of KR.Warning.t
 
   let pp_error_kw =
@@ -56,8 +56,8 @@ module Error = struct
               "@[<hv 0>Invalid total time found for %s:@ Reported %a, expected \
                %a.@]"
               s Time.pp t Time.pp total)
-    | Invalid_quarter kr ->
-        pf None (fun m ->
+    | Invalid_quarter (line_number, kr) ->
+        pf line_number (fun m ->
             m ppf
               "@[<hv 0>In objective \"%a\":@ Work logged on objective \
                scheduled for %a@]"
@@ -87,8 +87,8 @@ module Error = struct
     | Invalid_total_time (s, t, total) ->
         pf None (fun m ->
             m ppf "Invalid total time for %S (%a/%a)" s Time.pp t Time.pp total)
-    | Invalid_quarter kr ->
-        pf None (fun m ->
+    | Invalid_quarter (line_number, kr) ->
+        pf line_number (fun m ->
             m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
               (Fmt.option Quarter.pp) kr.quarter)
     | Invalid_objective w -> pf None (fun m -> m ppf "%a" KR.Warning.pp_short w)
@@ -165,14 +165,16 @@ let check_total_time ?check_time (krs : KR.t list) report_kind =
           else Error (Error.Invalid_total_time (name, time, expected)))
         tbl (Ok ())
 
-let check_quarters quarter krs warnings =
+let check_quarters quarter krs warnings lines =
   List.fold_left
     (fun acc kr ->
       match kr.KR.kind with
       | Meta _ -> acc
       | Work w ->
           if Quarter.check quarter w.quarter then acc
-          else Error.Invalid_quarter w :: acc)
+          else
+            let line_number = grep_n w.title lines in
+            Error.Invalid_quarter (line_number, w) :: acc)
     warnings krs
 
 let maybe_emit warnings =
@@ -208,7 +210,7 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
   in
   let* () = maybe_emit warnings in
   let krs = Report.all_krs report in
-  let warnings = check_quarters quarter krs warnings in
+  let warnings = check_quarters quarter krs warnings lines in
   let* () = maybe_emit warnings in
   Ok ()
 
