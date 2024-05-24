@@ -10,7 +10,6 @@ Team Lint example with invalid reports:
                       Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       File "admin//weekly/2022/41/eng2.md", line 5:
                       Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
-                      2 formatting errors found. Parsing aborted.
     + Report week 42: Not found: admin//weekly/2022/42/eng2.md
   [1]
 

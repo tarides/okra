@@ -83,7 +83,6 @@ Format errors
   $ okra lint err-bullet.md
   File "err-bullet.md", line 5:
   Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
-  1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short < err-bullet.md
   File "<stdin>", line 5:
@@ -99,7 +98,6 @@ Format errors
   $ okra lint err-space-title.md
   File "err-space-title.md", line 1:
   Error: Space found before title marker #. Start titles in first column.
-  1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short err-space-title.md
   File "err-space-title.md", line 1:
@@ -116,7 +114,6 @@ Format errors
   $ okra lint err-space-indent.md
   File "err-space-indent.md", line 3:
   Error: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
-  1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short err-space-indent.md
   File "err-space-indent.md", line 3:

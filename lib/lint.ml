@@ -69,9 +69,7 @@ let pp_error ~filename ppf =
       let pp_msg ppf (pos, msg) =
         Fmt.pf ppf "File %S, line %d:@\nError: %s" filename pos msg
       in
-      Fmt.pf ppf "@[<v 0>%a@,%d formatting errors found. Parsing aborted.@]"
-        (Fmt.list ~sep:Fmt.sp pp_msg)
-        x (List.length x)
+      Fmt.pf ppf "@[<v 0>%a@]" (Fmt.list ~sep:Fmt.sp pp_msg) x
   | Parsing_error (line_number, w) ->
       pf line_number (fun m -> m ppf "@[<hv 0>%a@]" Parser.Warning.pp w)
   | Invalid_total_time (s, t, total) ->

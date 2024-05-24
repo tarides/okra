@@ -66,5 +66,4 @@ A warning is emitted when the generated report contains placeholder text:
   $ okra lint err.md
   File "err.md", line 5:
   Error: Placeholder text detected. Replace with actual activity.
-  1 formatting errors found. Parsing aborted.
   [1]

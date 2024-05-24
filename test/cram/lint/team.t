@@ -42,5 +42,4 @@ Errors are not ignored outside the ignored section
   > EOF
   File "<stdin>", line 5:
   Error: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
-  1 formatting errors found. Parsing aborted.
   [1]
