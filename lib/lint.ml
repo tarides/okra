@@ -23,7 +23,7 @@ module Error = struct
     | Parsing_error of int option * Parser.Warning.t
     | Invalid_total_time of string * Time.t * Time.t
     | Invalid_quarter of int option * KR.Work.t
-    | Invalid_objective of KR.Warning.t
+    | Invalid_objective of int option * KR.Warning.t
 
   let pp_error_kw =
     Fmt.styled `Bold
@@ -62,8 +62,8 @@ module Error = struct
               "@[<hv 0>In objective \"%a\":@ Work logged on objective \
                scheduled for %a@]"
               KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter)
-    | Invalid_objective w ->
-        pf None (fun m -> m ppf "@[<hv 0>%a@]" KR.Warning.pp w)
+    | Invalid_objective (line_number, w) ->
+        pf line_number (fun m -> m ppf "@[<hv 0>%a@]" KR.Warning.pp w)
 
   let pp_short ~filename ppf =
     let pp_loc =
@@ -91,7 +91,8 @@ module Error = struct
         pf line_number (fun m ->
             m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
               (Fmt.option Quarter.pp) kr.quarter)
-    | Invalid_objective w -> pf None (fun m -> m ppf "%a" KR.Warning.pp_short w)
+    | Invalid_objective (line_number, w) ->
+        pf line_number (fun m -> m ppf "%a" KR.Warning.pp_short w)
 end
 
 type lint_result = (unit, Error.t list) result
@@ -205,7 +206,13 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
   let report, report_warnings = Report.of_krs ?okr_db okrs in
   let warnings =
     List.fold_left
-      (fun acc w -> Error.Invalid_objective w :: acc)
+      (fun acc w ->
+        let line_number =
+          match KR.Warning.greppable w with
+          | Some s -> grep_n s lines
+          | None -> None
+        in
+        Error.Invalid_objective (line_number, w) :: acc)
       warnings report_warnings
   in
   let* () = maybe_emit warnings in

@@ -56,12 +56,12 @@ and the error message points to the corresponding objective.
   okra: [WARNING] KR ID updated from "No KR" to "#701":
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
-  File "weekly.md", line 1:
+  File "weekly.md", line 3:
   Error: Invalid objective: "This objective does not exist"
-  File "weekly.md", line 1:
+  File "weekly.md", line 19:
   Error: Invalid objective:
          "General okra maintenance (#1115)" is a work-item. You should use an objective instead.
-  File "weekly.md", line 1:
+  File "weekly.md", line 15:
   Error: Invalid objective:
          "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
   [1]
@@ -70,7 +70,7 @@ and the error message points to the corresponding objective.
   okra: [WARNING] KR ID updated from "No KR" to "#701":
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
-  weekly.md:1: Invalid objective: "This objective does not exist" (not found)
-  weekly.md:1: Invalid objective: "General okra maintenance (#1115)" (work-item)
-  weekly.md:1: Invalid objective: "Property-Based Testing for Multicore (#1090)" (work-item), use "Property-Based Testing for Multicore (#558)" instead
+  weekly.md:3: Invalid objective: "This objective does not exist" (not found)
+  weekly.md:19: Invalid objective: "General okra maintenance (#1115)" (work-item)
+  weekly.md:15: Invalid objective: "Property-Based Testing for Multicore (#1090)" (work-item), use "Property-Based Testing for Multicore (#558)" instead
   [1]

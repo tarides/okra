@@ -21,7 +21,7 @@ module Error : sig
     | Parsing_error of int option * Parser.Warning.t
     | Invalid_total_time of string * Time.t * Time.t
     | Invalid_quarter of int option * KR.Work.t
-    | Invalid_objective of KR.Warning.t
+    | Invalid_objective of int option * KR.Warning.t
 
   val pp_short : filename:string -> t Fmt.t
   val pp : filename:string -> t Fmt.t

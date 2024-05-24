@@ -384,6 +384,10 @@ module Warning = struct
     | Migration { work_item; objective = Some obj } ->
         Fmt.pf ppf "Invalid objective: \"%a\" (work-item), use \"%a\" instead"
           Work.pp work_item Work.pp obj
+
+  let greppable = function
+    | Objective_not_found x -> Some x.title
+    | Migration { work_item; objective = _ } -> Some work_item.title
 end
 
 let update_from_master_db orig_kr db =
