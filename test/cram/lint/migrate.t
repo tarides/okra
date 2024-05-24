@@ -27,6 +27,10 @@ and the error message points to the corresponding objective.
   $ cat > weekly.md << EOF
   > # Last week
   > 
+  > - This objective does not exist (#32)
+  >   - @eng1 (0 day)
+  >   - xxx
+  > 
   > - JSOO Effect Performance (No KR)
   >   - @eng1 (1 day)
   >   - xxx
@@ -53,9 +57,20 @@ and the error message points to the corresponding objective.
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
   File "weekly.md", line 1:
+  Error: Invalid objective: "This objective does not exist"
+  File "weekly.md", line 1:
   Error: Invalid objective:
          "General okra maintenance (#1115)" is a work-item. You should use an objective instead.
   File "weekly.md", line 1:
   Error: Invalid objective:
          "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
+  [1]
+
+  $ okra lint -e -C admin weekly.md --short
+  okra: [WARNING] KR ID updated from "No KR" to "#701":
+  - "JSOO Effect Performance"
+  - "JSOO Effect Performance"
+  weekly.md:1: Invalid objective: "This objective does not exist" (not found)
+  weekly.md:1: Invalid objective: "General okra maintenance (#1115)" (work-item)
+  weekly.md:1: Invalid objective: "Property-Based Testing for Multicore (#1090)" (work-item), use "Property-Based Testing for Multicore (#558)" instead
   [1]

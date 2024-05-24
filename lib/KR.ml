@@ -377,16 +377,12 @@ module Warning = struct
           Work.pp work_item Work.pp obj
 
   let pp_short ppf = function
-    | Objective_not_found x -> Fmt.pf ppf "Invalid objective: %S" x.title
+    | Objective_not_found x ->
+        Fmt.pf ppf "Invalid objective: %S (not found)" x.title
     | Migration { work_item; objective = None } ->
-        Fmt.pf ppf
-          "Invalid objective:@ \"%a\" is a work-item, an objective should be \
-           used instead"
-          Work.pp work_item
+        Fmt.pf ppf "Invalid objective: \"%a\" (work-item)" Work.pp work_item
     | Migration { work_item; objective = Some obj } ->
-        Fmt.pf ppf
-          "Invalid objective:@ \"%a\" is a work-item, its parent objective \
-           \"%a\" should be used instead"
+        Fmt.pf ppf "Invalid objective: \"%a\" (work-item), use \"%a\" instead"
           Work.pp work_item Work.pp obj
 end
 
