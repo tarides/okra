@@ -59,20 +59,23 @@ let pp_error ~filename ppf = function
       Fmt.pf ppf "@[<hv 0>File %S, line %i:@\nError: @[<hv 0>%a@]@]@," filename
         line_number Parser.Warning.pp w
   | Parsing_error (None, w) ->
-      Fmt.pf ppf "@[<hv 0>File %S:@\nError: %a@]@," filename Parser.Warning.pp w
+      Fmt.pf ppf "@[<hv 0>File %S:@\nError: @[<hv 0>%a@]@]@," filename
+        Parser.Warning.pp w
   | Invalid_total_time (s, t, total) ->
       Fmt.pf ppf
         "@[<hv 0>File %S:@\n\
-         Error: Invalid total time found for %s (reported %a, expected %a).@]@,"
+         Error: @[<hv 0>Invalid total time found for %s:@ Reported %a, \
+         expected %a.@]@]@,"
         filename s Time.pp t Time.pp total
   | Invalid_quarter kr ->
       Fmt.pf ppf
         "@[<hv 0>File %S:@\n\
-         Error: In objective \"%a\":@ Work logged on objective scheduled for \
-         %a@]@,"
+         Error: @[<hv 0>In objective \"%a\":@ Work logged on objective \
+         scheduled for %a@]@]@,"
         filename KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter
   | Invalid_objective w ->
-      Fmt.pf ppf "@[<hv 0>File %S:@\nError: %a@]@," filename KR.Warning.pp w
+      Fmt.pf ppf "@[<hv 0>File %S:@\nError: @[<hv 0>%a@]@]@," filename
+        KR.Warning.pp w
 
 (* Check a single line for formatting errors returning a list of error messages
    with the position *)

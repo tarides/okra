@@ -100,5 +100,6 @@ Using the configuration file to change the default number of working days.
   >   - My work
   > EOF
   File "<stdin>":
-  Error: Invalid total time found for eng1 (reported 0.5 days, expected 1.5 days).
+  Error: Invalid total time found for eng1:
+         Reported 0.5 days, expected 1.5 days.
   [1]

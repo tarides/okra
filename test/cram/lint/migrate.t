@@ -54,8 +54,10 @@ and the error message points to the corresponding objective.
   - "JSOO Effect Performance"
   File "weekly.md":
   Error: Invalid objective:
-  "General okra maintenance (#1115)" is a work-item, you should use an objective instead
+         "General okra maintenance (#1115)" is a work-item.
+         You should use an objective instead.
   File "weekly.md":
   Error: Invalid objective:
-  "Property-Based Testing for Multicore (#1090)" is a work-item, you should use its parent objective "Property-Based Testing for Multicore (#558)" instead
+         "Property-Based Testing for Multicore (#1090)" is a work-item.
+         You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
   [1]

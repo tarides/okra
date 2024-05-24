@@ -89,7 +89,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > More unformatted text.
   > EOF
   File "<stdin>":
-  Error: Invalid total time found for eng1 (reported 1 day, expected 5 days).
+  Error: Invalid total time found for eng1: Reported 1 day, expected 5 days.
   File "<stdin>", line 10:
   Error: In objective "This is a KR":
          No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
@@ -171,7 +171,7 @@ The total time reported must be 5 days
   >   - My work
   > EOF
   File "<stdin>":
-  Error: Invalid total time found for eng1 (reported 4 days, expected 5 days).
+  Error: Invalid total time found for eng1: Reported 4 days, expected 5 days.
   [1]
   $ okra lint --engineer << EOF
   > # Title
@@ -199,5 +199,5 @@ The total time reported must be 5 days
   >   - My work
   > EOF
   File "<stdin>":
-  Error: Invalid total time found for eng1 (reported 10 days, expected 5 days).
+  Error: Invalid total time found for eng1: Reported 10 days, expected 5 days.
   [1]
