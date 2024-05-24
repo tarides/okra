@@ -52,11 +52,11 @@ and the error message points to the corresponding objective.
   okra: [WARNING] KR ID updated from "No KR" to "#701":
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
-  File "weekly.md":
+  File "weekly.md", line 1:
   Error: Invalid objective:
          "General okra maintenance (#1115)" is a work-item.
          You should use an objective instead.
-  File "weekly.md":
+  File "weekly.md", line 1:
   Error: Invalid objective:
          "Property-Based Testing for Multicore (#1090)" is a work-item.
          You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.

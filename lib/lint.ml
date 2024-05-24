@@ -47,7 +47,24 @@ let fail_fmt_patterns =
       "Placeholder text detected. Replace with actual activity." );
   ]
 
-let pp_error ~filename ppf = function
+let pp_error ~filename ppf =
+  let pf line_number_opt k =
+    let line_number = Option.value ~default:1 line_number_opt in
+    let pp_loc =
+      Fmt.styled `Bold @@ fun ppf (filename, line_number) ->
+      Fmt.pf ppf "File %S, line %i" filename line_number
+    in
+    let pp_error_kw =
+      Fmt.styled `Bold
+      @@ Fmt.styled (`Fg `Red)
+      @@ fun ppf () -> Fmt.pf ppf "%s" "Error"
+    in
+    k (fun ppf ->
+        Fmt.pf ppf "@[<hv 0>@{<loc>%a@}:@\n%a: " pp_loc (filename, line_number)
+          pp_error_kw ();
+        Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
+  in
+  function
   | Format_error x ->
       let pp_msg ppf (pos, msg) =
         Fmt.pf ppf "File %S, line %d:@\nError: %s" filename pos msg
@@ -55,27 +72,22 @@ let pp_error ~filename ppf = function
       Fmt.pf ppf "@[<v 0>%a@,%d formatting errors found. Parsing aborted.@]"
         (Fmt.list ~sep:Fmt.sp pp_msg)
         x (List.length x)
-  | Parsing_error (Some line_number, w) ->
-      Fmt.pf ppf "@[<hv 0>File %S, line %i:@\nError: @[<hv 0>%a@]@]@," filename
-        line_number Parser.Warning.pp w
-  | Parsing_error (None, w) ->
-      Fmt.pf ppf "@[<hv 0>File %S:@\nError: @[<hv 0>%a@]@]@," filename
-        Parser.Warning.pp w
+  | Parsing_error (line_number, w) ->
+      pf line_number (fun m -> m ppf "@[<hv 0>%a@]" Parser.Warning.pp w)
   | Invalid_total_time (s, t, total) ->
-      Fmt.pf ppf
-        "@[<hv 0>File %S:@\n\
-         Error: @[<hv 0>Invalid total time found for %s:@ Reported %a, \
-         expected %a.@]@]@,"
-        filename s Time.pp t Time.pp total
+      pf None (fun m ->
+          m ppf
+            "@[<hv 0>Invalid total time found for %s:@ Reported %a, expected \
+             %a.@]"
+            s Time.pp t Time.pp total)
   | Invalid_quarter kr ->
-      Fmt.pf ppf
-        "@[<hv 0>File %S:@\n\
-         Error: @[<hv 0>In objective \"%a\":@ Work logged on objective \
-         scheduled for %a@]@]@,"
-        filename KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter
+      pf None (fun m ->
+          m ppf
+            "@[<hv 0>In objective \"%a\":@ Work logged on objective scheduled \
+             for %a@]"
+            KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter)
   | Invalid_objective w ->
-      Fmt.pf ppf "@[<hv 0>File %S:@\nError: @[<hv 0>%a@]@]@," filename
-        KR.Warning.pp w
+      pf None (fun m -> m ppf "@[<hv 0>%a@]" KR.Warning.pp w)
 
 (* Check a single line for formatting errors returning a list of error messages
    with the position *)

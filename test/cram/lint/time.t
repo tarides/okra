@@ -99,7 +99,7 @@ Using the configuration file to change the default number of working days.
   >   - @eng1 (0.5 days)
   >   - My work
   > EOF
-  File "<stdin>":
+  File "<stdin>", line 1:
   Error: Invalid total time found for eng1:
          Reported 0.5 days, expected 1.5 days.
   [1]
