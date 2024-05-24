@@ -42,8 +42,8 @@ let run conf =
   in
   let report_error filename e =
     match conf.format with
-    | Pretty -> Fmt.(pf stderr "%a" (Okra.Lint.pp_error ~filename) e)
-    | Short -> Fmt.(pf stderr "%a" (Okra.Lint.pp_error_short ~filename) e)
+    | Pretty -> Fmt.(pf stderr "%a" (Okra.Lint.Error.pp ~filename) e)
+    | Short -> Fmt.(pf stderr "%a" (Okra.Lint.Error.pp_short ~filename) e)
   in
   let report_ok (name, _) =
     match conf.format with

@@ -15,14 +15,19 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type lint_error =
-  | Format_error of (int * string) list
-  | Parsing_error of int option * Parser.Warning.t
-  | Invalid_total_time of string * Time.t * Time.t
-  | Invalid_quarter of KR.Work.t
-  | Invalid_objective of KR.Warning.t
+module Error : sig
+  type t =
+    | Format_error of (int * string) list
+    | Parsing_error of int option * Parser.Warning.t
+    | Invalid_total_time of string * Time.t * Time.t
+    | Invalid_quarter of KR.Work.t
+    | Invalid_objective of KR.Warning.t
 
-type lint_result = (unit, lint_error list) result
+  val pp_short : filename:string -> t Fmt.t
+  val pp : filename:string -> t Fmt.t
+end
+
+type lint_result = (unit, Error.t list) result
 
 val lint :
   ?okr_db:Masterdb.t ->
@@ -44,6 +49,3 @@ val lint_string_list :
   string list ->
   lint_result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)
-
-val pp_error_short : filename:string -> lint_error Fmt.t
-val pp_error : filename:string -> lint_error Fmt.t

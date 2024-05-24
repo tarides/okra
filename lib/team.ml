@@ -28,7 +28,7 @@ let make ~name ~members = { name; members }
 let name { name; _ } = name
 let members { members; _ } = members
 
-type file_status = Complete | Not_found | Not_lint of Lint.lint_error list
+type file_status = Complete | Not_found | Not_lint of Lint.Error.t list
 type week_report = { week : int; filename : string; status : file_status }
 type user_report = { member : Member.t; week_reports : week_report list }
 type team_report = { team : t; user_reports : user_report list }
@@ -71,7 +71,7 @@ let pp_report ppf = function
   | { filename; status = Not_found; _ } -> Fmt.pf ppf "Not found: %s" filename
   | { filename; status = Not_lint e; _ } ->
       Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" filename
-        (Fmt.list (Lint.pp_error ~filename))
+        (Fmt.list (Lint.Error.pp ~filename))
         e
 
 let result_partition f =
