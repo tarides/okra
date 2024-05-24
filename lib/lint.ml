@@ -227,27 +227,30 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
     ?check_time ?report_kind ~filename s
 
-let short_messages_of_error ~filename =
-  let short_message line_number msg =
-    [
-      Fmt.str "@[<hv 0>File %S, line %d:@\nError: %s@]" filename line_number msg;
-    ]
-  in
-  let short_messagef line_number_opt fmt =
+let pp_error_short ~filename ppf =
+  let pf line_number_opt k =
     let line_number = Option.value ~default:1 line_number_opt in
-    Format.kasprintf (short_message line_number) fmt
+    let pp_loc =
+      Fmt.styled `Bold @@ fun ppf (filename, line_number) ->
+      Fmt.pf ppf "%s:%i" filename line_number
+    in
+    k (fun ppf ->
+        Fmt.pf ppf "@[<hv 0>@{<loc>%a@}: " pp_loc (filename, line_number);
+        Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
   in
   function
   | Format_error errs ->
-      List.concat_map
-        (fun (line_number, message) -> short_message line_number message)
+      List.iter
+        (fun (line_number, message) ->
+          pf (Some line_number) (fun m -> m ppf "%s" message))
         errs
   | Parsing_error (line_number, w) ->
-      short_messagef line_number "%a" Parser.Warning.pp_short w
+      pf line_number (fun m -> m ppf "%a" Parser.Warning.pp_short w)
   | Invalid_total_time (s, t, total) ->
-      short_messagef None "Invalid total time for %S (%a/%a)" s Time.pp t
-        Time.pp total
+      pf None (fun m ->
+          m ppf "Invalid total time for %S (%a/%a)" s Time.pp t Time.pp total)
   | Invalid_quarter kr ->
-      short_messagef None "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp
-        kr (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective w -> short_messagef None "%a" KR.Warning.pp_short w
+      pf None (fun m ->
+          m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
+            (Fmt.option Quarter.pp) kr.quarter)
+  | Invalid_objective w -> pf None (fun m -> m ppf "%a" KR.Warning.pp_short w)
