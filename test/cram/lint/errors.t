@@ -92,7 +92,8 @@ Format errors
   1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short < err-bullet.md
-  <stdin>:5:+ used as bullet point, this can confuse the parser. Only use - as bullet marker.
+  File <stdin>, line 5:
+  Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
   [1]
   $ cat > err-space-title.md << EOF
   >  # Title
@@ -108,7 +109,8 @@ Format errors
   1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short err-space-title.md
-  err-space-title.md:1:Space found before title marker #. Start titles in first column.
+  File err-space-title.md, line 1:
+  Error: Space found before title marker #. Start titles in first column.
   [1]
 
   $ cat > err-space-indent.md << EOF
@@ -125,7 +127,8 @@ Format errors
   1 formatting errors found. Parsing aborted.
   [1]
   $ okra lint --short err-space-indent.md
-  err-space-indent.md:3:Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
+  File err-space-indent.md, line 3:
+  Error: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
   [1]
 
   $ cat > err-no-time.md << EOF
@@ -141,7 +144,8 @@ Format errors
     No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
   $ okra lint --short err-no-time.md
-  err-no-time.md:3:No time found in "Everything is great (E1)"
+  File err-no-time.md, line 3:
+  Error: No time found in "Everything is great (E1)"
   [1]
 
   $ cat > err-invalid-time.md << EOF
@@ -159,7 +163,8 @@ Format errors
     where x and y must be divisible by 0.5
   [1]
   $ okra lint --short err-invalid-time.md
-  err-invalid-time.md:4:Invalid time entry "@a (day)" in "Everything is great (E1)"
+  File err-invalid-time.md, line 4:
+  Error: Invalid time entry "@a (day)" in "Everything is great (E1)"
   [1]
 
   $ cat > err-multiple-time.md << EOF
@@ -177,7 +182,8 @@ Format errors
     Multiple time entries found. Only one time entry should follow immediately after the objective.
   [1]
   $ okra lint --short err-multiple-time.md
-  err-multiple-time.md:3:Multiple time entries for "Everything is great (E1)"
+  File err-multiple-time.md, line 3:
+  Error: Multiple time entries for "Everything is great (E1)"
   [1]
 
   $ cat > err-no-work.md << EOF
@@ -193,7 +199,8 @@ Format errors
     No work items found. This may indicate an unreported parsing error. Remove the objective if it is without work.
   [1]
   $ okra lint --short err-no-work.md
-  err-no-work.md:3:No work found for "Everything is great (E1)"
+  File err-no-work.md, line 3:
+  Error: No work found for "Everything is great (E1)"
   [1]
 
   $ cat > err-no-kr-id.md << EOF
@@ -210,7 +217,8 @@ Format errors
     No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
   $ okra lint --short err-no-kr-id.md
-  err-no-kr-id.md:3:No KR ID found for "Everything is great"
+  File err-no-kr-id.md, line 3:
+  Error: No KR ID found for "Everything is great"
   [1]
 
   $ cat > err-no-project.md << EOF
@@ -224,7 +232,8 @@ Format errors
   In objective "Everything is great (E1)": No project found (starting with '#')
   [1]
   $ okra lint --short err-no-project.md
-  err-no-project.md:1:No project found for "Everything is great (E1)"
+  File err-no-project.md, line 1:
+  Error: No project found for "Everything is great (E1)"
   [1]
 
   $ cat > err-not-all-includes.md << EOF
@@ -240,5 +249,6 @@ Format errors
   Missing includes section: SECTION B, SECTION A
   [1]
   $ okra lint --include-sections "Section A,Section B" --short err-not-all-includes.md
-  err-not-all-includes.md:1:Missing includes section: SECTION B, SECTION A
+  File err-not-all-includes.md, line 1:
+  Error: Missing includes section: SECTION B, SECTION A
   [1]

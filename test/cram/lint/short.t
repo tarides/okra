@@ -16,7 +16,8 @@ And with 1 when there is an error:
   > - Everything is great (E1)
   >   - Did everything
   > EOF
-  <stdin>:3:No time found in "Everything is great (E1)"
+  File <stdin>, line 3:
+  Error: No time found in "Everything is great (E1)"
   [1]
 
 This also works with files:
@@ -35,8 +36,12 @@ This also works with files:
   > EOF
 
   $ okra lint --short a.md b.md
-  b.md:1:No time found in "Everything is great (E1)"
-  b.md:1:No project found for "Everything is great (E1)"
-  a.md:4:* used as bullet point, this can confuse the parser. Only use - as bullet marker.
-  a.md:5:* used as bullet point, this can confuse the parser. Only use - as bullet marker.
+  File b.md, line 1:
+  Error: No time found in "Everything is great (E1)"
+  File b.md, line 1:
+  Error: No project found for "Everything is great (E1)"
+  File a.md, line 4:
+  Error: * used as bullet point, this can confuse the parser. Only use - as bullet marker.
+  File a.md, line 5:
+  Error: * used as bullet point, this can confuse the parser. Only use - as bullet marker.
   [1]

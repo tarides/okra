@@ -209,7 +209,10 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
 
 let short_messages_of_error file_name =
   let short_message line_number msg =
-    [ Printf.sprintf "%s:%d:%s" file_name line_number msg ]
+    [
+      Fmt.str "@[<hv 0>File %s, line %d:@\nError: %s@]" file_name line_number
+        msg;
+    ]
   in
   let short_messagef line_number_opt fmt =
     let line_number = Option.value ~default:1 line_number_opt in
