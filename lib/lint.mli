@@ -45,6 +45,5 @@ val lint_string_list :
   lint_result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)
 
-val string_of_error : lint_error -> string
-val short_messages_of_error : string -> lint_error -> string list
-val pp_error : Format.formatter -> lint_error -> unit
+val short_messages_of_error : filename:string -> lint_error -> string list
+val pp_error : filename:string -> lint_error Fmt.t

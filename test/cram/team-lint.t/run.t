@@ -6,8 +6,10 @@ Team Lint example with invalid reports:
     + Report week 42: Not found: admin//weekly/2022/42/eng1.md
     + Report week 40: Not found: admin//weekly/2022/40/eng2.md
     + Report week 41: Lint error at admin//weekly/2022/41/eng2.md
-                      Line 4: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
-                      Line 5: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
+                      File "admin//weekly/2022/41/eng2.md", line 4:
+                      Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
+                      File "admin//weekly/2022/41/eng2.md", line 5:
+                      Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       2 formatting errors found. Parsing aborted.
     + Report week 42: Not found: admin//weekly/2022/42/eng2.md
   [1]

@@ -47,25 +47,32 @@ let fail_fmt_patterns =
       "Placeholder text detected. Replace with actual activity." );
   ]
 
-let pp_error ppf = function
+let pp_error ~filename ppf = function
   | Format_error x ->
-      let pp_msg ppf (pos, msg) = Fmt.pf ppf "Line %d: %s" pos msg in
+      let pp_msg ppf (pos, msg) =
+        Fmt.pf ppf "File %S, line %d:@\nError: %s" filename pos msg
+      in
       Fmt.pf ppf "@[<v 0>%a@,%d formatting errors found. Parsing aborted.@]"
         (Fmt.list ~sep:Fmt.sp pp_msg)
         x (List.length x)
-  | Parsing_error (_, w) -> Fmt.pf ppf "@[<hv 2>%a@]@," Parser.Warning.pp w
+  | Parsing_error (Some line_number, w) ->
+      Fmt.pf ppf "@[<hv 0>File %S, line %i:@\nError: @[<hv 0>%a@]@]@," filename
+        line_number Parser.Warning.pp w
+  | Parsing_error (None, w) ->
+      Fmt.pf ppf "@[<hv 0>File %S:@\nError: %a@]@," filename Parser.Warning.pp w
   | Invalid_total_time (s, t, total) ->
       Fmt.pf ppf
-        "@[<hv 2>Invalid total time found for %s (reported %a, expected %a).@]@,"
-        s Time.pp t Time.pp total
+        "@[<hv 0>File %S:@\n\
+         Error: Invalid total time found for %s (reported %a, expected %a).@]@,"
+        filename s Time.pp t Time.pp total
   | Invalid_quarter kr ->
       Fmt.pf ppf
-        "@[<hv 2>In objective \"%a\":@ Work logged on objective scheduled for \
+        "@[<hv 0>File %S:@\n\
+         Error: In objective \"%a\":@ Work logged on objective scheduled for \
          %a@]@,"
-        KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter
-  | Invalid_objective w -> Fmt.pf ppf "@[<hv 2>%a@]@," KR.Warning.pp w
-
-let string_of_error = Fmt.to_to_string pp_error
+        filename KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter
+  | Invalid_objective w ->
+      Fmt.pf ppf "@[<hv 0>File %S:@\nError: %a@]@," filename KR.Warning.pp w
 
 (* Check a single line for formatting errors returning a list of error messages
    with the position *)
@@ -207,11 +214,10 @@ let lint ?okr_db ?(include_sections = []) ?(ignore_sections = []) ?check_time
   document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
     ?check_time ?report_kind ~filename s
 
-let short_messages_of_error file_name =
+let short_messages_of_error ~filename =
   let short_message line_number msg =
     [
-      Fmt.str "@[<hv 0>File %s, line %d:@\nError: %s@]" file_name line_number
-        msg;
+      Fmt.str "@[<hv 0>File %S, line %d:@\nError: %s@]" filename line_number msg;
     ]
   in
   let short_messagef line_number_opt fmt =

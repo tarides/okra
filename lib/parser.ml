@@ -66,7 +66,9 @@ module Warning = struct
         Fmt.pf ppf "In objective \"%a\":@ No project found (starting with '#')"
           KR.Heading.pp kr
     | Not_all_includes_accounted_for s ->
-        Fmt.pf ppf "Missing includes section: %a" Fmt.(list ~sep:comma string) s
+        Fmt.pf ppf "Missing includes section:@ %a"
+          Fmt.(list ~sep:comma string)
+          s
     | Invalid_markdown_in_work_items s -> Fmt.pf ppf "Invalid markdown:@ %s" s
 
   let pp_short ppf = function

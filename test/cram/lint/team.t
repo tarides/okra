@@ -40,8 +40,7 @@ Errors are not ignored outside the ignored section
   >   - @eng1 (1 day)
   >  - My work
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  Line 5: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
+  File "<stdin>", line 5:
+  Error: Single space used for indentation (' - text'). Remove or replace by 2 or more spaces.
   1 formatting errors found. Parsing aborted.
   [1]

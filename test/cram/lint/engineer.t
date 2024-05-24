@@ -60,14 +60,12 @@ Errors in include section are detected even if the rest is ignored.
   > 
   > More unformatted text.
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  In objective "This is a KR":
-    No time entry found. Each objective must be followed by '- @... (x days)'
-  [ERROR(S)]: <stdin>
-  
-  In objective "This is a KR":
-    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
+  File "<stdin>", line 10:
+  Error: In objective "This is a KR":
+         No time entry found. Each objective must be followed by '- @... (x days)'
+  File "<stdin>", line 10:
+  Error: In objective "This is a KR":
+         No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
 Only "No KR" and "New KR" are supported for KR's without identifiers
@@ -90,13 +88,11 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > 
   > More unformatted text.
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  Invalid total time found for eng1 (reported 1 day, expected 5 days).
-  [ERROR(S)]: <stdin>
-  
-  In objective "This is a KR":
-    No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
+  File "<stdin>":
+  Error: Invalid total time found for eng1 (reported 1 day, expected 5 days).
+  File "<stdin>", line 10:
+  Error: In objective "This is a KR":
+         No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
   $ okra lint --engineer << EOF
@@ -117,11 +113,10 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > 
   > More unformatted text.
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  In objective "This is a KR (KR1)":
-    Invalid time entry "@eng1 (1.1 day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
-    where x and y must be divisible by 0.5
+  File "<stdin>", line 11:
+  Error: In objective "This is a KR (KR1)":
+         Invalid time entry "@eng1 (1.1 day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
+         where x and y must be divisible by 0.5
   [1]
 
   $ okra lint --engineer << EOF
@@ -142,11 +137,10 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
   > 
   > More unformatted text.
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  In objective "This is a KR (KR1)":
-    Invalid time entry "@eng1 ( day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
-    where x and y must be divisible by 0.5
+  File "<stdin>", line 11:
+  Error: In objective "This is a KR (KR1)":
+         Invalid time entry "@eng1 ( day)" found. Format is '- @eng1 (x days), @eng2 (y days)'
+         where x and y must be divisible by 0.5
   [1]
 
 The total time reported must be 5 days
@@ -176,9 +170,8 @@ The total time reported must be 5 days
   >   - @eng1 (1.5 days), @eng1 (.5 day)
   >   - My work
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  Invalid total time found for eng1 (reported 4 days, expected 5 days).
+  File "<stdin>":
+  Error: Invalid total time found for eng1 (reported 4 days, expected 5 days).
   [1]
   $ okra lint --engineer << EOF
   > # Title
@@ -205,7 +198,6 @@ The total time reported must be 5 days
   >   - @eng1 (1.5 days), @eng1 (.5 day)
   >   - My work
   > EOF
-  [ERROR(S)]: <stdin>
-  
-  Invalid total time found for eng1 (reported 10 days, expected 5 days).
+  File "<stdin>":
+  Error: Invalid total time found for eng1 (reported 10 days, expected 5 days).
   [1]

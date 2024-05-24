@@ -7,19 +7,17 @@ Lint can read from a file:
   >   - Do it
   > EOF
   $ okra lint err.md
-  [ERROR(S)]: err.md
-  
-  In objective "Everything is great (E1)":
-    No time entry found. Each objective must be followed by '- @... (x days)'
+  File "err.md", line 3:
+  Error: In objective "Everything is great (E1)":
+         No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
 
 It can also read from stdin:
 
   $ okra lint < err.md
-  [ERROR(S)]: <stdin>
-  
-  In objective "Everything is great (E1)":
-    No time entry found. Each objective must be followed by '- @... (x days)'
+  File "<stdin>", line 3:
+  Error: In objective "Everything is great (E1)":
+         No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
 
 If everything is fine, nothing is printed and it exits with 0:
@@ -47,15 +45,13 @@ When errors are found in several files, they are all printed:
   >   - Do it
   > EOF
   $ okra lint err.md err2.md
-  [ERROR(S)]: err2.md
-  
-  In objective "Everything is great (E1)":
-    Invalid time entry "@a" found. Format is '- @eng1 (x days), @eng2 (y days)'
-    where x and y must be divisible by 0.5
-  [ERROR(S)]: err.md
-  
-  In objective "Everything is great (E1)":
-    No time entry found. Each objective must be followed by '- @... (x days)'
+  File "err2.md", line 4:
+  Error: In objective "Everything is great (E1)":
+         Invalid time entry "@a" found. Format is '- @eng1 (x days), @eng2 (y days)'
+         where x and y must be divisible by 0.5
+  File "err.md", line 3:
+  Error: In objective "Everything is great (E1)":
+         No time entry found. Each objective must be followed by '- @... (x days)'
   [1]
 
 A warning is emitted when the generated report contains placeholder text:
@@ -68,8 +64,7 @@ A warning is emitted when the generated report contains placeholder text:
   >   - Work Item 1
   > EOF
   $ okra lint err.md
-  [ERROR(S)]: err.md
-  
-  Line 5: Placeholder text detected. Replace with actual activity.
+  File "err.md", line 5:
+  Error: Placeholder text detected. Replace with actual activity.
   1 formatting errors found. Parsing aborted.
   [1]
