@@ -27,7 +27,8 @@ module Warning : sig
     | No_KR_ID_found of string  (** Empty or no KR ID *)
     | No_project_found of KR.Heading.t  (** No project found *)
     | Not_all_includes_accounted_for of string list
-        (** There should be a section for all include sections passed to the parser *)
+        (** There should be a section for all include sections passed to the
+            parser *)
     | Invalid_markdown_in_work_items of string
         (** Subset of markdown not supported in work items *)
 

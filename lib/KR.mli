@@ -30,12 +30,12 @@ module Work : sig
       | New_KR
       | No_KR
       | ID of string
-          (** The kinds of KR identifiers that are possible, a new KR, a no KR and a
-          KR with an concrete identifier. *)
+          (** The kinds of KR identifiers that are possible, a new KR, a no KR
+              and a KR with an concrete identifier. *)
 
     val equal : t -> t -> bool
     (** [equal a b] compares ids [a] and [b] for equality. Matching identifiers
-    is not case sensitive. *)
+        is not case sensitive. *)
 
     val pp : t Fmt.t
   end
@@ -81,8 +81,8 @@ module Warning : sig
   type t =
     | Objective_not_found of Work.t
     | Migration of { work_item : Work.t; objective : Work.t option }
-        (** For retro-compatibility only.
-            This case should be removed once everything has migrated to objectives. *)
+        (** For retro-compatibility only. This case should be removed once
+            everything has migrated to objectives. *)
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t

@@ -21,7 +21,8 @@ let title { title; _ } = title
 
 type t = { projects : project list; activity : Get_activity.Contributions.t }
 
-(** Grouping the activity items together in a tree: 1 item can have many sub-items *)
+(** Grouping the activity items together in a tree: 1 item can have many
+    sub-items *)
 module Tree = struct
   open Get_activity.Contributions
 

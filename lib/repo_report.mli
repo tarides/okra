@@ -84,7 +84,7 @@ val get :
   string list ->
   (data Project_map.t, [ `Msg of string ]) result
 (** [get ~period ~token repos] gets the information for [repos] over the
-      specified [period] using the Github [token] *)
+    specified [period] using the Github [token] *)
 
 val pp :
   ?with_names:bool -> ?with_times:bool -> ?with_descriptions:bool -> t Fmt.t
