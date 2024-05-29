@@ -74,7 +74,7 @@ let run conf =
     Okra.Report.pp ~show_time:(Common.with_days conf.c) ~show_time_calc:false
       ~show_engineers:(Common.with_names conf.c)
   in
-  Okra.Printer.to_channel oc pp okrs
+  Fmt.pf (Format.formatter_of_out_channel oc) "%a%!" pp okrs
 
 let term =
   let open Let_syntax_cmdliner in

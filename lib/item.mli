@@ -40,7 +40,7 @@ type t =
   | Code_block of string * string
   | Title of int * string
 
-val pp : t Printer.t
-val pp_inline : inline Printer.t
+val pp : t Fmt.t
+val pp_inline : inline Fmt.t
 val dump : t Fmt.t
 val dump_inline : inline Fmt.t

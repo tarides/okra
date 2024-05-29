@@ -186,8 +186,8 @@ let rec block = function
       err_markdown "Table";
       None
 
-let inline_to_string = Printer.to_string Item.pp_inline
-let item_to_string = Printer.to_string Item.pp
+let inline_to_string = Fmt.to_to_string Item.pp_inline
+let item_to_string = Fmt.to_to_string Item.pp
 
 let kr ~project ~objective = function
   | [] -> None

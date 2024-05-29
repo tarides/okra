@@ -268,9 +268,10 @@ let pp ?show_time ?show_time_calc ?show_engineers ppf t =
   let doc =
     List.concat_map (make_project ?show_time ?show_time_calc ?show_engineers) ps
   in
-  Printer.list ~sep:Printer.(newline ++ newline) Item.pp ppf doc;
-  Printer.newline ppf ()
+  let newline = Format.pp_force_newline in
+  Fmt.list ~sep:Fmt.(newline ++ newline) Item.pp ppf doc;
+  newline ppf ()
 
 let print ?show_time ?show_time_calc ?show_engineers t =
   let pp = pp ?show_time ?show_time_calc ?show_engineers in
-  Printer.to_stdout pp t
+  Fmt.pr "%a" pp t

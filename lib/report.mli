@@ -57,7 +57,7 @@ val add : ?okr_db:Masterdb.t -> t -> KR.t -> KR.Warning.t option
 val all_krs : t -> KR.t list
 
 val pp :
-  ?show_time:bool -> ?show_time_calc:bool -> ?show_engineers:bool -> t Printer.t
+  ?show_time:bool -> ?show_time_calc:bool -> ?show_engineers:bool -> t Fmt.t
 (** [pp] pretty-print weekly team reports.
 
     When [show_time_calc] is set, an extra line will be added to the output each

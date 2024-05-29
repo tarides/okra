@@ -44,7 +44,7 @@ let aggregate t =
   let pp =
     Okra.Report.pp ~show_time:true ~show_time_calc:false ~show_engineers:true
   in
-  Okra.Printer.to_channel stdout pp report
+  Fmt.pr "%a" pp report
 
 let lint_cmd =
   let doc = "Lint reports for a team." in

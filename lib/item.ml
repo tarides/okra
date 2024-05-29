@@ -77,7 +77,9 @@ let rec dump ppf = function
 
 (* Pretty-print contents *)
 
-open Printer
+open Fmt
+
+let newline = Format.pp_force_newline
 
 let rec pp_inline ppf = function
   | Concat c -> list ~sep:nop pp_inline ppf c
@@ -127,7 +129,7 @@ let rec pp ppf = function
           int ppf i;
           char ppf c;
           char ppf ' ';
-          nest 2 (list ~sep:newline pp) ppf e)
+          box (list ~sep:newline pp) ppf e)
         ppf y
   | List (Bullet c, y) ->
       list ~sep:newline
@@ -135,7 +137,7 @@ let rec pp ppf = function
           let e = insert_breaks_between_paragraph e in
           char ppf c;
           char ppf ' ';
-          nest 2 (list ~sep:newline pp) ppf e)
+          box (list ~sep:newline pp) ppf e)
         ppf y
   | Blockquote l ->
       string ppf "> ";
