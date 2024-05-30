@@ -138,11 +138,6 @@ let test_exclude_engineers () =
   let t2 = filter t ~exclude_engineers:[ e1; e2 ] in
   Alcotest.(check int) "exclude foo,bar" 0 (List.length (Report.all_krs t2));
 
-  (* check that counter do not change if the KR filter return total KRs. *)
-  let t1 = filter t ~include_krs:[ ID id2 ] ~include_engineers:[ e1 ] in
-  let kr = get_kr t1 in
-  Alcotest.(check int) "check counter" kr2.KR.counter kr.KR.counter;
-
   let t2 = filter t ~include_krs:[ ID id3 ] ~include_engineers:[ e2 ] in
   let kr = get_kr t2 in
   Alcotest.(check (list (list (pair string Alcotest_ext.time))))

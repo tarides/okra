@@ -52,7 +52,6 @@ module Kind : sig
 end
 
 type t = private {
-  counter : int;
   kind : Kind.t;
   project : string;
   objective : string;

@@ -246,7 +246,6 @@ module Id = struct
 end
 
 type t = {
-  counter : int;
   kind : Kind.t;
   project : string;
   objective : string;
@@ -255,15 +254,7 @@ type t = {
   work : Item.t list list;
 }
 
-let counter =
-  let c = ref 0 in
-  fun () ->
-    let i = !c in
-    incr c;
-    i
-
 let v ~kind ~project ~objective ~time_entries work =
-  let counter = counter () in
   (* Sum time per engineer *)
   let time_per_engineer =
     let tbl = Hashtbl.create 7 in
@@ -277,13 +268,12 @@ let v ~kind ~project ~objective ~time_entries work =
       time_entries;
     tbl
   in
-  { counter; kind; project; objective; time_entries; time_per_engineer; work }
+  { kind; project; objective; time_entries; time_per_engineer; work }
 
 let dump =
   let open Fmt.Dump in
   record
     [
-      field "counter" (fun t -> t.counter) Fmt.int;
       field "kind" (fun t -> t.kind) Kind.dump;
       field "project" (fun t -> t.project) string;
       field "objective" (fun t -> t.objective) string;
@@ -297,7 +287,6 @@ let dump =
     ]
 
 let merge x y =
-  let counter = x.counter in
   let kind = Kind.merge x.kind y.kind in
   let project =
     match (x.project, y.project) with
@@ -331,7 +320,7 @@ let merge x y =
     t
   in
   let work = x.work @ y.work in
-  { counter; kind; project; objective; time_entries; time_per_engineer; work }
+  { kind; project; objective; time_entries; time_per_engineer; work }
 
 let compare a b = Kind.compare a.kind b.kind
 
