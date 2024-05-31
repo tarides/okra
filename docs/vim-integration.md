@@ -9,7 +9,7 @@ To do so, set up this repository as a vim plugin. For example with [vim-plug],
 add this line to the list of plugins in `~/.vimrc`:
 
 ```vim
-Plug 'MagnusS/okra'
+Plug 'tarides/okra'
 ```
 
 By default, checkers are not active so a manual `:SyntasticCheck okra` is
