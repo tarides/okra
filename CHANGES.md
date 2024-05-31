@@ -1,3 +1,7 @@
+## unreleased
+
+- Add flycheck based checker for Emacs users (#243 , @punchagan)
+
 ## 1.0.0
 
 ### Changed
