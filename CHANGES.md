@@ -2,7 +2,7 @@
 
 ### Added
 
-- Add flycheck based checker for Emacs users (#243 , @punchagan)
+- Add flycheck based checker for Emacs users (#243, @punchagan)
 
 ## 2.0.0
 
