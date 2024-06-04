@@ -50,10 +50,10 @@ let lint_member_week admin_dir member ~week ~year =
            mode. *)
         match Lint.lint ic ~report_kind:Engineer ~filename:fname with
         | Ok () -> Complete
-        | Error (lx : [> Lint.Warning.t | Lint.Error.t ] list) ->
+        | Error lx ->
             Not_lint
               (List.fold_left
-                 (fun (acc : [> Lint.Error.t ] list) -> function
+                 (fun acc -> function
                    | #Lint.Error.t as e -> e :: acc
                    | #Lint.Warning.t -> acc)
                  [] lx
