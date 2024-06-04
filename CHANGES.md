@@ -1,6 +1,14 @@
 ## unreleased
 
+### Added
+
 - Add flycheck based checker for Emacs users (#243 , @punchagan)
+
+## 2.0.0
+
+### Changed
+
+- Lint: Workitems in legacy reports don't cause linting to fail (#244, @gpetiot)
 
 ## 1.0.0
 

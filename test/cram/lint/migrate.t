@@ -59,11 +59,11 @@ and the error message points to the corresponding objective.
   File "weekly.md", line 3:
   Error: Invalid objective: "This objective does not exist"
   File "weekly.md", line 19:
-  Error: Invalid objective:
-         "General okra maintenance (#1115)" is a work-item. You should use an objective instead.
+  Warning: Invalid objective:
+           "General okra maintenance (#1115)" is a work-item. You should use an objective instead.
   File "weekly.md", line 15:
-  Error: Invalid objective:
-         "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
+  Warning: Invalid objective:
+           "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
   [1]
 
   $ okra lint -e -C admin weekly.md --short

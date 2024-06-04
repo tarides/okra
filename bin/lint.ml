@@ -28,7 +28,7 @@ let red = Fmt.(styled `Red string)
 let pp_status style ppf s = Fmt.(pf ppf "[%a]" style s)
 
 let run conf =
-  let collect_errors name ic =
+  let lint name ic =
     match
       Okra.Lint.lint ~filename:name ?okr_db:(Common.okr_db conf.c)
         ?check_time:(Common.check_time conf.c)
@@ -38,33 +38,59 @@ let run conf =
         ic
     with
     | Ok () -> (name, [])
-    | Error errors -> (name, errors)
+    | Error lx -> (name, lx)
   in
   let report_error filename e =
-    match conf.format with
-    | Pretty -> Fmt.(pf stderr "%a" (Okra.Lint.Error.pp ~filename) e)
-    | Short -> Fmt.(pf stderr "%a" (Okra.Lint.Error.pp_short ~filename) e)
+    let open Okra.Lint in
+    match (e, conf.format) with
+    | (#Error.t as e), Pretty -> Fmt.epr "%a" (Error.pp ~filename) e
+    | (#Error.t as e), Short -> Fmt.epr "%a" (Error.pp_short ~filename) e
   in
-  let report_ok (name, _) =
+  let report_warning filename e =
+    let open Okra.Lint in
+    match (e, conf.format) with
+    | (#Warning.t as e), Pretty -> Fmt.epr "%a" (Warning.pp ~filename) e
+    | (#Warning.t as e), Short -> Fmt.epr "%a" (Warning.pp_short ~filename) e
+  in
+  let report_ok (name, warnings) =
     match conf.format with
-    | Pretty -> Fmt.pr "%a: %s\n%!" (pp_status green) "OK" name
+    | Pretty ->
+        Fmt.pr "%a: %s\n%!" (pp_status green) "OK" name;
+        List.iter (report_warning name) warnings
     | Short -> ()
   in
   try
-    let errors =
+    let lint_result =
       if conf.input_files <> [] then
         List.map
-          (fun path -> with_in_file path (fun ic -> collect_errors path ic))
+          (fun path -> with_in_file path (fun ic -> lint path ic))
           conf.input_files
-      else [ collect_errors "<stdin>" stdin ]
+      else [ lint "<stdin>" stdin ]
     in
+    (* [correct] can only contain warnings. [errors] can contain both. *)
     let correct, errors =
-      List.partition (fun (_name, err) -> err = []) errors
+      List.fold_left
+        (fun (correct, errors) (name, lx) ->
+          let err, warn =
+            List.fold_left
+              (fun (errors, warnings) -> function
+                | #Okra.Lint.Error.t as e -> (e :: errors, warnings)
+                | #Okra.Lint.Warning.t as w -> (errors, w :: warnings))
+              ([], []) lx
+          in
+          if err = [] then ((name, warn) :: correct, errors)
+          else (correct, (name, lx) :: errors))
+        ([], []) lint_result
     in
-    List.iter report_ok (List.rev correct);
+    List.iter report_ok correct;
     List.iter
-      (fun (name, error) -> List.iter (report_error name) error)
-      (List.rev errors);
+      (fun (name, lx) ->
+        List.iter
+          (function
+            | #Okra.Lint.Error.t as e -> report_error name e
+            | #Okra.Lint.Warning.t as w -> report_warning name w)
+          lx)
+      errors;
     if errors <> [] then exit 1
   with e ->
     Printf.fprintf stderr "Caught unknown error while linting:\n\n";
