@@ -34,7 +34,9 @@ module Objective : sig
 end
 
 val empty : unit -> t
-val of_krs : ?okr_db:Masterdb.t -> KR.t list -> t * KR.Warning.t list
+
+val of_krs :
+  ?okr_db:Masterdb.t -> KR.t list -> t * [> KR.Warning.t | KR.Error.t ] list
 
 val of_markdown :
   ?existing_report:t ->
@@ -43,7 +45,7 @@ val of_markdown :
   ?okr_db:Masterdb.t ->
   ?report_kind:Parser.report_kind ->
   Parser.markdown ->
-  t * KR.Warning.t list
+  t * [> KR.Warning.t | KR.Error.t ] list
 
 val iter :
   ?project:(string -> project -> unit) ->
@@ -53,7 +55,10 @@ val iter :
   unit
 
 val find : t -> KR.Id.t -> KR.t list
-val add : ?okr_db:Masterdb.t -> t -> KR.t -> KR.Warning.t option
+
+val add :
+  ?okr_db:Masterdb.t -> t -> KR.t -> [> KR.Warning.t | KR.Error.t ] option
+
 val all_krs : t -> KR.t list
 
 val pp :

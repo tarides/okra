@@ -348,35 +348,42 @@ let make_time_entries t =
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
 module Warning = struct
-  type t =
-    | Objective_not_found of Work.t
-    | Migration of { work_item : Work.t; objective : Work.t option }
+  type t = [ `Migration of Work.t * Work.t option ]
 
   let pp ppf = function
-    | Objective_not_found x -> Fmt.pf ppf "Invalid objective:@ %S" x.title
-    | Migration { work_item; objective = None } ->
+    | `Migration (work_item, None) ->
         Fmt.pf ppf
           "Invalid objective:@ \"%a\" is a work-item. You should use an \
            objective instead."
           Work.pp work_item
-    | Migration { work_item; objective = Some obj } ->
+    | `Migration (work_item, Some obj) ->
         Fmt.pf ppf
           "Invalid objective:@ \"%a\" is a work-item. You should use its \
            parent objective \"%a\" instead."
           Work.pp work_item Work.pp obj
 
   let pp_short ppf = function
-    | Objective_not_found x ->
-        Fmt.pf ppf "Invalid objective: %S (not found)" x.title
-    | Migration { work_item; objective = None } ->
+    | `Migration (work_item, None) ->
         Fmt.pf ppf "Invalid objective: \"%a\" (work-item)" Work.pp work_item
-    | Migration { work_item; objective = Some obj } ->
+    | `Migration (work_item, Some obj) ->
         Fmt.pf ppf "Invalid objective: \"%a\" (work-item), use \"%a\" instead"
           Work.pp work_item Work.pp obj
 
   let greppable = function
-    | Objective_not_found x -> Some x.title
-    | Migration { work_item; objective = _ } -> Some work_item.title
+    | `Migration (work_item, _) -> Some work_item.Work.title
+end
+
+module Error = struct
+  type t = [ `Objective_not_found of Work.t ]
+
+  let pp ppf = function
+    | `Objective_not_found x -> Fmt.pf ppf "Invalid objective:@ %S" x.Work.title
+
+  let pp_short ppf = function
+    | `Objective_not_found x ->
+        Fmt.pf ppf "Invalid objective: %S (not found)" x.Work.title
+
+  let greppable = function `Objective_not_found x -> Some x.Work.title
 end
 
 let update_from_master_db orig_kr db =
@@ -395,13 +402,13 @@ let update_from_master_db orig_kr db =
                 l "KR ID not found for new KR %S" orig_work.title);
           match db.work_item_db with
           (* Not found in objectives, no WI database *)
-          | None -> (orig_kr, Some (Warning.Objective_not_found orig_work))
+          | None -> (orig_kr, Some (`Objective_not_found orig_work))
           | Some work_item_db -> (
               match
                 Masterdb.Work_item.find_title_opt work_item_db orig_work.title
               with
               (* Not found in objectives, not found in workitems *)
-              | None -> (orig_kr, Some (Objective_not_found orig_work))
+              | None -> (orig_kr, Some (`Objective_not_found orig_work))
               | Some work_item_kr -> (
                   let work_item = orig_work in
                   match
@@ -409,14 +416,12 @@ let update_from_master_db orig_kr db =
                       work_item_kr.objective
                   with
                   (* Not found in objectives, found in WI db, no objective *)
-                  | None ->
-                      (orig_kr, Some (Migration { work_item; objective = None }))
+                  | None -> (orig_kr, Some (`Migration (work_item, None)))
                   (* Not found in objectives, found in WI db, has objective *)
                   | Some { printable_id = id; title; quarter; _ } ->
                       let work = { Work.id = ID id; title; quarter } in
                       let kr = { orig_kr with kind = Work work } in
-                      (kr, Some (Migration { work_item; objective = Some work }))
-                  )))
+                      (kr, Some (`Migration (work_item, Some work))))))
       | Some db_kr ->
           if orig_work.id = No_KR then
             Log.warn (fun l ->

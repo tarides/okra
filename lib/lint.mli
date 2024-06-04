@@ -17,17 +17,22 @@
 
 module Error : sig
   type t =
-    | Format_error of (int * string) list
-    | Parsing_error of int option * Parser.Warning.t
-    | Invalid_total_time of string * Time.t * Time.t
-    | Invalid_quarter of int option * KR.Work.t
-    | Invalid_objective of int option * KR.Warning.t
+    [ `Format_error of (int * string) list
+    | `Parsing_error of int option * Parser.Warning.t
+    | `Invalid_total_time of string * Time.t * Time.t
+    | `Invalid_quarter of int option * KR.Work.t
+    | `Invalid_KR of int option * KR.Error.t ]
 
   val pp_short : filename:string -> t Fmt.t
   val pp : filename:string -> t Fmt.t
 end
 
-type lint_result = (unit, Error.t list) result
+module Warning : sig
+  type t = [ `Warning_KR of int option * KR.Warning.t ]
+
+  val pp_short : filename:string -> t Fmt.t
+  val pp : filename:string -> t Fmt.t
+end
 
 val lint :
   ?okr_db:Masterdb.t ->
@@ -37,7 +42,7 @@ val lint :
   ?report_kind:Parser.report_kind ->
   filename:string ->
   in_channel ->
-  lint_result
+  (unit, [> Warning.t | Error.t ] list) result
 
 val lint_string_list :
   ?okr_db:Masterdb.t ->
@@ -47,5 +52,5 @@ val lint_string_list :
   ?report_kind:Parser.report_kind ->
   filename:string ->
   string list ->
-  lint_result
+  (unit, [> Warning.t | Error.t ] list) result
 (** [lint_string_list] is like {!lint} except the input is a list of lines *)

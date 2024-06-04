@@ -78,10 +78,17 @@ end
 
 module Warning : sig
   type t =
-    | Objective_not_found of Work.t
-    | Migration of { work_item : Work.t; objective : Work.t option }
-        (** For retro-compatibility only. This case should be removed once
-            everything has migrated to objectives. *)
+    [ `Migration of Work.t (* work-item *) * Work.t option (* objective *) ]
+  (** For retro-compatibility only. This case should be removed once everything
+      has migrated to objectives. *)
+
+  val pp : t Fmt.t
+  val pp_short : t Fmt.t
+  val greppable : t -> string option
+end
+
+module Error : sig
+  type t = [ `Objective_not_found of Work.t ]
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
@@ -99,7 +106,9 @@ val v :
 val dump : t Fmt.t
 val merge : t -> t -> t
 val compare : t -> t -> int
-val update_from_master_db : t -> Masterdb.t -> t * Warning.t option
+
+val update_from_master_db :
+  t -> Masterdb.t -> t * [> Warning.t | Error.t ] option
 
 (** {2 Pretty-print} *)
 

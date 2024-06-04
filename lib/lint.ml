@@ -19,11 +19,11 @@ let ( let* ) = Result.bind
 
 module Error = struct
   type t =
-    | Format_error of (int * string) list
-    | Parsing_error of int option * Parser.Warning.t
-    | Invalid_total_time of string * Time.t * Time.t
-    | Invalid_quarter of int option * KR.Work.t
-    | Invalid_objective of int option * KR.Warning.t
+    [ `Format_error of (int * string) list
+    | `Parsing_error of int option * Parser.Warning.t
+    | `Invalid_total_time of string * Time.t * Time.t
+    | `Invalid_quarter of int option * KR.Work.t
+    | `Invalid_KR of int option * KR.Error.t ]
 
   let pp_error_kw =
     Fmt.styled `Bold
@@ -43,26 +43,80 @@ module Error = struct
           Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
     in
     function
-    | Format_error x ->
+    | `Format_error x ->
         let pp_msg ppf (pos, msg) =
           Fmt.pf ppf "File %S, line %d:@\nError: %s" filename pos msg
         in
         Fmt.pf ppf "@[<v 0>%a@]" (Fmt.list ~sep:Fmt.sp pp_msg) x
-    | Parsing_error (line_number, w) ->
+    | `Parsing_error (line_number, w) ->
         pf line_number (fun m -> m ppf "@[<hv 0>%a@]" Parser.Warning.pp w)
-    | Invalid_total_time (s, t, total) ->
+    | `Invalid_total_time (s, t, total) ->
         pf None (fun m ->
             m ppf
               "@[<hv 0>Invalid total time found for %s:@ Reported %a, expected \
                %a.@]"
               s Time.pp t Time.pp total)
-    | Invalid_quarter (line_number, kr) ->
+    | `Invalid_quarter (line_number, kr) ->
         pf line_number (fun m ->
             m ppf
               "@[<hv 0>In objective \"%a\":@ Work logged on objective \
                scheduled for %a@]"
               KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter)
-    | Invalid_objective (line_number, w) ->
+    | `Invalid_KR (line_number, w) ->
+        pf line_number (fun m -> m ppf "@[<hv 0>%a@]" KR.Error.pp w)
+
+  let pp_short ~filename ppf =
+    let pp_loc =
+      Fmt.styled `Bold @@ fun ppf (filename, line_number) ->
+      Fmt.pf ppf "%s:%i" filename line_number
+    in
+    let pf line_number_opt k =
+      let line_number = Option.value ~default:1 line_number_opt in
+      k (fun ppf ->
+          Fmt.pf ppf "@[<hv 0>@{<loc>%a@}: " pp_loc (filename, line_number);
+          Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
+    in
+    function
+    | `Format_error errs ->
+        List.iter
+          (fun (line_number, message) ->
+            pf (Some line_number) (fun m -> m ppf "%s" message))
+          errs
+    | `Parsing_error (line_number, w) ->
+        pf line_number (fun m -> m ppf "%a" Parser.Warning.pp_short w)
+    | `Invalid_total_time (s, t, total) ->
+        pf None (fun m ->
+            m ppf "Invalid total time for %S (%a/%a)" s Time.pp t Time.pp total)
+    | `Invalid_quarter (line_number, kr) ->
+        pf line_number (fun m ->
+            m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
+              (Fmt.option Quarter.pp) kr.quarter)
+    | `Invalid_KR (line_number, w) ->
+        pf line_number (fun m -> m ppf "%a" KR.Error.pp_short w)
+end
+
+module Warning = struct
+  type t = [ `Warning_KR of int option * KR.Warning.t ]
+
+  let pp_warning_kw =
+    Fmt.styled `Bold
+    @@ Fmt.styled (`Fg `Yellow)
+    @@ fun ppf () -> Fmt.pf ppf "%s" "Warning"
+
+  let pp ~filename ppf =
+    let pp_loc =
+      Fmt.styled `Bold @@ fun ppf (filename, line_number) ->
+      Fmt.pf ppf "File %S, line %i" filename line_number
+    in
+    let pf line_number_opt k =
+      let line_number = Option.value ~default:1 line_number_opt in
+      k (fun ppf ->
+          Fmt.pf ppf "@[<hv 0>@{<loc>%a@}:@\n%a: " pp_loc
+            (filename, line_number) pp_warning_kw ();
+          Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
+    in
+    function
+    | `Warning_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "@[<hv 0>%a@]" KR.Warning.pp w)
 
   let pp_short ~filename ppf =
@@ -77,25 +131,9 @@ module Error = struct
           Fmt.kpf (fun ppf -> Fmt.pf ppf "@]@,") ppf)
     in
     function
-    | Format_error errs ->
-        List.iter
-          (fun (line_number, message) ->
-            pf (Some line_number) (fun m -> m ppf "%s" message))
-          errs
-    | Parsing_error (line_number, w) ->
-        pf line_number (fun m -> m ppf "%a" Parser.Warning.pp_short w)
-    | Invalid_total_time (s, t, total) ->
-        pf None (fun m ->
-            m ppf "Invalid total time for %S (%a/%a)" s Time.pp t Time.pp total)
-    | Invalid_quarter (line_number, kr) ->
-        pf line_number (fun m ->
-            m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
-              (Fmt.option Quarter.pp) kr.quarter)
-    | Invalid_objective (line_number, w) ->
+    | `Warning_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "%a" KR.Warning.pp_short w)
 end
-
-type lint_result = (unit, Error.t list) result
 
 let fail_fmt_patterns =
   [
@@ -138,7 +176,7 @@ let add_context lines w =
     | Some s -> grep_n s lines
     | None -> None
   in
-  Error.Parsing_error (line_number, w)
+  `Parsing_error (line_number, w)
 
 let check_total_time ?check_time (krs : KR.t list) report_kind =
   match report_kind with
@@ -163,7 +201,7 @@ let check_total_time ?check_time (krs : KR.t list) report_kind =
         (fun name time acc ->
           let* () = acc in
           if Time.equal time expected then Ok ()
-          else Error (Error.Invalid_total_time (name, time, expected)))
+          else Error (`Invalid_total_time (name, time, expected)))
         tbl (Ok ())
 
 let check_quarters quarter krs warnings lines =
@@ -175,7 +213,7 @@ let check_quarters quarter krs warnings lines =
           if Quarter.check quarter w.quarter then acc
           else
             let line_number = grep_n w.title lines in
-            Error.Invalid_quarter (line_number, w) :: acc)
+            `Invalid_quarter (line_number, w) :: acc)
     warnings krs
 
 let maybe_emit warnings =
@@ -205,14 +243,13 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
   let* () = maybe_emit warnings in
   let report, report_warnings = Report.of_krs ?okr_db okrs in
   let warnings =
+    let line_number = function Some s -> grep_n s lines | None -> None in
     List.fold_left
-      (fun acc w ->
-        let line_number =
-          match KR.Warning.greppable w with
-          | Some s -> grep_n s lines
-          | None -> None
-        in
-        Error.Invalid_objective (line_number, w) :: acc)
+      (fun acc -> function
+        | #KR.Error.t as w ->
+            `Invalid_KR (line_number (KR.Error.greppable w), w) :: acc
+        | #KR.Warning.t as w ->
+            `Warning_KR (line_number (KR.Warning.greppable w), w) :: acc)
       warnings report_warnings
   in
   let* () = maybe_emit warnings in
@@ -226,7 +263,7 @@ let document_ok ?okr_db ~include_sections ~ignore_sections ~format_errors
   if !format_errors <> [] then
     Error
       [
-        Error.Format_error
+        `Format_error
           (List.sort (fun (x, _) (y, _) -> compare x y) !format_errors);
       ]
   else
