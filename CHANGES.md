@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Lint: Workitems in legacy reports don't cause linting to fail (#<PR_NUMBER>, @gpetiot)
+- Lint: Workitems in legacy reports don't cause linting to fail (#244, @gpetiot)
 
 ## 1.0.0
 
