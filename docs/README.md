@@ -20,4 +20,5 @@ Table of contents
   - [Repository Report](report-formats.md#repository-report)
   - [Team activity report](report-formats.md#team-activity-report)
 - [Configuration file](configuration-file.md)
+- [Emacs integration](emacs-integration.md)
 - [Vim integration](vim-integration.md)
