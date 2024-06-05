@@ -122,7 +122,4 @@ Parentheses in the objective name:
   > EOF
 
   $ okra lint -e eng1.md
-  File "eng1.md", line 3:
-  Error: In objective "Ensure OCaml 5 series has feature parity with OCaml 4":
-         No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
-  [1]
+  [OK]: eng1.md

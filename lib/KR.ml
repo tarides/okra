@@ -182,17 +182,24 @@ module Heading = struct
     | Work (s, Some id) -> Fmt.pf ppf "%s (%a)" s Work.Id.pp id
     | Work (s, None) -> Fmt.pf ppf "%s" s
 
+  let sub_opt s x y =
+    match String.sub s x y with
+    | exception Invalid_argument _ -> None
+    | r -> Some r
+
   let of_string s =
     let title, id =
-      match String.split_on_char '(' s with
-      | [] -> (None, None)
-      | title :: rest -> (
-          match rest with
-          | [] -> (Some title, None)
-          | id :: _ -> (
-              match String.split_on_char ')' id with
-              | [] -> (Some title, Some id)
-              | id :: _ -> (Some title, Some id)))
+      match String.rindex_opt s '(' with
+      | None -> (Some s, None)
+      | Some opn_par ->
+          let title = String.sub s 0 opn_par in
+          let end_index =
+            match String.rindex_opt s ')' with
+            | None -> String.length s
+            | Some cls_par -> cls_par
+          in
+          let id = sub_opt s (opn_par + 1) (end_index - opn_par - 1) in
+          (Some title, id)
     in
     match title with
     | Some title -> (
