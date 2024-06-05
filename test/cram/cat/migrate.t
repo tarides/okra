@@ -19,6 +19,7 @@ and the error message points to the corresponding objective.
 
   $ cat > admin/data/team-objectives.csv << EOF
   > "id","title","status","quarter","team","pillar","objective","funder","labels","progress"
+  > "#543","Ensure OCaml 5 series has feature parity with OCaml 4 (Commercial)","In Progress","Q2 2024","Compiler Backend","Compiler","","Jane Street - Commercial","Proposal",""
   > "#558","Property-Based Testing for Multicore","In Progress","Q2 2024","Compiler & Language","Compiler","","","Proposal",""
   > "#677","Improve OCaml experience on Windows","Todo","Q2 2024","Multicore applications","Ecosystem","","","",""
   > "#701","JSOO Effect Performance","","Q2 2024","Compiler & Language","Compiler","","","focus/technology,level/team",""
@@ -115,3 +116,33 @@ Linting of the produced file succeeds because we now use objectives
 
   $ okra lint -e -C admin eng1.objectives.md
   [OK]: eng1.objectives.md
+
+Parentheses in the objective name:
+
+  $ cat > eng1.md << EOF
+  > # Last week
+  > 
+  > - Ensure OCaml 5 series has feature parity with OCaml 4 (Commercial) (#543)
+  >   - @eng1 (1 day)
+  >   - Something
+  > 
+  > - Leave (#1074)
+  >   - @eng1 (4 days)
+  >   - off
+  > EOF
+
+  $ okra cat -e -C admin eng1.md -o eng1.cat.md
+
+  $ cat eng1.cat.md
+  # Last week
+  
+  - Ensure OCaml 5 series has feature parity with OCaml 4 (Commercial) (#543)
+    - @eng1 (1 day)
+    - Something
+  
+  - Leave
+    - @eng1 (4 days)
+    - off
+
+  $ okra lint -e -C admin eng1.cat.md
+  [OK]: eng1.cat.md
