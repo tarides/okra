@@ -10,6 +10,7 @@ Workitems can be checked when a DB of this form is provided:
   > "Learn","Learning","Active 🏗","Rolling","Engineering","All","","","",""
   > "Onboard","Onboard","Active 🏗","Rolling","Engineering","All","","","",""
   > "Meet","Meet","Active 🏗","Rolling","Engineering","All","","","",""
+  > "#543","Ensure OCaml 5 series has feature parity with OCaml 4 (Commercial)","In Progress","Q2 2024","Compiler Backend","Compiler","","Jane Street - Commercial","Proposal",""
   > "#1053","Multicore OCaml Merlin project","Dropped ❌","Q3 2023 - Jul - Sep","Benchmark tooling","","Maintenance - Irmin","","",""
   > "#1058","Application and Operational Metrics","Complete ✅","Q4 2023 - Oct - Dec","Ci & Ops","QA","Operational Metrics for Core OCaml Services","Jane Street - Community","pillar/qa","50."
   > "#1090","Property-Based Testing for Multicore","Active 🏗","Q1 2024 - Jan - Mar","Compiler and language","Compiler","Property-Based Testing for Multicore","","pillar/compiler,team/compiler&language,Proposal","25."
@@ -105,3 +106,23 @@ The DB can be looked up in the [repo-dir] passed through the [-C]/[--repo-dir] o
   - "Property-Based Testing for Multicore"
   - "Invalid name"
   [OK]: weekly.md
+
+Parentheses in the objective name:
+
+  $ cat > eng1.md << EOF
+  > # Last week
+  > 
+  > - Ensure OCaml 5 series has feature parity with OCaml 4 (Commercial) (#543)
+  >   - @eng1 (1 day)
+  >   - Something
+  > 
+  > - Leave (#1074)
+  >   - @eng1 (4 days)
+  >   - off
+  > EOF
+
+  $ okra lint -e eng1.md
+  File "eng1.md", line 3:
+  Error: In objective "Ensure OCaml 5 series has feature parity with OCaml 4":
+         No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
+  [1]
