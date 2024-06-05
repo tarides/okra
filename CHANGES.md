@@ -6,7 +6,7 @@
 
 ### Fixed
 
-- Fix parsing of objective names containing parentheses (#<PR_NUMBER>, @gpetiot)
+- Fix parsing of objective names containing parentheses (#246, @gpetiot)
 
 ## 2.0.0
 
