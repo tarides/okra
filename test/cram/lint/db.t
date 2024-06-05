@@ -121,5 +121,5 @@ Parentheses in the objective name:
   >   - off
   > EOF
 
-  $ okra lint -e eng1.md
+  $ okra lint -e -C admin eng1.md
   [OK]: eng1.md
