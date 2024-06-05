@@ -4,6 +4,10 @@
 
 - Add flycheck based checker for Emacs users (#243, @punchagan)
 
+### Fixed
+
+- Fix parsing of objective names containing parentheses (#<PR_NUMBER>, @gpetiot)
+
 ## 2.0.0
 
 ### Changed
