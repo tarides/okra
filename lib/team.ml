@@ -78,7 +78,7 @@ let pp_report ppf = function
   | { filename; status = Not_found; _ } -> Fmt.pf ppf "Not found: %s" filename
   | { filename; status = Not_lint e; _ } ->
       Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" filename
-        (Fmt.list (Lint.Error.pp ~filename))
+        (Fmt.list (Lint.Error.pp ~filename) ~sep:Fmt.nop)
         e
 
 let result_partition f =
@@ -102,7 +102,7 @@ let pp_member_lint ppf { member = _; week_reports } =
   else
     Error
       (fun () ->
-        Fmt.pf ppf "@[%a@]"
+        Fmt.pf ppf "@[<v 0>%a@]"
           (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
           not_complete)
 
