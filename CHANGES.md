@@ -3,6 +3,7 @@
 ### Fixed
 
 - Fix: Use the admin_dir field in conf file to infer the path to WI/obj DB (#253, @gpetiot)
+- Fix missing trailing break after format error messages (#250, @gpetiot)
 
 ## 2.0.1
 
