@@ -1,5 +1,9 @@
 ## unreleased
 
+### Changed
+
+- Update the Meta standardized categories: Off, Hack and Misc (#254, @gpetiot)
+
 ### Fixed
 
 - Fix: Use the admin_dir field in conf file to infer the path to WI/obj DB (#253, @gpetiot)

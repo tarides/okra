@@ -36,13 +36,9 @@ Special objectives can be used to report the following activities:
 
 |   Category | Description  |
 |:------------------|:-------------|
-| Meet       | Meetings, Offsite |
-| Management | TL and EM work other than meetings |
-| Leave      | Any kind of leaves, holidays, time off from work, incl 2-week Aug company break |
-| Learning   | Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats |
-| Hack       | Hacking Days |
-| Onboard    | Onboarding time |
-| Community  | Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack. |
+| Off      | Any kind of leave, holiday, or time off from work, including the two-week August company break. |
+| Hack       | Time spent on Hacking Days. |
+| Misc  | This includes any work that does not fall under specific objectives. |
 
 This information is also available at and is kept in sync with [tarides/admin GH repo README](https://github.com/tarides/admin?tab=readme-ov-file#reporting-non-engineering-work-time).
 

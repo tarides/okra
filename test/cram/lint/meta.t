@@ -19,31 +19,15 @@ Meta workitems are not checked in the database:
   $ cat > weekly.md << EOF
   > # Last week
   > 
-  > - Meet
-  >   - @eng1 (1 day)
-  >   - xxx
-  > 
-  > - Management
-  >   - @eng1 (1 day)
-  >   - xxx
-  > 
   > - Leave
   >   - @eng1 (1 day)
   > 
-  > - Learning
-  >   - @eng1 (0.5 day)
-  >   - xxx
-  > 
   > - Hack
-  >   - @eng1 (0.5 day)
+  >   - @eng1 (1 day)
   >   - xxx
   > 
-  > - Onboard
-  >   - @eng1 (0.5 day)
-  >   - xxx
-  > 
-  > - Community
-  >   - @eng1 (0.5 day)
+  > - Off-objective
+  >   - @eng1 (3 days)
   >   - xxx
   > EOF
 

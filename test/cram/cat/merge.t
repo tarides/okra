@@ -57,7 +57,7 @@ Behaviour without a database
     - Some work
     - Some other work
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days)
 
   $ okra cat --engineer --append-to=agg.md eng3.md > agg2.md && cat agg2.md
@@ -73,7 +73,7 @@ Behaviour without a database
     - @eng3 (1.5 days)
     - Some work
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days), @eng3 (2 days)
 
 Behaviour with a database
@@ -86,7 +86,7 @@ Behaviour with a database
     - Some work
     - Some other work
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days)
 
   $ okra cat --objective-db=team-objectives.csv --engineer --append-to=agg.md eng3.md > agg2.md && cat agg2.md
@@ -102,5 +102,5 @@ Behaviour with a database
     - @eng3 (1.5 days)
     - Some work
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days), @eng3 (2 days)

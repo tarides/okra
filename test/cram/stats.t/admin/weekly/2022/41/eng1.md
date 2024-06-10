@@ -1,10 +1,10 @@
 # Last Week
 
-- Learning
+- Misc
   - @eng1 (0.5 day)
-  - Learn
+  - Something
 
-- Leave
+- Off
   - @eng1 (0.5 day)
 
 ## Project 1

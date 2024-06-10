@@ -6,5 +6,5 @@
 - A KR (KR100)
   - @eng1 (1 day)
   - Work 1
-- Leave
+- Off
   - @eng1 (1 day)

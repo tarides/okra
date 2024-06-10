@@ -17,11 +17,11 @@ Team aggregate example
     - @eng2 (1 day)
     - Work 1
   
-  - Learning
+  - Misc
     - @eng2 (1 day)
-    - Learn 1
+    - Something
   
-  - Leave
+  - Off
     - @eng2 (1 day)
 
 Only select a few okrs
@@ -47,11 +47,11 @@ Exclude a few okrs
     - @eng1 (1 day)
     - Work 1
   
-  - Learning
+  - Misc
     - @eng2 (1 day)
-    - Learn 1
+    - Something
   
-  - Leave
+  - Off
     - @eng2 (1 day)
 
 Multiple weeks
@@ -76,11 +76,11 @@ Multiple weeks
     - Work 1
     - Work 1
   
-  - Learning
+  - Misc
     - @eng2 (1 day)
-    - Learn 1
+    - Something
   
-  - Leave
+  - Off
     - @eng1 (1 day), @eng2 (1 day)
 
 The result of aggregate should pass the lint
@@ -120,7 +120,7 @@ The result of aggregate should pass the lint
   $ cat aggr.md
   # Last week
   
-  - Leave
+  - Off
     - @dummy (10 days)
     - xxx
     - xxx
@@ -194,5 +194,5 @@ This weekly is using objectives:
     - @eng2 (1 day)
     - This is an objective
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days)

@@ -26,65 +26,40 @@ let compare_no_case x y =
   String.compare x y
 
 module Meta = struct
-  type t = Community | Hack | Learning | Leave | Management | Meet | Onboard
+  type t = Hack | Off | Misc
 
   let pp ppf = function
-    | Community -> Fmt.pf ppf "Community"
     | Hack -> Fmt.pf ppf "Hack"
-    | Learning -> Fmt.pf ppf "Learning"
-    | Leave -> Fmt.pf ppf "Leave"
-    | Management -> Fmt.pf ppf "Management"
-    | Meet -> Fmt.pf ppf "Meet"
-    | Onboard -> Fmt.pf ppf "Onboard"
+    | Off -> Fmt.pf ppf "Off"
+    | Misc -> Fmt.pf ppf "Misc"
 
   let of_string s =
     match String.lowercase_ascii s with
-    | "community" -> Some Community
     | "hack" -> Some Hack
-    | "learning" -> Some Learning
-    | "leave" -> Some Leave
-    | "management" -> Some Management
-    | "meet" -> Some Meet
-    | "onboard" -> Some Onboard
+    | "off" | "leave" -> Some Off
+    | "misc" | "off-objective" | "off_objective" | "off objective" -> Some Misc
     | _ -> None
 
   let compare x y =
     String.compare (Fmt.to_to_string pp x) (Fmt.to_to_string pp y)
 
   let pp_template ~username ppf () =
-    let pp_user = User.pp ~with_link:false in
+    let pp_user ppf () = User.pp ~with_link:false ppf username in
     Fmt.pf ppf
       {|
-- Leave
+- Off
   - %a (0 days)
-  - Any kind of leaves, holidays, time off from work, incl 2-week Aug company break
-
-- Community
-  - %a (0 days)
-  - Maintenance work that does not fall into any maintenance proposals. Discussion on discuss, discord, slack.
+  - Any kind of leaves, holidays, time off from work, including 2-week August company break.
 
 - Hack
   - %a (0 days)
-  - Hacking Days
+  - Hacking Days.
 
-- Learning
+- Misc
   - %a (0 days)
-  - Attending company-sponsored training, attending Conferences, learning, Mirage/OCaml retreats
-
-- Management
-  - %a (0 days)
-  - TL and EM work other than meetings
-
-- Meet
-  - %a (0 days)
-  - Meetings, Offsite
-
-- Onboard
-  - %a (0 days)
-  - Onboarding time
+  - Any work that does not fall under specific objectives.
 |}
-      pp_user username pp_user username pp_user username pp_user username
-      pp_user username pp_user username pp_user username
+      pp_user () pp_user () pp_user ()
 end
 
 module Work = struct

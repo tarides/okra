@@ -1,6 +1,6 @@
 # Last Week
 
-- Leave
+- Off
   - @eng2 (1 day)
 
 ## Project 1

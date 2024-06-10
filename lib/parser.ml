@@ -252,7 +252,7 @@ let kr ~project ~objective = function
       let work = List.filter_map (function Work e -> Some e | _ -> None) l in
       (if work = [] then
          match !kr_heading with
-         | Some (KR.Heading.Meta KR.Meta.Leave) -> ()
+         | Some (KR.Heading.Meta KR.Meta.Off) -> ()
          | Some _ -> err_no_work kr
          | None -> ());
 

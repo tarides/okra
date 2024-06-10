@@ -17,7 +17,7 @@
  *)
 
 module Meta : sig
-  type t = Community | Hack | Learning | Leave | Management | Meet | Onboard
+  type t = Hack | Off | Misc
 
   val pp : t Fmt.t
   val compare : t -> t -> int

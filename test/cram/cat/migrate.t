@@ -75,7 +75,7 @@ This weekly is using objectives:
     - @eng2 (1 day)
     - This is an objective
   
-  - Leave
+  - Off
     - @eng1 (2 days), @eng2 (2 days)
 
 # Automatic update of weekly using okra cat
@@ -109,7 +109,7 @@ We rewrite the file using okra cat
     - @eng1 (3 days)
     - This is a workitem with a parent objective in the DB
   
-  - Leave
+  - Off
     - @eng1 (2 days)
 
 Linting of the produced file succeeds because we now use objectives
@@ -140,7 +140,7 @@ Parentheses in the objective name:
     - @eng1 (1 day)
     - Something
   
-  - Leave
+  - Off
     - @eng1 (4 days)
     - off
 
