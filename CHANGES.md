@@ -1,3 +1,9 @@
+## unreleased
+
+### Fixed
+
+- Fix: Use the admin_dir field in conf file to infer the path to WI/obj DB (#<PR_NUMBER>, @gpetiot)
+
 ## 2.0.1
 
 ### Added

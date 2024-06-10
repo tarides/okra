@@ -74,3 +74,21 @@ and the error message points to the corresponding objective.
   weekly.md:19: Invalid objective: "General okra maintenance (#1115)" (work-item)
   weekly.md:15: Invalid objective: "Property-Based Testing for Multicore (#1090)" (work-item), use "Property-Based Testing for Multicore (#558)" instead
   [1]
+
+The DB can be looked up in the [admin_dir] field set int the configuration file:
+  $ cat > eng1.md << EOF
+  > # Last week
+  > 
+  > - Doesnt exist (#100000)
+  >   - @eng1 (5 days)
+  >   - Something
+  > EOF
+  $ cat > conf.yml << EOF
+  > admin_dir: admin
+  > EOF
+  $ okra lint -e eng1.md
+  [OK]: eng1.md
+  $ okra lint -e --conf conf.yml eng1.md
+  File "eng1.md", line 3:
+  Error: Invalid objective: "Doesnt exist"
+  [1]

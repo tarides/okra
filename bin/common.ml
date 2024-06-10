@@ -364,18 +364,28 @@ let term =
     report_kind;
   }
 
+let repo t =
+  match t.repo with
+  | Some x -> Ok x
+  | None ->
+      Option.to_result (Conf.admin_dir t.conf)
+        ~none:
+          (`Msg
+            "Missing [-C] or [--repo-dir] argument, or [admin_dir] \
+             configuration.")
+
 let db_path t ~from_cmdline ~from_conf ~from_file:fname =
   let ( or ) x y = match x with Some x -> Some x | None -> y in
   from_cmdline
   or from_conf t.conf
   or
-  match t.repo with
-  | Some repo -> (
+  match repo t with
+  | Ok repo -> (
       let path = Fpath.(v repo / "data" / fname) in
       match Bos.OS.File.exists path with
       | Ok true -> Some (Fpath.to_string path)
       | _ -> None)
-  | None -> None
+  | Error _ -> None
 
 let okr_db t =
   match t.okr_db_state with
@@ -418,16 +428,6 @@ let filter t =
       in
       let extra_filter = Okra.Filter.v ?include_krs:(Some kr_ids) () in
       Okra.Filter.union t.filter extra_filter
-
-let repo t =
-  match t.repo with
-  | Some x -> Ok x
-  | None ->
-      Option.to_result (Conf.admin_dir t.conf)
-        ~none:
-          (`Msg
-            "Missing [-C] or [--repo-dir] argument, or [admin_dir] \
-             configuration.")
 
 let date t = t.calendar
 let year t = Okra.Calendar.year t.calendar
