@@ -3,16 +3,16 @@ Team Lint example with invalid reports:
 
   $ okra team lint -C admin/ -w 40-43 -y 2022 --conf ./conf.yml
   Team "My Team":
-    + Report week 42: Not found: admin//weekly/2022/42/eng1.md
-    + Report week 40: Not found: admin//weekly/2022/40/eng2.md
-    + Report week 41: Lint error at admin//weekly/2022/41/eng2.md
-                      File "admin//weekly/2022/41/eng2.md", line 4:
+    + Report week 42: Not found: admin/weekly/2022/42/eng1.md
+    + Report week 40: Not found: admin/weekly/2022/40/eng2.md
+    + Report week 41: Lint error at admin/weekly/2022/41/eng2.md
+                      File "admin/weekly/2022/41/eng2.md", line 4:
                       Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       
-                      File "admin//weekly/2022/41/eng2.md", line 5:
+                      File "admin/weekly/2022/41/eng2.md", line 5:
                       Error: + used as bullet point, this can confuse the parser. Only use - as bullet marker.
                       
-    + Report week 42: Not found: admin//weekly/2022/42/eng2.md
+    + Report week 42: Not found: admin/weekly/2022/42/eng2.md
   [1]
 
 Team Lint example with only valid reports:
@@ -57,6 +57,6 @@ Wrong week
 
   $ okra team lint -C admin/ -w 53 -y 2020 --conf ./conf.yml
   Team "My Team":
-    + Report week 53: Not found: admin//weekly/2020/53/eng1.md
-    + Report week 53: Not found: admin//weekly/2020/53/eng2.md
+    + Report week 53: Not found: admin/weekly/2020/53/eng1.md
+    + Report week 53: Not found: admin/weekly/2020/53/eng2.md
   [1]

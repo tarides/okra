@@ -35,7 +35,13 @@ type team_report = { team : t; user_reports : user_report list }
 type lint_report = team_report list
 
 let file_path ~admin_dir ~week ~year ~engineer_name =
-  Format.asprintf "%s/weekly/%4d/%02i/%s.md" admin_dir year week engineer_name
+  let open Fpath in
+  v admin_dir
+  / "weekly"
+  / Fmt.str "%4d" year
+  / Fmt.str "%02i" week
+  / (engineer_name ^ ".md")
+  |> to_string
 
 let lint_member_week admin_dir member ~week ~year =
   let fname =
