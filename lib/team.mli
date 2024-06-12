@@ -40,7 +40,13 @@ val aggregate :
 (** [aggregate admin_dir weeks teams] aggregates the reports of the teams for
     the given weeks. *)
 
-val lint : string -> year:int -> weeks:int list -> t list -> lint_report
+val lint :
+  ?okr_db:Masterdb.t ->
+  string ->
+  year:int ->
+  weeks:int list ->
+  t list ->
+  lint_report
 (** [lint admin_dir weeks teams] generates a [lint_report] for the teams at the
     given weeks. *)
 

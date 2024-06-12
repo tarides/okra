@@ -24,11 +24,12 @@ let get_or_error = function
 
 let lint t =
   let repo = get_or_error @@ Common.repo t in
+  let okr_db = Common.okr_db t in
   let weeks = Common.weeks t in
   let year = Common.year t in
   let teams = Common.teams t in
   (* Here the linting is done week-by-week. *)
-  let lint_report = Okra.Team.lint repo ~year ~weeks teams in
+  let lint_report = Okra.Team.lint ?okr_db repo ~year ~weeks teams in
   Format.printf "%a" Okra.Team.pp_lint_report lint_report;
   if not (Okra.Team.is_valid lint_report) then exit 1
 

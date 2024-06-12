@@ -28,11 +28,28 @@ let make ~name ~members = { name; members }
 let name { name; _ } = name
 let members { members; _ } = members
 
-type file_status = Complete | Not_found | Not_lint of Lint.Error.t list
+type file_status =
+  | Complete of Lint.Warning.t list
+  | Not_found
+  | Not_lint of [ Lint.Warning.t | Lint.Error.t ] list
+
 type week_report = { week : int; filename : string; status : file_status }
-type user_report = { member : Member.t; week_reports : week_report list }
-type team_report = { team : t; user_reports : user_report list }
-type lint_report = team_report list
+
+type user_report = {
+  member : Member.t;
+  week_reports :
+    [ `Complete of int * week_report list | `Incomplete of week_report list ];
+}
+
+type team_report = {
+  team : t;
+  user_reports :
+    [ `Complete of int * week_report list | `Incomplete of week_report list ];
+}
+
+type lint_report =
+  [ `Complete of int * (t * week_report list) list
+  | `Incomplete of (t * week_report list) list ]
 
 let file_path ~admin_dir ~week ~year ~engineer_name =
   let open Fpath in
@@ -43,7 +60,7 @@ let file_path ~admin_dir ~week ~year ~engineer_name =
   / (engineer_name ^ ".md")
   |> to_string
 
-let lint_member_week admin_dir member ~week ~year =
+let lint_member_week ?okr_db ~admin_dir member ~week ~year : week_report =
   let fname =
     file_path ~admin_dir ~week ~year ~engineer_name:(Member.github member)
   in
@@ -54,101 +71,127 @@ let lint_member_week admin_dir member ~week ~year =
         let ic = open_in fname in
         (* We lint week-by-week so we use the default options of the [engineer]
            mode. *)
-        match Lint.lint ic ~report_kind:Engineer ~filename:fname with
-        | Ok () -> Complete
+        match Lint.lint ?okr_db ic ~report_kind:Engineer ~filename:fname with
+        | Ok () -> Complete []
         | Error lx ->
-            Not_lint
-              (List.fold_left
-                 (fun acc -> function
-                   | #Lint.Error.t as e -> e :: acc
-                   | #Lint.Warning.t -> acc)
-                 [] lx
-              |> List.rev))
+            let err, warn =
+              List.fold_left
+                (fun (errors, warnings) -> function
+                  | #Lint.Error.t as e -> (e :: errors, warnings)
+                  | #Lint.Warning.t as w -> (errors, w :: warnings))
+                ([], []) lx
+            in
+            if err = [] then Complete warn else Not_lint lx)
   in
   { week; filename = fname; status }
 
-let lint_member admin_dir ~year weeks member =
-  let lint_member_week = lint_member_week admin_dir member in
-  List.map (fun week -> lint_member_week ~year ~week) weeks
+let lint_member_weeks ?okr_db ~admin_dir ~year member =
+  List.map (fun week -> lint_member_week ?okr_db ~year ~week ~admin_dir member)
 
-let lint_team admin_dir ~year ~weeks members =
-  let lint_member = lint_member ~year admin_dir weeks in
-  List.map (fun member -> { member; week_reports = lint_member member }) members
+let lint_member ?okr_db ~admin_dir ~year weeks member : user_report =
+  let week_reports = lint_member_weeks ?okr_db ~year ~admin_dir member weeks in
+  let week_reports =
+    List.fold_left
+      (fun acc wr ->
+        match acc with
+        | `Incomplete errs -> (
+            match wr.status with
+            | Complete [] -> `Incomplete errs
+            | _ -> `Incomplete (wr :: errs))
+        | `Complete (total, wrs) -> (
+            match wr.status with
+            | Complete [] -> `Complete (total + 1, wrs)
+            | Complete _ -> `Complete (total + 1, wr :: wrs)
+            | _ -> `Incomplete (wr :: wrs)))
+      (`Complete (0, []))
+      week_reports
+  in
+  { member; week_reports }
 
-let lint admin_dir ~year ~weeks teams =
-  let lint_team = lint_team ~year admin_dir ~weeks in
-  List.map (fun team -> { team; user_reports = lint_team (members team) }) teams
+let lint_members ?okr_db ~admin_dir ~year ~weeks =
+  List.map (lint_member ?okr_db ~year ~admin_dir weeks)
 
-let pp_report ppf = function
-  | { status = Complete; _ } -> Fmt.pf ppf "Complete"
+let lint_team ?okr_db ~year ~admin_dir ~weeks team : team_report =
+  let user_reports =
+    lint_members ?okr_db ~year ~admin_dir ~weeks (members team)
+  in
+  let user_reports =
+    List.fold_left
+      (fun acc ur ->
+        match acc with
+        | `Incomplete wrs -> (
+            match ur.week_reports with
+            | `Complete (_, []) -> `Incomplete wrs
+            | `Complete (_, wrs') -> `Incomplete (List.rev_append wrs' wrs)
+            | `Incomplete wrs' -> `Incomplete (List.rev_append wrs' wrs))
+        | `Complete (total, wrs) -> (
+            match ur.week_reports with
+            | `Complete (total', []) -> `Complete (total + total', wrs)
+            | `Complete (total', wrs') ->
+                `Complete (total + total', List.rev_append wrs' wrs)
+            | `Incomplete wrs' -> `Incomplete (List.rev_append wrs' wrs)))
+      (`Complete (0, []))
+      user_reports
+  in
+  { team; user_reports }
+
+let lint ?okr_db admin_dir ~year ~weeks teams : lint_report =
+  let team_reports =
+    List.map (lint_team ?okr_db ~year ~admin_dir ~weeks) teams
+  in
+  List.fold_left
+    (fun acc ur ->
+      match acc with
+      | `Incomplete wrs -> (
+          match ur.user_reports with
+          | `Complete (_, []) -> `Incomplete wrs
+          | `Complete (_, wrs') -> `Incomplete ((ur.team, wrs') :: wrs)
+          | `Incomplete wrs' -> `Incomplete ((ur.team, wrs') :: wrs))
+      | `Complete (total, wrs) -> (
+          match ur.user_reports with
+          | `Complete (total', []) -> `Complete (total + total', wrs)
+          | `Complete (total', wrs') ->
+              `Complete (total + total', (ur.team, wrs') :: wrs)
+          | `Incomplete wrs' -> `Incomplete ((ur.team, wrs') :: wrs)))
+    (`Complete (0, []))
+    team_reports
+
+let pp_week_report ppf = function
+  | { status = Complete []; _ } -> Fmt.pf ppf "Complete"
+  | { filename; status = Complete warnings; _ } ->
+      Fmt.pf ppf "Complete@ @[<v 0>%a@]"
+        (Fmt.list (Lint.Warning.pp ~filename))
+        warnings
   | { filename; status = Not_found; _ } -> Fmt.pf ppf "Not found: %s" filename
   | { filename; status = Not_lint e; _ } ->
       Fmt.pf ppf "Lint error at %s@ @[<v 0>%a@]" filename
-        (Fmt.list (Lint.Error.pp ~filename))
+        (Fmt.list (fun ppf -> function
+           | #Lint.Warning.t as w -> Lint.Warning.pp ~filename ppf w
+           | #Lint.Error.t as e -> Lint.Error.pp ~filename ppf e))
         e
 
-let result_partition f =
-  List.partition_map (fun x ->
-      match f x with Ok i -> Either.Left i | Error e -> Either.Right e)
+let pp_lint_errors ppf =
+  Fmt.pf ppf "@[<v 0>%a@]"
+    (Fmt.list (fun ppf (team, wrs) ->
+         Fmt.pf ppf "Team %S:@;<1 2>%a" team.name
+           (fun ppf ->
+             Fmt.pf ppf "@[<v 0>%a@]"
+               (Fmt.list (fun ppf report ->
+                    Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]"
+                      report.week pp_week_report report)))
+           wrs))
 
-let sum = List.fold_left ( + ) 0
+let pp_lint_report ppf (lint_report : lint_report) =
+  match lint_report with
+  | `Complete (total, warnings) -> (
+      match warnings with
+      | [] -> Fmt.pf ppf "[OK]: %i reports@." total
+      | _ -> Fmt.pf ppf "[OK]: %i reports@ %a@." total pp_lint_errors warnings)
+  | `Incomplete trl -> Fmt.pf ppf "%a@." pp_lint_errors trl
 
-let pp_report_lint ppf report =
-  Fmt.pf ppf "@[<hv 0>+ Report week %i: @[<v 0>%a@]@]" report.week pp_report
-    report
-
-let pp_member_lint ppf { member = _; week_reports } =
-  let complete, not_complete =
-    List.partition
-      (fun r ->
-        match r.status with Complete -> true | Not_found | Not_lint _ -> false)
-      week_reports
-  in
-  if not_complete = [] then Ok (List.length complete)
-  else
-    Error
-      (fun () ->
-        Fmt.pf ppf "@[<v 0>%a@]"
-          (Fmt.list ~sep:(Fmt.any "@;<1 0>") pp_report_lint)
-          not_complete)
-
-let pp_team_lint ppf { team; user_reports } =
-  let complete, not_complete =
-    result_partition (pp_member_lint ppf) user_reports
-  in
-  if not_complete = [] then Ok (sum complete)
-  else
-    Error
-      (fun () ->
-        Fmt.pf ppf "Team %S:@;<1 2>%a" (name team)
-          (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
-          not_complete)
-
-let pp_lint_report ppf lint_report =
-  let complete, not_complete =
-    result_partition (pp_team_lint ppf) lint_report
-  in
-  if not_complete = [] then
-    let total = sum complete in
-    Fmt.pf ppf "[OK]: %i reports@." total
-  else
-    Fmt.pf ppf "@[<v 0>%a@]@."
-      (Fmt.list ~sep:(Fmt.any "@;<1 2>") (fun _ f -> f ()))
-      not_complete
-
-let is_valid lint_report =
-  List.for_all
-    (fun team_report ->
-      List.for_all
-        (fun user_report ->
-          List.for_all
-            (fun week_report ->
-              match week_report.status with
-              | Complete -> true
-              | Not_found | Not_lint _ -> false)
-            user_report.week_reports)
-        team_report.user_reports)
-    lint_report
+let is_valid : lint_report -> bool = function
+  | `Complete _ -> true
+  | `Incomplete _ -> false
 
 let read_file f =
   let ic = open_in f in

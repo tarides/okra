@@ -1,5 +1,5 @@
 # Last Week
 
-- A KR (KR123)
+- Leave
   - @eng1 (5 days)
   - Work 1
