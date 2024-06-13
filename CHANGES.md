@@ -3,7 +3,7 @@
 ### Fixed
 
 - Fix: Use the admin_dir field in conf file to infer the path to WI/obj DB (#253, @gpetiot)
-- team lint: Take WI/obj DB into account (#<PR_NUMBER>, @gpetiot)
+- team lint: Take WI/obj DB into account (#256, @gpetiot)
 - Fix missing trailing break after format error messages (#250, @gpetiot)
 - team lint: Fix file paths printed in error messages (#255, @gpetiot)
 
