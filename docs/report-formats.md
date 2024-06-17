@@ -38,7 +38,7 @@ Special objectives can be used to report the following activities:
 |:------------------|:-------------|
 | Off      | Any kind of leave, holiday, or time off from work, including the two-week August company break. |
 | Hack       | Time spent on Hacking Days. |
-| Misc  | This includes any work that does not fall under specific objectives. |
+| Misc  | This includes any work that does not fall under specific objectives, including Tech Talks and All Hands. |
 
 This information is also available at and is kept in sync with [tarides/admin GH repo README](https://github.com/tarides/admin?tab=readme-ov-file#reporting-non-engineering-work-time).
 

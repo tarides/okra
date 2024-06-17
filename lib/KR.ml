@@ -57,7 +57,7 @@ module Meta = struct
 
 - Misc
   - %a (0 days)
-  - Any work that does not fall under specific objectives.
+  - Any work that does not fall under specific objectives, including Tech Talks and All Hands.
 |}
       pp_user () pp_user () pp_user ()
 end
