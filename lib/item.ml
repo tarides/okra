@@ -146,7 +146,7 @@ let rec pp ppf = function
       string ppf "```";
       string ppf lang;
       newline ppf ();
-      string ppf code;
+      lines ppf code;
       string ppf "```"
   | Title (lvl, str) ->
       string ppf (String.make lvl '#');
