@@ -10,7 +10,7 @@
 - team lint: Take WI/obj DB into account (#256, @gpetiot)
 - Fix missing trailing break after format error messages (#250, @gpetiot)
 - team lint: Fix file paths printed in error messages (#255, @gpetiot)
-- cat: Fix formatting of code blocks (#<PR_NUMBER>, @gpetiot)
+- cat: Fix formatting of code blocks (#259, @gpetiot)
 
 ## 2.0.1
 
