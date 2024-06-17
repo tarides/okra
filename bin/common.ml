@@ -61,7 +61,7 @@ let exclude_projects =
 
   Arg.(value (opt (list string) [] i))
 
-let exclude_objectives =
+let include_objectives =
   let i =
     Arg.info [ "include-objectives" ]
       ~doc:"If non-empty, only include this list of objectives in the output."
@@ -69,7 +69,7 @@ let exclude_objectives =
   in
   Arg.(value (opt (list string) [] i))
 
-let include_objectives =
+let exclude_objectives =
   let i =
     Arg.info [ "exclude-objectives" ]
       ~doc:"If non-empty, exclude objectives in this list from the output."
