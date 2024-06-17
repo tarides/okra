@@ -11,7 +11,7 @@
 - Fix missing trailing break after format error messages (#250, @gpetiot)
 - team lint: Fix file paths printed in error messages (#255, @gpetiot)
 - cat: Fix formatting of code blocks (#259, @gpetiot)
-- Fix the interpretation of options include-objectives and exclude-objectives (#<PR_NUMBER>, @gpetiot)
+- Fix the interpretation of options include-objectives and exclude-objectives (#260, @gpetiot)
 
 ## 2.0.1
 
