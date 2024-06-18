@@ -2,6 +2,7 @@
 
 ### Changed
 
+- Check the current version is compatible with the last release (#<PR_NUMBER>, @gpetiot)
 - Update the Meta standardized categories: Off, Hack and Misc (#254, @gpetiot)
 
 ### Fixed

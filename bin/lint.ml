@@ -110,11 +110,20 @@ let format_term =
   in
   if short then Short else Pretty
 
+let get_or_error = function
+  | Ok v -> v
+  | Error (`Msg m) ->
+      Fmt.epr "%s" m;
+      exit 1
+
 let term =
   let open Let_syntax_cmdliner in
   let+ c = Common.term
   and+ format = format_term
+  and+ token_file = Token.term
   and+ input_files = Common.input_files in
+  let token = get_or_error @@ Get_activity.Token.load token_file in
+  Version.check ~token;
   run { c; input_files; format }
 
 let cmd =

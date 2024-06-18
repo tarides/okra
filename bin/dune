@@ -12,6 +12,7 @@
   logs.cli
   fmt.tty
   dune-build-info
+  semver
   xdg)
  (preprocess
   (pps ppx_deriving_yaml)))
