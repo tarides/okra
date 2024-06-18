@@ -249,7 +249,8 @@ let make_objective ?show_time ?show_time_calc ?show_engineers o =
     List.concat_map (KR.items ?show_time ?show_time_calc ?show_engineers) krs
   with
   | [] -> []
-  | krs -> if o.name = "" then krs else Item.Title (2, o.name) :: krs
+  | krs ->
+      if o.name = "" then krs else Heading ([], 2, Text ([], o.name)) :: krs
 
 let make_project ?show_time ?show_time_calc ?show_engineers p =
   let os = List.of_seq (Hashtbl.to_seq p.objectives |> Seq.map snd) in
@@ -260,7 +261,7 @@ let make_project ?show_time ?show_time_calc ?show_engineers p =
       os
   with
   | [] -> []
-  | os -> if p.name = "" then os else Item.Title (1, p.name) :: os
+  | os -> if p.name = "" then os else Heading ([], 1, Text ([], p.name)) :: os
 
 let pp ?show_time ?show_time_calc ?show_engineers ppf t =
   let ps = List.of_seq (Hashtbl.to_seq t.projects |> Seq.map snd) in

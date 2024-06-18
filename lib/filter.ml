@@ -131,16 +131,18 @@ let apply f (t : Report.t) =
               ignore @@ Report.add new_t kr
             else
               let work =
-                Item.
-                  [
-                    Paragraph
-                      (Concat
-                         [
-                           Text
-                             "WARNING: the following items might cover more \
-                              work than what the time entries indicate.";
-                         ]);
-                  ]
+                [
+                  Omd.Paragraph
+                    ( [],
+                      Concat
+                        ( [],
+                          [
+                            Text
+                              ( [],
+                                "WARNING: the following items might cover more \
+                                 work than what the time entries indicate." );
+                          ] ) );
+                ]
                 :: kr.work
               in
               let kr =
