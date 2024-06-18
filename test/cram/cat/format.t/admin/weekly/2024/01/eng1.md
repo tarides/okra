@@ -16,6 +16,10 @@
     - Foo the foo?
       > xxx
       > xxx
+      aaa | bbb | ccc
+      --- | --- | ---
+      aaa | bbb | ccc
+      aaa | bbb | ccc
       
 
 - Off

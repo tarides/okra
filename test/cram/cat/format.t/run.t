@@ -24,6 +24,10 @@ The file admin/weekly/2024/01/eng1.md contains a code block that should preserve
       - Foo the foo?
         > xxx
         > xxx
+        | aaa | bbb | ccc |
+        | --- | --- | --- |
+        | aaa | bbb | ccc |
+        | aaa | bbb | ccc |
   
   - Off
     - @jmid (2 days)
