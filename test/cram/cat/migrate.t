@@ -93,7 +93,7 @@ This weekly is using objectives:
 
 Linting of the original file fails because we used workitems
 
-  $ okra lint -e -C admin eng1.workitems.md
+  $ okra lint -e -C admin eng1.workitems.md --no-version-check
   [OK]: eng1.workitems.md
   File "eng1.workitems.md", line 3:
   Warning: Invalid objective:
@@ -114,7 +114,7 @@ We rewrite the file using okra cat
 
 Linting of the produced file succeeds because we now use objectives
 
-  $ okra lint -e -C admin eng1.objectives.md
+  $ okra lint -e -C admin eng1.objectives.md --no-version-check
   [OK]: eng1.objectives.md
 
 Parentheses in the objective name:
@@ -144,5 +144,5 @@ Parentheses in the objective name:
     - @eng1 (4 days)
     - off
 
-  $ okra lint -e -C admin eng1.cat.md
+  $ okra lint -e -C admin eng1.cat.md --no-version-check
   [OK]: eng1.cat.md

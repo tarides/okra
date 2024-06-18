@@ -125,7 +125,7 @@ The result of aggregate should pass the lint
     - xxx
     - xxx
 
-  $ cat aggr.md | okra lint
+  $ cat aggr.md | okra lint --no-version-check
   [OK]: <stdin>
 
 We used to report on workitems and now we use objectives.

@@ -3,7 +3,7 @@ Engineer reports
 
 This is a valid one:
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Projects
   > 
   > - Project1 (KR1)
@@ -42,7 +42,7 @@ This is a valid one:
 
 Errors in include section are detected even if the rest is ignored.
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Projects
   > 
   > - Project1 (KR1)
@@ -70,7 +70,7 @@ Errors in include section are detected even if the rest is ignored.
 
 Only "No KR" and "New KR" are supported for KR's without identifiers
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Projects
   > 
   > - Project1 (KR1)
@@ -95,7 +95,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
          No ID found. Objectives should be in the format "This is an objective (#123)", where 123 is the objective issue ID. For objectives that don't have an ID yet, use "New KR" and for work without an objective use "No KR".
   [1]
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Projects
   > 
   > - Project1 (KR1)
@@ -119,7 +119,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
          where x and y must be divisible by 0.5
   [1]
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Projects
   > 
   > - Project1 (KR1)
@@ -145,7 +145,7 @@ Only "No KR" and "New KR" are supported for KR's without identifiers
 
 The total time reported must be 5 days
 
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Title
   > 
   > ## Last week
@@ -173,7 +173,7 @@ The total time reported must be 5 days
   File "<stdin>", line 1:
   Error: Invalid total time found for eng1: Reported 4 days, expected 5 days.
   [1]
-  $ okra lint --engineer << EOF
+  $ okra lint --engineer --no-version-check << EOF
   > # Title
   > 
   > ## Last week

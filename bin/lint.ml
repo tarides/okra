@@ -121,9 +121,14 @@ let term =
   let+ c = Common.term
   and+ format = format_term
   and+ token_file = Token.term
+  and+ no_version_check = Version.no_version_check
   and+ input_files = Common.input_files in
-  let token = get_or_error @@ Get_activity.Token.load token_file in
-  Version.check ~token;
+  let () =
+    if no_version_check then ()
+    else
+      let token = get_or_error @@ Get_activity.Token.load token_file in
+      Version.check ~token
+  in
   run { c; input_files; format }
 
 let cmd =

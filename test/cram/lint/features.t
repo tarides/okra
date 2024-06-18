@@ -6,7 +6,7 @@ Lint can read from a file:
   > - Everything is great (E1)
   >   - Do it
   > EOF
-  $ okra lint err.md
+  $ okra lint --no-version-check err.md
   File "err.md", line 3:
   Error: In objective "Everything is great (E1)":
          No time entry found. Each objective must be followed by '- @... (x days)'
@@ -14,7 +14,7 @@ Lint can read from a file:
 
 It can also read from stdin:
 
-  $ okra lint < err.md
+  $ okra lint --no-version-check < err.md
   File "<stdin>", line 3:
   Error: In objective "Everything is great (E1)":
          No time entry found. Each objective must be followed by '- @... (x days)'
@@ -30,9 +30,9 @@ If everything is fine, nothing is printed and it exits with 0:
   >   - Do it
   > EOF
 
-  $ okra lint ok.md
+  $ okra lint ok.md --no-version-check
   [OK]: ok.md
-  $ okra lint < ok.md
+  $ okra lint --no-version-check < ok.md
   [OK]: <stdin>
 
 When errors are found in several files, they are all printed:
@@ -44,7 +44,7 @@ When errors are found in several files, they are all printed:
   >   - @a
   >   - Do it
   > EOF
-  $ okra lint err.md err2.md
+  $ okra lint err.md err2.md --no-version-check
   File "err2.md", line 4:
   Error: In objective "Everything is great (E1)":
          Invalid time entry "@a" found. Format is '- @eng1 (x days), @eng2 (y days)'
@@ -63,7 +63,7 @@ A warning is emitted when the generated report contains placeholder text:
   >   - @a (1 day)
   >   - Work Item 1
   > EOF
-  $ okra lint err.md
+  $ okra lint err.md --no-version-check
   File "err.md", line 5:
   Error: Placeholder text detected. Replace with actual activity.
   [1]

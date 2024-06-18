@@ -52,7 +52,7 @@ and the error message points to the corresponding objective.
   >   - xxx
   > EOF
 
-  $ okra lint -e -C admin weekly.md
+  $ okra lint -e -C admin weekly.md --no-version-check
   okra: [WARNING] KR ID updated from "No KR" to "#701":
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
@@ -66,7 +66,7 @@ and the error message points to the corresponding objective.
            "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
   [1]
 
-  $ okra lint -e -C admin weekly.md --short
+  $ okra lint -e -C admin weekly.md --short --no-version-check
   okra: [WARNING] KR ID updated from "No KR" to "#701":
   - "JSOO Effect Performance"
   - "JSOO Effect Performance"
@@ -86,9 +86,9 @@ The DB can be looked up in the [admin_dir] field set int the configuration file:
   $ cat > conf.yml << EOF
   > admin_dir: admin
   > EOF
-  $ okra lint -e eng1.md
+  $ okra lint -e eng1.md --no-version-check
   [OK]: eng1.md
-  $ okra lint -e --conf conf.yml eng1.md
+  $ okra lint -e --conf conf.yml eng1.md --no-version-check
   File "eng1.md", line 3:
   Error: Invalid objective: "Doesnt exist"
   [1]

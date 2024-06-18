@@ -1,7 +1,7 @@
 Using an empty conf should not fail:
 
   $ touch empty-conf.yaml
-  $ okra lint --engineer --conf empty-conf.yaml << EOF
+  $ okra lint --engineer --conf empty-conf.yaml --no-version-check << EOF
   > # Last week
   > 
   > - This is a KR (KR1)
@@ -15,7 +15,7 @@ Using an invalid conf should fail:
   $ cat > invalid-conf.yaml << EOF
   > invalid
   > EOF
-  $ okra lint --engineer --conf invalid-conf.yaml << EOF
+  $ okra lint --engineer --conf invalid-conf.yaml --no-version-check << EOF
   > # Last week
   > 
   > - This is a KR (KR1)
@@ -31,7 +31,7 @@ Using a valid conf should succeed:
   $ cat > valid-conf.yaml << EOF
   > admin_dir: /path/to/admin
   > EOF
-  $ okra lint --engineer --conf valid-conf.yaml << EOF
+  $ okra lint --engineer --conf valid-conf.yaml --no-version-check << EOF
   > # Last week
   > 
   > - This is a KR (KR1)

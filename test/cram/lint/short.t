@@ -1,6 +1,6 @@
 Short mode exits with 0 when there is no error:
 
-  $ okra lint --short << EOF
+  $ okra lint --short --no-version-check << EOF
   > # Last week
   > 
   > - Everything is great (E1)
@@ -10,7 +10,7 @@ Short mode exits with 0 when there is no error:
 
 And with 1 when there is an error:
 
-  $ okra lint --short << EOF
+  $ okra lint --short --no-version-check << EOF
   > # Last week
   > 
   > - Everything is great (E1)
@@ -34,7 +34,7 @@ This also works with files:
   >   - Did everything
   > EOF
 
-  $ okra lint --short a.md b.md
+  $ okra lint --short a.md b.md --no-version-check
   b.md:1: No time found in "Everything is great (E1)"
   b.md:1: No project found for "Everything is great (E1)"
   a.md:4: * used as bullet point, this can confuse the parser. Only use - as bullet marker.
