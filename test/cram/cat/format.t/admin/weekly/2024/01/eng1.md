@@ -20,6 +20,10 @@
       --- | --- | ---
       aaa | bbb | ccc
       aaa | bbb | ccc
+      <table>
+        <tr><th>aaa</th></tr>
+        <tr><td><aaa></th></tr>
+      </table>
       
 
 - Off

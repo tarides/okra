@@ -141,7 +141,7 @@ let rec pp ppf = function
       char ppf ' ';
       pp_inline ppf x
   | Thematic_break _ -> Fmt.pf ppf "---"
-  | Html_block (_, s) -> Fmt.pf ppf "%s" s
+  | Html_block (_, s) -> Fmt.pf ppf "%a" lines s
   | Definition_list (_, l) ->
       let sep ppf () =
         newline ppf ();

@@ -28,6 +28,11 @@ The file admin/weekly/2024/01/eng1.md contains a code block that should preserve
         | --- | --- | --- |
         | aaa | bbb | ccc |
         | aaa | bbb | ccc |
+        <table>
+          <tr><th>aaa</th></tr>
+          <tr><td><aaa></th></tr>
+        </table>
+        
   
   - Off
     - @jmid (2 days)
