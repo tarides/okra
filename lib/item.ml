@@ -125,8 +125,11 @@ let rec pp ppf = function
           box (list ~sep:newline pp) ppf e)
         ppf y
   | Blockquote (_, l) ->
-      string ppf "> ";
-      List.iter (pp ppf) l
+      List.iter
+        (fun e ->
+          let lines = Fmt.to_to_string pp e |> String.split_on_char '\n' in
+          list ~sep:newline (fun ppf e -> Fmt.pf ppf "> %s" e) ppf lines)
+        l
   | Code_block (_, lang, code) ->
       string ppf "```";
       string ppf lang;
