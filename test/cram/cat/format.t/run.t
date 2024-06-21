@@ -1,7 +1,7 @@
 
 The file admin/weekly/2024/01/eng1.md contains a code block that should preserve its formatting:
 
-  $ okra lint -e admin/weekly/2024/01/eng1.md
+  $ okra lint -e admin/weekly/2024/01/eng1.md --no-version-check
   [OK]: admin/weekly/2024/01/eng1.md
 
   $ okra cat -e admin/weekly/2024/01/eng1.md > eng1-out.md
@@ -28,5 +28,5 @@ The file admin/weekly/2024/01/eng1.md contains a code block that should preserve
     - Foo
     - Bar
 
-  $ okra lint -e eng1-out.md
+  $ okra lint -e eng1-out.md --no-version-check
   [OK]: eng1-out.md

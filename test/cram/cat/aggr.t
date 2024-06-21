@@ -83,7 +83,7 @@ The output of cat passes the lint
   >     __aaaa__ bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
   >     ___oooo___ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
   > EOF
-  $ okra lint -e eng3.md
+  $ okra lint -e eng3.md --no-version-check
   [OK]: eng3.md
 
   $ okra cat eng3.md > aggregate.md
@@ -96,5 +96,5 @@ The output of cat passes the lint
       _oooo_ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
       __aaaa__ bbb ccc ddd eee fff ggg hhhh iiiii jjj kkk llll mmmm nnnn
       ___oooo___ pppp qqqq rrrr sssss tttt uuuu vvvv xxxxxxxx yyyyy zzzzzzzz
-  $ okra lint aggregate.md
+  $ okra lint aggregate.md --no-version-check
   [OK]: aggregate.md

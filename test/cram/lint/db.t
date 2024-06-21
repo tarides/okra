@@ -53,15 +53,15 @@ Workitems can be checked when a DB of this form is provided:
   >   - off
   > EOF
 
-  $ okra lint -e -C admin admin/weekly/2023/50/eng1.md
+  $ okra lint -e -C admin admin/weekly/2023/50/eng1.md --no-version-check
   [OK]: admin/weekly/2023/50/eng1.md
 
-  $ okra lint -e -C admin admin/weekly/2023/50/eng2.md
+  $ okra lint -e -C admin admin/weekly/2023/50/eng2.md --no-version-check
   [OK]: admin/weekly/2023/50/eng2.md
 
   $ cp admin/weekly/2023/50/eng1.md admin/weekly/2024/01/eng1.md
 
-  $ okra lint -e -C admin admin/weekly/2024/01/eng1.md
+  $ okra lint -e -C admin admin/weekly/2024/01/eng1.md --no-version-check
   [OK]: admin/weekly/2024/01/eng1.md
 
   $ cat > weekly.md << EOF
@@ -86,7 +86,7 @@ Workitems can be checked when a DB of this form is provided:
 
 No check on WIs without the DB:
 
-  $ okra lint -e weekly.md
+  $ okra lint -e weekly.md --no-version-check
   okra: [WARNING] Conflicting titles:
   - "Property-Based Testing for Multicore"
   - "Invalid name"
@@ -94,14 +94,14 @@ No check on WIs without the DB:
 
 The DB can be passed through the [--okr-db] option:
 
-  $ okra lint -e --work-item-db admin/data/db.csv weekly.md
+  $ okra lint -e --work-item-db admin/data/db.csv weekly.md --no-version-check
   okra: [WARNING] Conflicting titles:
   - "Property-Based Testing for Multicore"
   - "Invalid name"
   [OK]: weekly.md
 
 The DB can be looked up in the [repo-dir] passed through the [-C]/[--repo-dir] option:
-  $ okra lint -e -C admin weekly.md
+  $ okra lint -e -C admin weekly.md --no-version-check
   okra: [WARNING] Conflicting titles:
   - "Property-Based Testing for Multicore"
   - "Invalid name"
@@ -121,5 +121,5 @@ Parentheses in the objective name:
   >   - off
   > EOF
 
-  $ okra lint -e -C admin eng1.md
+  $ okra lint -e -C admin eng1.md --no-version-check
   [OK]: eng1.md

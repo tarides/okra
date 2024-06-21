@@ -87,25 +87,6 @@ let user : Get_activity.User.t Term.t =
   let doc = Arg.info ~doc:"User name" [ "user" ] in
   Arg.(value & opt user_conv Viewer & doc)
 
-(* Get activity configuration *)
-let home =
-  match Sys.getenv_opt "HOME" with
-  | None -> Fmt.failwith "$HOME is not set!"
-  | Some dir -> dir
-
-let default_token_file =
-  let ( / ) = Filename.concat in
-  home / ".github" / "github-activity-token"
-
-let token =
-  Arg.value
-  @@ Arg.opt Arg.file default_token_file
-  @@ Arg.info
-       ~doc:
-         "The path to a file containing your github token, defaults to \
-          ~/.github/github-activity-token"
-       ~docv:"TOKEN" [ "token" ]
-
 module User_fetch = Get_activity.Contributions
 module Repo_fetch = Okra.Repo_report
 
@@ -222,7 +203,7 @@ let run ppf cal conf token no_activity no_links with_names with_times
 let term =
   let open Let_syntax_cmdliner in
   let+ c = Common.term
-  and+ token_file = token
+  and+ token_file = Token.term
   and+ no_activity = no_activity
   and+ print_projects = print_projects
   and+ with_repositories = with_repositories_term

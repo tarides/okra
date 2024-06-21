@@ -27,6 +27,7 @@
   bos
   dune-build-info
   (yaml (>= 3.0))
+  semver
   (cohttp-lwt-unix (>= 5.0.0))))
 
 (package

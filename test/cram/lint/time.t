@@ -3,7 +3,7 @@ Time formats
 
 Invalid time
 
-  $ okra lint << EOF
+  $ okra lint --no-version-check << EOF
   > # Title
   > 
   > - This is a KR (KR123)
@@ -15,7 +15,7 @@ Invalid time
          Invalid time entry "@eng1 (1 day), eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
          where x and y must be divisible by 0.5
   [1]
-  $ okra lint << EOF
+  $ okra lint --no-version-check << EOF
   > # Title
   > 
   > - This is a KR (KR123)
@@ -27,7 +27,7 @@ Invalid time
          Invalid time entry "@eng1 (1 day); @eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
          where x and y must be divisible by 0.5
   [1]
-  $ okra lint << EOF
+  $ okra lint --no-version-check << EOF
   > # Title
   > 
   > - This is a KR (KR123)
@@ -39,7 +39,7 @@ Invalid time
          Invalid time entry "@eng1 (1 day) @eng2 (2 days)" found. Format is '- @eng1 (x days), @eng2 (y days)'
          where x and y must be divisible by 0.5
   [1]
-  $ okra lint << EOF
+  $ okra lint --no-version-check << EOF
   > # Title
   > 
   > - This is a KR (KR123)
@@ -54,7 +54,7 @@ Invalid time
 
 Valid time
 
-  $ okra lint << EOF
+  $ okra lint --no-version-check << EOF
   > # Title
   > 
   > - This is a KR (KR123)
@@ -84,7 +84,7 @@ Using the configuration file to change the default number of working days.
   $ cat > valid-conf.yaml << EOF
   > work_days_in_a_week: 1.5
   > EOF
-  $ okra lint --engineer --conf valid-conf.yaml << EOF
+  $ okra lint --engineer --conf valid-conf.yaml --no-version-check << EOF
   > # Last week
   > 
   > - This is a KR (KR1)
@@ -92,7 +92,7 @@ Using the configuration file to change the default number of working days.
   >   - My work
   > EOF
   [OK]: <stdin>
-  $ okra lint --engineer --conf valid-conf.yaml << EOF
+  $ okra lint --engineer --conf valid-conf.yaml --no-version-check << EOF
   > # Last week
   > 
   > - This is a KR (KR1)

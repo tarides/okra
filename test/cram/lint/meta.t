@@ -31,5 +31,5 @@ Meta workitems are not checked in the database:
   >   - xxx
   > EOF
 
-  $ okra lint -e -C admin/ weekly.md
+  $ okra lint -e -C admin/ weekly.md --no-version-check
   [OK]: weekly.md
