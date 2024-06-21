@@ -82,7 +82,7 @@ Let's suppose you have the following weekly report:
   - @jack (3 days)
   - Some work you did
 
-- Leave
+- Off
   - @jack (2 days)
 ```
 
@@ -109,7 +109,7 @@ $ okra cat -C /path/to/admin -e old_weekly.md -o new_weekly.md
   - @jack (3 days)
   - Some work you did
   
-- Leave
+- Off
   - @jack (2 days)
 ```
 

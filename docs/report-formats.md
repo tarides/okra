@@ -32,7 +32,7 @@ There are a few rules:
 
 ### Non-engineering work time
 
-Special objectives can be used to report the following activities:
+For non-engineering work time, whenever relevant, the recommendation is to attribute the work to one of the ongoing objectives. So, dev meetings that you have for a particular project may be reported under the corresponding objective. The same goes for conference talks, workshops, interviews, blog posts, etc. The same goes for funded internships; report to the appropriate objective. For anything that does not fit in, use the dedicated categories to report the activities:
 
 |   Category | Description  |
 |:------------------|:-------------|
@@ -40,18 +40,20 @@ Special objectives can be used to report the following activities:
 | Hack       | Time spent on Hacking Days. |
 | Misc  | This includes any work that does not fall under specific objectives, including Tech Talks and All Hands. |
 
-This information is also available at and is kept in sync with [tarides/admin GH repo README](https://github.com/tarides/admin?tab=readme-ov-file#reporting-non-engineering-work-time).
-
 Here is an example:
 ```md
 # Last Week
 
-- Leave
-  - @jack (1 day)
+- Off
+  - @jack (2 days)
 
-- Learning
+- Misc
   - @jack (1 day)
-  - Studied something
+  - Studied XYZ
+
+- Hack
+  - @jack (2 days)
+  - Worked on ABC during hacking days
 ```
 
 ## Repository Report
