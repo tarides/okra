@@ -57,7 +57,7 @@ module Meta = struct
 
 - Misc
   - %a (0 days)
-  - Any work that does not fall under specific objectives, including Tech Talks and All Hands.
+  - Any work that does not fall under specific objectives, including meetings, management work, offsite, workshops, training, conferences, tech talks and all hands.
 |}
       pp_user () pp_user () pp_user ()
 end
