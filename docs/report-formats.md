@@ -38,7 +38,7 @@ For non-engineering work time, whenever relevant, the recommendation is to attri
 |:------------------|:-------------|
 | Off      | Any kind of leave, holiday, or time off from work, including the two-week August company break. |
 | Hack       | Time spent on Hacking Days. |
-| Misc  | This includes any work that does not fall under specific objectives, including Tech Talks and All Hands. |
+| Misc  | This includes any work that does not fall under specific objectives, including meetings, management work, offsite, workshops, training, conferences, tech talks and all hands. |
 
 Here is an example:
 ```md
