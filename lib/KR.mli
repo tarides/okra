@@ -78,9 +78,9 @@ end
 
 module Warning : sig
   type t =
-    [ `Migration of Work.t (* work-item *) * Work.t option (* objective *) ]
-  (** For retro-compatibility only. This case should be removed once everything
-      has migrated to objectives. *)
+    [ `Migration_warning of
+      Work.t (* work-item *) * Work.t option (* objective *)
+      (** For reports written before June 2024. *) ]
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
@@ -88,7 +88,10 @@ module Warning : sig
 end
 
 module Error : sig
-  type t = [ `Objective_not_found of Work.t ]
+  type t =
+    [ `Objective_not_found of Work.t
+    | `Migration_error of Work.t (* work-item *) * Work.t option (* objective *)
+      (** For reports written from June 2024. *) ]
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
@@ -108,7 +111,7 @@ val merge : t -> t -> t
 val compare : t -> t -> int
 
 val update_from_master_db :
-  t -> Masterdb.t -> t * [> Warning.t | Error.t ] option
+  ?week:Week.t -> t -> Masterdb.t -> t * [> Warning.t | Error.t ] option
 
 (** {2 Pretty-print} *)
 

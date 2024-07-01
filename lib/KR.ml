@@ -330,45 +330,51 @@ let make_time_entries t =
   Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
 
 module Warning = struct
-  type t = [ `Migration of Work.t * Work.t option ]
+  type t = [ `Migration_warning of Work.t * Work.t option ]
 
   let pp ppf = function
-    | `Migration (work_item, None) ->
+    | `Migration_warning (work_item, None) ->
         Fmt.pf ppf
           "Invalid objective:@ \"%a\" is a work-item. You should use an \
            objective instead."
           Work.pp work_item
-    | `Migration (work_item, Some obj) ->
+    | `Migration_warning (work_item, Some obj) ->
         Fmt.pf ppf
           "Invalid objective:@ \"%a\" is a work-item. You should use its \
            parent objective \"%a\" instead."
           Work.pp work_item Work.pp obj
 
   let pp_short ppf = function
-    | `Migration (work_item, None) ->
+    | `Migration_warning (work_item, None) ->
         Fmt.pf ppf "Invalid objective: \"%a\" (work-item)" Work.pp work_item
-    | `Migration (work_item, Some obj) ->
+    | `Migration_warning (work_item, Some obj) ->
         Fmt.pf ppf "Invalid objective: \"%a\" (work-item), use \"%a\" instead"
           Work.pp work_item Work.pp obj
 
   let greppable = function
-    | `Migration (work_item, _) -> Some work_item.Work.title
+    | `Migration_warning (work_item, _) -> Some work_item.Work.title
 end
 
 module Error = struct
-  type t = [ `Objective_not_found of Work.t ]
+  type t =
+    [ `Objective_not_found of Work.t
+    | `Migration_error of Work.t * Work.t option ]
 
   let pp ppf = function
     | `Objective_not_found x -> Fmt.pf ppf "Invalid objective:@ %S" x.Work.title
+    | `Migration_error x -> Warning.pp ppf (`Migration_warning x)
 
   let pp_short ppf = function
     | `Objective_not_found x ->
         Fmt.pf ppf "Invalid objective: %S (not found)" x.Work.title
+    | `Migration_error x -> Warning.pp_short ppf (`Migration_warning x)
 
-  let greppable = function `Objective_not_found x -> Some x.Work.title
+  let greppable = function
+    | `Objective_not_found x -> Some x.Work.title
+    | `Migration_error x -> Warning.greppable (`Migration_warning x)
 end
 
-let update_from_master_db orig_kr db =
+let update_from_master_db ?week orig_kr db =
   match orig_kr.kind with
   | Meta _ -> (orig_kr, None)
   | Work orig_work -> (
@@ -391,19 +397,34 @@ let update_from_master_db orig_kr db =
               with
               (* Not found in objectives, not found in workitems *)
               | None -> (orig_kr, Some (`Objective_not_found orig_work))
-              | Some work_item_kr -> (
+              | Some work_item_kr ->
                   let work_item = orig_work in
-                  match
-                    Masterdb.Objective.find_title_opt db.objective_db
-                      work_item_kr.objective
-                  with
-                  (* Not found in objectives, found in WI db, no objective *)
-                  | None -> (orig_kr, Some (`Migration (work_item, None)))
-                  (* Not found in objectives, found in WI db, has objective *)
-                  | Some { printable_id = id; title; quarter; _ } ->
-                      let work = { Work.id = ID id; title; quarter } in
-                      let kr = { orig_kr with kind = Work work } in
-                      (kr, Some (`Migration (work_item, Some work))))))
+                  let kr, objective =
+                    match
+                      Masterdb.Objective.find_title_opt db.objective_db
+                        work_item_kr.objective
+                    with
+                    (* Not found in objectives, found in WI db, no objective *)
+                    | None -> (orig_kr, None)
+                    (* Not found in objectives, found in WI db, has objective *)
+                    | Some { printable_id = id; title; quarter; _ } ->
+                        let obj = { Work.id = ID id; title; quarter } in
+                        let new_kr = { orig_kr with kind = Work obj } in
+                        (new_kr, Some obj)
+                  in
+                  let error =
+                    let should_error =
+                      match week with
+                      | Some file_week ->
+                          (* June 03 - June 09 *)
+                          let limit = { Week.year = 2024; week = 23 } in
+                          Week.compare file_week limit >= 0
+                      | None -> false
+                    in
+                    if should_error then `Migration_error (work_item, objective)
+                    else `Migration_warning (work_item, objective)
+                  in
+                  (kr, Some error)))
       | Some db_kr ->
           if orig_work.id = No_KR then
             Log.warn (fun l ->

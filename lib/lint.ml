@@ -226,6 +226,7 @@ let ( let* ) = Result.bind
 let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
     ?report_kind ~filename s =
   let quarter = Quarter.of_filename ~filename in
+  let week = Week.of_filename ~filename in
   let lines =
     String.split_on_char '\n' s |> List.mapi (fun i s -> (i + 1, s))
   in
@@ -241,7 +242,7 @@ let check_document ?okr_db ~include_sections ~ignore_sections ?check_time
     | Error w -> w :: warnings
   in
   let* () = maybe_emit warnings in
-  let report, report_warnings = Report.of_krs ?okr_db okrs in
+  let report, report_warnings = Report.of_krs ?okr_db ?week okrs in
   let warnings =
     let line_number = function Some s -> grep_n s lines | None -> None in
     List.fold_left
