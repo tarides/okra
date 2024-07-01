@@ -2,7 +2,7 @@
 
 ### Changed
 
-- Lint: using a work-item instead of an objective raises an error starting from Week 23 (from June 3, 2024) (#<PR_NUMBER>, @gpetiot)
+- Lint: using a work-item instead of an objective raises an error starting from Week 23 (from June 3, 2024) (#270, @gpetiot)
 
 ## 2.1.0
 
