@@ -92,3 +92,31 @@ The DB can be looked up in the [admin_dir] field set int the configuration file:
   File "eng1.md", line 3:
   Error: Invalid objective: "Doesnt exist"
   [1]
+
+Using a work-item instead of an objective emits a warning before Week 23 (before June 3, 2024)
+
+  $ mkdir -p admin/weekly/2024/22
+  $ cat > admin/weekly/2024/22/eng1.md << EOF
+  > # Last week
+  > 
+  > - Property-Based Testing for Multicore (#1090)
+  >   - @eng1 (5 days)
+  >   - xxx
+  > EOF
+
+  $ okra lint -e -C admin admin/weekly/2024/22/eng1.md
+  [OK]: admin/weekly/2024/22/eng1.md
+  File "admin/weekly/2024/22/eng1.md", line 3:
+  Warning: Invalid objective:
+           "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
+
+Using a work-item instead of an objective raises an error starting from Week 23 (from June 3, 2024)
+
+  $ mkdir -p admin/weekly/2024/23
+  $ cp admin/weekly/2024/22/eng1.md admin/weekly/2024/23
+
+  $ okra lint -e -C admin admin/weekly/2024/23/eng1.md
+  File "admin/weekly/2024/23/eng1.md", line 3:
+  Error: Invalid objective:
+         "Property-Based Testing for Multicore (#1090)" is a work-item. You should use its parent objective "Property-Based Testing for Multicore (#558)" instead.
+  [1]
