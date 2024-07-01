@@ -17,28 +17,8 @@
 
 (** The subset of mardown supported for work items *)
 
-type list_type = Ordered of int * char | Bullet of char
-
-type inline =
-  | Concat of inline list
-  | Text of string
-  | Emph of inline
-  | Strong of inline
-  | Code of string
-  | Hard_break
-  | Soft_break
-  | Link of link
-  | Image of link
-  | Html of string
-
-and link = { label : inline; destination : string; title : string option }
-
-type t =
-  | Paragraph of inline
-  | List of list_type * t list list
-  | Blockquote of t list
-  | Code_block of string * string
-  | Title of int * string
+type t = Omd.attributes Omd.block
+type inline = Omd.attributes Omd.inline
 
 val pp : t Fmt.t
 val pp_inline : inline Fmt.t

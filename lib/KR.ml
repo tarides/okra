@@ -317,17 +317,18 @@ let make_engineers ~time entries =
   match engineers with
   | [] -> []
   | e :: es ->
-      let open Item in
       let lst =
         List.fold_left
-          (fun acc engineer -> Text engineer :: Text ", " :: acc)
-          [ Text e ] es
+          (fun acc engineer ->
+            Omd.Text ([], engineer) :: Text ([], ", ") :: acc)
+          [ Omd.Text ([], e) ]
+          es
       in
-      [ Paragraph (Concat lst) ]
+      [ Omd.Paragraph ([], Concat ([], lst)) ]
 
 let make_time_entries t =
   let aux (e, d) = Fmt.str "@%s (%a)" e Time.pp d in
-  Item.[ Paragraph (Text (String.concat ", " (List.map aux t))) ]
+  [ Omd.Paragraph ([], Text ([], String.concat ", " (List.map aux t))) ]
 
 module Warning = struct
   type t = [ `Migration of Work.t * Work.t option ]
@@ -423,26 +424,32 @@ let update_from_master_db orig_kr db =
 
 let items ?(show_time = true) ?(show_time_calc = false) ?(show_engineers = true)
     kr =
-  let open Item in
   let items =
     if not show_engineers then []
     else if show_time then
       if show_time_calc then
         (* show time calc + engineers *)
         [
-          List (Bullet '+', List.map make_time_entries kr.time_entries);
-          List (Bullet '=', [ make_engineers ~time:true kr.time_per_engineer ]);
+          Omd.List
+            ([], Bullet '+', Tight, List.map make_time_entries kr.time_entries);
+          List
+            ( [],
+              Bullet '=',
+              Tight,
+              [ make_engineers ~time:true kr.time_per_engineer ] );
         ]
       else make_engineers ~time:true kr.time_per_engineer
     else make_engineers ~time:false kr.time_per_engineer
   in
   [
-    List
-      ( Bullet '-',
+    Omd.List
+      ( [],
+        Bullet '-',
+        Tight,
         [
           [
-            Paragraph (Text (Fmt.str "%a" Kind.pp kr.kind));
-            List (Bullet '-', items :: kr.work);
+            Paragraph ([], Text ([], Fmt.str "%a" Kind.pp kr.kind));
+            List ([], Bullet '-', Tight, items :: kr.work);
           ];
         ] );
   ]

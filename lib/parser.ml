@@ -30,7 +30,6 @@ module Warning = struct
     | No_KR_ID_found of string
     | No_project_found of KR.Heading.t
     | Not_all_includes_accounted_for of string list
-    | Invalid_markdown_in_work_items of string
 
   let pp ppf = function
     | No_time_found kr ->
@@ -69,7 +68,6 @@ module Warning = struct
         Fmt.pf ppf "Missing includes section:@ %a"
           Fmt.(list ~sep:comma string)
           s
-    | Invalid_markdown_in_work_items s -> Fmt.pf ppf "Invalid markdown:@ %s" s
 
   let pp_short ppf = function
     | No_time_found kr -> Fmt.pf ppf "No time found in \"%a\"" KR.Heading.pp kr
@@ -83,8 +81,6 @@ module Warning = struct
         Fmt.pf ppf "No project found for \"%a\"" KR.Heading.pp kr
     | Not_all_includes_accounted_for l ->
         Fmt.pf ppf "Missing includes section: %s" (String.concat ", " l)
-    | Invalid_markdown_in_work_items s ->
-        Fmt.pf ppf "Invalid markdown in work items: %s" s
 
   let greppable = function
     | No_time_found s -> Some (Fmt.str "%a" KR.Heading.pp s)
@@ -94,7 +90,6 @@ module Warning = struct
     | No_KR_ID_found s -> Some s
     | No_project_found s -> Some (Fmt.str "%a" KR.Heading.pp s)
     | Not_all_includes_accounted_for _ -> None
-    | Invalid_markdown_in_work_items s -> Some s
 end
 
 (* Types for parsing the AST *)
@@ -139,53 +134,11 @@ let dump_elt ppf = function
 let dump ppf okr = Fmt.Dump.list dump_elt ppf okr
 let err_no_project s = add_warning (No_project_found s)
 let err_multiple_time_entries s = add_warning (Multiple_time_entries s)
-let err_markdown s = add_warning (Invalid_markdown_in_work_items s)
 let err_no_work s = add_warning (No_work_found s)
 let err_no_id s = add_warning (No_KR_ID_found s)
 let err_time ~kr ~entry = add_warning (Invalid_time { kr; entry })
 let err_no_time s = add_warning (No_time_found s)
 let err_missing_includes s = add_warning (Not_all_includes_accounted_for s)
-
-let rec inline = function
-  | Concat (_, xs) -> Item.Concat (List.map inline xs)
-  | Text (_, s) -> Item.Text s
-  | Emph (_, s) -> Item.Emph (inline s)
-  | Strong (_, s) -> Item.Strong (inline s)
-  | Code (_, s) -> Item.Code s
-  | Hard_break _ -> Item.Hard_break
-  | Soft_break _ -> Item.Soft_break
-  | Link (_, { label; destination; title }) ->
-      Item.Link { label = inline label; destination; title }
-  | Html (_, s) -> Item.Html s
-  | Image (_, { label; destination; title }) ->
-      Item.Image { label = inline label; destination; title }
-
-let list_type = function
-  | Ordered (i, c) -> Item.Ordered (i, c)
-  | Bullet c -> Item.Bullet c
-
-let rec block = function
-  | Paragraph (_, x) -> Some (Item.Paragraph (inline x))
-  | List (_, x, _, bls) ->
-      Some (Item.List (list_type x, List.map (List.filter_map block) bls))
-  | Blockquote (_, x) -> Some (Item.Blockquote (List.filter_map block x))
-  | Code_block (_, x, y) -> Some (Item.Code_block (x, y))
-  | Html_block _ ->
-      err_markdown "Html_bloc";
-      None
-  | Definition_list _ ->
-      err_markdown "Definition_list";
-      None
-  | Thematic_break _ ->
-      err_markdown "Thematic_break";
-      None
-  | Heading _ ->
-      err_markdown "Heading";
-      None
-  | Table _ ->
-      err_markdown "Table";
-      None
-
 let inline_to_string = Fmt.to_to_string Item.pp_inline
 let item_to_string = Fmt.to_to_string Item.pp
 
@@ -292,26 +245,16 @@ let kr ~project ~objective = function
 
 let block_okr = function
   | Paragraph (_, x) ->
-      let okr_title = String.trim (inline_to_string (inline x)) in
+      let okr_title = String.trim (inline_to_string x) in
       [ KR_heading (KR.Heading.of_string okr_title) ]
   | List (_, _, _, bls) ->
       List.map
         (fun bl ->
           if is_time_block bl then
             (* todo verify that this is true *)
-            let time_s =
-              String.concat ""
-                (List.map
-                   (fun b ->
-                     match block b with
-                     | Some b -> item_to_string b
-                     | None -> "")
-                   bl)
-            in
+            let time_s = String.concat "" (List.map item_to_string bl) in
             Time time_s
-          else
-            let work_items = List.filter_map block bl in
-            Work work_items)
+          else Work bl)
         bls
   | _ -> []
 

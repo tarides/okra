@@ -15,65 +15,58 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-type list_type = Ordered of int * char | Bullet of char
-
-type inline =
-  | Concat of inline list
-  | Text of string
-  | Emph of inline
-  | Strong of inline
-  | Code of string
-  | Hard_break
-  | Soft_break
-  | Link of link
-  | Image of link
-  | Html of string
-
-and link = { label : inline; destination : string; title : string option }
-
-(* The subset of mardown supported for work items *)
-type t =
-  | Paragraph of inline
-  | List of list_type * t list list
-  | Blockquote of t list
-  | Code_block of string * string
-  | Title of int * string
+type t = Omd.attributes Omd.block
+type inline = Omd.attributes Omd.inline
 
 (* Dump contents *)
 
 let dump_list_type ppf = function
-  | Ordered (d, c) -> Fmt.pf ppf "Ordered (%d, %c)" d c
+  | Omd.Ordered (d, c) -> Fmt.pf ppf "Ordered (%d, %c)" d c
   | Bullet c -> Fmt.pf ppf "Bullet %c" c
 
 let rec dump_inline ppf = function
-  | Concat c -> Fmt.pf ppf "Concat %a" (Fmt.Dump.list dump_inline) c
-  | Text s -> Fmt.pf ppf "Text %S" s
-  | Emph e -> Fmt.pf ppf "Emph (%a)" dump_inline e
-  | Strong e -> Fmt.pf ppf "Strong (%a)" dump_inline e
-  | Code s -> Fmt.pf ppf "Code %S" s
-  | Hard_break -> Fmt.pf ppf "Hard_break"
-  | Soft_break -> Fmt.pf ppf "Soft_break"
-  | Link l -> Fmt.pf ppf "Link %a" dump_link l
-  | Image l -> Fmt.pf ppf "Image %a" dump_link l
-  | Html s -> Fmt.pf ppf "Html %S" s
+  | Omd.Concat (_, c) -> Fmt.pf ppf "Concat %a" (Fmt.Dump.list dump_inline) c
+  | Text (_, s) -> Fmt.pf ppf "Text %S" s
+  | Emph (_, e) -> Fmt.pf ppf "Emph (%a)" dump_inline e
+  | Strong (_, e) -> Fmt.pf ppf "Strong (%a)" dump_inline e
+  | Code (_, s) -> Fmt.pf ppf "Code %S" s
+  | Hard_break _ -> Fmt.pf ppf "Hard_break"
+  | Soft_break _ -> Fmt.pf ppf "Soft_break"
+  | Link (_, l) -> Fmt.pf ppf "Link %a" dump_link l
+  | Image (_, l) -> Fmt.pf ppf "Image %a" dump_link l
+  | Html (_, s) -> Fmt.pf ppf "Html %S" s
 
 and dump_link ppf t =
   let open Fmt.Dump in
   record
     [
-      field "label" (fun x -> x.label) dump_inline;
-      field "destination" (fun x -> x.destination) string;
-      field "title" (fun x -> x.title) (option string);
+      field "label" (fun x -> x.Omd.label) dump_inline;
+      field "destination" (fun x -> x.Omd.destination) string;
+      field "title" (fun x -> x.Omd.title) (option string);
+    ]
+    ppf t
+
+and dump_def_elt ppf t =
+  let open Fmt.Dump in
+  record
+    [
+      field "term" (fun x -> x.Omd.term) dump_inline;
+      field "defs" (fun x -> x.Omd.defs) Fmt.Dump.(list dump_inline);
     ]
     ppf t
 
 let rec dump ppf = function
-  | Paragraph t -> Fmt.pf ppf "Paragraph (%a)" dump_inline t
-  | List (x, y) ->
+  | Omd.Paragraph (_, t) -> Fmt.pf ppf "Paragraph (%a)" dump_inline t
+  | List (_, x, _, y) ->
       Fmt.pf ppf "List (%a, %a)" dump_list_type x Fmt.Dump.(list (list dump)) y
-  | Blockquote l -> Fmt.pf ppf "Blockquote %a" Fmt.(Dump.list dump) l
-  | Code_block (x, y) -> Fmt.pf ppf "Code_block (%S, %S)" x y
-  | Title (n, x) -> Fmt.pf ppf "Title (%d, %S)" n x
+  | Blockquote (_, l) -> Fmt.pf ppf "Blockquote %a" Fmt.(Dump.list dump) l
+  | Code_block (_, x, y) -> Fmt.pf ppf "Code_block (%S, %S)" x y
+  | Heading (_, n, x) -> Fmt.pf ppf "Heading (%d, %a)" n dump_inline x
+  | Thematic_break _ -> Fmt.pf ppf "Thematic_break"
+  | Html_block (_, s) -> Fmt.pf ppf "Html_block %S" s
+  | Definition_list (_, l) ->
+      Fmt.pf ppf "Definition_list (%a)" (Fmt.Dump.list dump_def_elt) l
+  | Table _ -> Fmt.pf ppf "Table _"
 
 (* Pretty-print contents *)
 
@@ -82,73 +75,90 @@ open Fmt
 let newline = Format.pp_force_newline
 
 let rec pp_inline ppf = function
-  | Concat c -> list ~sep:nop pp_inline ppf c
-  | Text s -> string ppf s
-  | Emph e ->
+  | Omd.Concat (_, c) -> list ~sep:nop pp_inline ppf c
+  | Text (_, s) -> string ppf s
+  | Emph (_, e) ->
       string ppf "_";
       pp_inline ppf e;
       string ppf "_"
-  | Strong e ->
+  | Strong (_, e) ->
       string ppf "__";
       pp_inline ppf e;
       string ppf "__"
-  | Code s ->
+  | Code (_, s) ->
       string ppf "`";
       string ppf s;
       string ppf "`"
-  | Hard_break ->
+  | Hard_break _ ->
       newline ppf ();
       newline ppf ()
-  | Soft_break -> newline ppf ()
-  | Link l ->
+  | Soft_break _ -> newline ppf ()
+  | Link (_, l) ->
       string ppf "[";
       pp_inline ppf l.label;
       string ppf "](";
       string ppf l.destination;
       string ppf ")"
-  | Image l ->
+  | Image (_, l) ->
       string ppf "![";
       pp_inline ppf l.label;
       string ppf "](";
       string ppf l.destination;
       string ppf ")"
-  | Html s -> string ppf s
-
-let rec insert_breaks_between_paragraph = function
-  | [] -> []
-  | (Paragraph _ as h) :: (Paragraph _ :: _ as t) ->
-      h :: Paragraph (Concat []) :: insert_breaks_between_paragraph t
-  | h :: t -> h :: insert_breaks_between_paragraph t
+  | Html (_, s) -> string ppf s
 
 let rec pp ppf = function
-  | Paragraph t -> pp_inline ppf t
-  | List (Ordered (i, c), y) ->
+  | Omd.Paragraph (_, t) -> pp_inline ppf t
+  | Omd.List (_, Ordered (i, c), _, y) ->
       list ~sep:nop
         (fun ppf e ->
-          let e = insert_breaks_between_paragraph e in
           int ppf i;
           char ppf c;
           char ppf ' ';
           box (list ~sep:newline pp) ppf e)
         ppf y
-  | List (Bullet c, y) ->
+  | Omd.List (_, Bullet c, _, y) ->
       list ~sep:newline
         (fun ppf e ->
-          let e = insert_breaks_between_paragraph e in
           char ppf c;
           char ppf ' ';
           box (list ~sep:newline pp) ppf e)
         ppf y
-  | Blockquote l ->
-      string ppf "> ";
-      List.iter (pp ppf) l
-  | Code_block (lang, code) ->
+  | Blockquote (_, l) ->
+      List.iter
+        (fun e ->
+          let lines = Fmt.to_to_string pp e |> String.split_on_char '\n' in
+          list ~sep:newline (fun ppf e -> Fmt.pf ppf "> %s" e) ppf lines)
+        l
+  | Code_block (_, lang, code) ->
       string ppf "```";
       string ppf lang;
       newline ppf ();
       lines ppf code;
       string ppf "```"
-  | Title (lvl, str) ->
+  | Heading (_, lvl, x) ->
       string ppf (String.make lvl '#');
       char ppf ' ';
-      string ppf str
+      pp_inline ppf x
+  | Thematic_break _ -> Fmt.pf ppf "---"
+  | Html_block (_, s) -> Fmt.pf ppf "%a" lines s
+  | Definition_list (_, l) ->
+      let sep ppf () =
+        newline ppf ();
+        Fmt.string ppf ": "
+      in
+      list ~sep:newline
+        (fun ppf { Omd.term; defs } -> list ~sep pp_inline ppf (term :: defs))
+        ppf l
+  | Table (_, headers, rows) ->
+      let bar ppf () = Fmt.string ppf " | " in
+      pf ppf "| %a |"
+        (list ~sep:bar (fun ppf (e, _align) -> pp_inline ppf e))
+        headers;
+      newline ppf ();
+      pf ppf "| %a |" (list ~sep:bar (fun ppf _ -> string ppf "---")) headers;
+      newline ppf ();
+      list ~sep:newline
+        (fun ppf row ->
+          pf ppf "| %a |" (list ~sep:bar (fun ppf e -> pp_inline ppf e)) row)
+        ppf rows

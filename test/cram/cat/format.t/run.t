@@ -22,6 +22,17 @@ The file admin/weekly/2024/01/eng1.md contains a code block that should preserve
         [ ]    0    0    0    0 / 1000     0.0s STM Domain.DLS test sequential (generating)
         ```
       - Foo the foo?
+        > xxx
+        > xxx
+        | aaa | bbb | ccc |
+        | --- | --- | --- |
+        | aaa | bbb | ccc |
+        | aaa | bbb | ccc |
+        <table>
+          <tr><th>aaa</th></tr>
+          <tr><td><aaa></th></tr>
+        </table>
+        
   
   - Off
     - @jmid (2 days)

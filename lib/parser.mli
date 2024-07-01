@@ -29,8 +29,6 @@ module Warning : sig
     | Not_all_includes_accounted_for of string list
         (** There should be a section for all include sections passed to the
             parser *)
-    | Invalid_markdown_in_work_items of string
-        (** Subset of markdown not supported in work items *)
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
