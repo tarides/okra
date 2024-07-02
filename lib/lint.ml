@@ -22,7 +22,6 @@ module Error = struct
     [ `Format_error of (int * string) list
     | `Parsing_error of int option * Parser.Warning.t
     | `Invalid_total_time of string * Time.t * Time.t
-    | `Invalid_quarter of int option * KR.Work.t
     | `Invalid_KR of int option * KR.Error.t ]
 
   let pp_error_kw =
@@ -56,12 +55,6 @@ module Error = struct
               "@[<hv 0>Invalid total time found for %s:@ Reported %a, expected \
                %a.@]"
               s Time.pp t Time.pp total)
-    | `Invalid_quarter (line_number, kr) ->
-        pf line_number (fun m ->
-            m ppf
-              "@[<hv 0>In objective \"%a\":@ Work logged on objective \
-               scheduled for %a@]"
-              KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter)
     | `Invalid_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "@[<hv 0>%a@]" KR.Error.pp w)
 
@@ -87,16 +80,14 @@ module Error = struct
     | `Invalid_total_time (s, t, total) ->
         pf None (fun m ->
             m ppf "Invalid total time for %S (%a/%a)" s Time.pp t Time.pp total)
-    | `Invalid_quarter (line_number, kr) ->
-        pf line_number (fun m ->
-            m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
-              (Fmt.option Quarter.pp) kr.quarter)
     | `Invalid_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "%a" KR.Error.pp_short w)
 end
 
 module Warning = struct
-  type t = [ `Warning_KR of int option * KR.Warning.t ]
+  type t =
+    [ `Warning_KR of int option * KR.Warning.t
+    | `Invalid_quarter of int option * KR.Work.t ]
 
   let pp_warning_kw =
     Fmt.styled `Bold
@@ -118,6 +109,12 @@ module Warning = struct
     function
     | `Warning_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "@[<hv 0>%a@]" KR.Warning.pp w)
+    | `Invalid_quarter (line_number, kr) ->
+        pf line_number (fun m ->
+            m ppf
+              "@[<hv 0>In objective \"%a\":@ Work logged on objective \
+               scheduled for %a@]"
+              KR.Work.pp kr (Fmt.option Quarter.pp) kr.quarter)
 
   let pp_short ~filename ppf =
     let pp_loc =
@@ -133,6 +130,10 @@ module Warning = struct
     function
     | `Warning_KR (line_number, w) ->
         pf line_number (fun m -> m ppf "%a" KR.Warning.pp_short w)
+    | `Invalid_quarter (line_number, kr) ->
+        pf line_number (fun m ->
+            m ppf "Using KR of invalid quarter: \"%a\" (%a)" KR.Work.pp kr
+              (Fmt.option Quarter.pp) kr.quarter)
 end
 
 let fail_fmt_patterns =

@@ -3,6 +3,7 @@
 ### Changed
 
 - Lint: using a work-item instead of an objective raises an error starting from Week 24 (June 10, 2024) (#270, @gpetiot)
+- Lint: do not fail if an objective is used for the wrong quarter (#272, @gpetiot)
 
 ## 2.1.0
 

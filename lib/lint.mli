@@ -20,7 +20,6 @@ module Error : sig
     [ `Format_error of (int * string) list
     | `Parsing_error of int option * Parser.Warning.t
     | `Invalid_total_time of string * Time.t * Time.t
-    | `Invalid_quarter of int option * KR.Work.t
     | `Invalid_KR of int option * KR.Error.t ]
 
   val pp_short : filename:string -> t Fmt.t
@@ -28,7 +27,9 @@ module Error : sig
 end
 
 module Warning : sig
-  type t = [ `Warning_KR of int option * KR.Warning.t ]
+  type t =
+    [ `Warning_KR of int option * KR.Warning.t
+    | `Invalid_quarter of int option * KR.Work.t ]
 
   val pp_short : filename:string -> t Fmt.t
   val pp : filename:string -> t Fmt.t
