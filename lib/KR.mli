@@ -80,7 +80,7 @@ module Warning : sig
   type t =
     [ `Migration_warning of
       Work.t (* work-item *) * Work.t option (* objective *)
-      (** For reports written before June 2024. *) ]
+      (** For reports written before June 10, 2024 (week 24). *) ]
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t
@@ -91,7 +91,7 @@ module Error : sig
   type t =
     [ `Objective_not_found of Work.t
     | `Migration_error of Work.t (* work-item *) * Work.t option (* objective *)
-      (** For reports written from June 2024. *) ]
+      (** For reports written from June 10, 2024 (week 24). *) ]
 
   val pp : t Fmt.t
   val pp_short : t Fmt.t

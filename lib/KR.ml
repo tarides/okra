@@ -416,8 +416,8 @@ let update_from_master_db ?week orig_kr db =
                     let should_error =
                       match week with
                       | Some file_week ->
-                          (* June 03 - June 09 *)
-                          let limit = { Week.year = 2024; week = 23 } in
+                          (* June 10 - June 16 *)
+                          let limit = { Week.year = 2024; week = 24 } in
                           Week.compare file_week limit >= 0
                       | None -> false
                     in
